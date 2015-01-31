@@ -1,0 +1,11 @@
+rng.registration_type.add:
+  route_name: entity.registration_type.add
+  title: 'Add registration type'
+  appears_on:
+    - rng.registration_type.overview
+
+rng.event_type_config.add:
+  route_name: entity.event_type_config.add
+  title: 'Add event type'
+  appears_on:
+    - rng.event_type_config.overview

@@ -4,5 +4,4 @@ description: 'Allows people to associate with an event.'
 package: RNG
 core: 8.x
 dependencies:
-  - field
-  - datetime
+  - entity_reference

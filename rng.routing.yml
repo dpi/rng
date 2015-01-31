@@ -1,0 +1,103 @@
+# registration entities
+# Registration add: rng.event.{entity_type_of_event}.register
+# See \Drupal\rng\Routing\RNGRouteSubscriber for more info.
+entity.registration.canonical:
+  path: '/registration/{registration}'
+  defaults:
+    _entity_view: 'registration'
+    _title: 'Registration'
+  requirements:
+    _entity_access: 'registration.view'
+
+entity.registration.edit:
+  path: '/registration/{registration}/edit'
+  defaults:
+    _entity_form: 'registration.edit'
+    _title: 'Edit registration'
+  requirements:
+    _entity_access: 'registration.edit'
+
+entity.registration.delete:
+  path: '/registration/{registration}/delete'
+  defaults:
+    _entity_form: 'registration.delete'
+    _title: 'Delete registration'
+  requirements:
+    _entity_access: 'registration.delete'
+
+# registration_type entities
+entity.registration_type.add:
+  path: '/admin/structure/rng/registration_types/add'
+  defaults:
+    _entity_form: 'registration_type.add'
+    _title: 'Add registration type'
+  requirements:
+    _permission: 'administer registration types'
+
+entity.registration_type.edit:
+  path: '/admin/structure/rng/registration_types/manage/{registration_type}'
+  defaults:
+    _entity_form: 'registration_type.edit'
+    _title: 'Edit registration type'
+  requirements:
+    _permission: 'administer registration types'
+
+entity.registration_type.delete:
+  path: '/admin/structure/rng/registration_types/manage/{registration_type}/delete'
+  defaults:
+    _entity_form: 'registration_type.delete'
+    _title: 'Delete registration type'
+  requirements:
+    _permission: 'administer registration types'
+
+rng.registration_type.overview:
+  path: '/admin/structure/rng/registration_types'
+  defaults:
+    _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
+    entity_type: 'registration_type'
+    _title: 'Registration types'
+  requirements:
+    _permission: 'administer registration types'
+
+# event_type_config entities
+entity.event_type_config.add:
+  path: '/admin/config/rng/event_types/add'
+  defaults:
+    _entity_form: 'event_type_config.add'
+    _title: 'Add event type'
+  requirements:
+    _permission: 'administer event types'
+
+entity.event_type_config.edit:
+  path: '/admin/config/rng/event_types/manage/{event_type_config}/edit'
+  defaults:
+    _entity_form: 'event_type_config.edit'
+    _title: 'Edit event type'
+  requirements:
+    _permission: 'administer event types'
+
+entity.event_type_config.delete:
+  path: '/admin/config/rng/event_types/manage/{event_type_config}/delete'
+  defaults:
+    _entity_form: 'event_type_config.delete'
+    _title: 'Delete event type'
+  requirements:
+    _permission: 'administer event types'
+
+rng.event_type_config.overview:
+  path: '/admin/config/rng/event_types'
+  defaults:
+    _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
+    entity_type: 'event_type_config'
+    _title: 'Event types'
+  requirements:
+    _permission: 'administer event types'
+
+# RNG Configuration
+rng.config:
+  path: '/admin/config/rng'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'RNG'
+  requirements:
+    _permission: 'access administration pages'

@@ -1,0 +1,16 @@
+services:
+  rng.route_subscriber:
+    class: Drupal\rng\Routing\RNGRouteSubscriber
+    arguments: ['@entity.manager']
+    tags:
+      - { name: event_subscriber }
+  access_check.rng.entity_is_event:
+    class: Drupal\rng\Access\EntityIsEventCheck
+    arguments: ['@entity.manager']
+    tags:
+      - { name: access_check, applies_to: _entity_is_event }
+  access_check.rng.event_registrations_allowed:
+    class: Drupal\rng\Access\EventRegistrationAllowedCheck
+    arguments: ['@entity.manager']
+    tags:
+      - { name: access_check, applies_to: _new_registrations }

@@ -10,20 +10,24 @@ later date.
 
 # Terms
 
-* Host: any entity. A host entity represents an event.
-* Registration: an entity that associates with one Host entity, and has at least
-  one child Registrant. Each Registration has at least one owner Registrant.
-* Registrant: an entity that maintains a relationship between a Registration and
-  a Contact.
-* Contact: any entity that has implemented a method for contacting itself, core
-  implements the User entity, although RNG provides another entity which is used
-  for anonymous purposes.
+ * Event: any content (fieldable) entity.
+ * Registration type: bundle entity for Registrations.
+ * Registration: an entity that associates with one Event, and has at least
+   one child Registrant. Each Registration has at least one owner Registrant.
+ * Registrant: an entity that maintains a relationship between a Registration and
+   a Contact.
+ * Contact: any entity that has implemented a method for contacting itself, core
+   implements the User entity, although RNG provides another entity which is used
+   for anonymous purposes.
+ * EventTypeConfig: and entity maintaining configuration, and default values
+   for EventConfig. Each EventTypeConfig is associated with an event bundle.
+   This type exists pending [#2361775].
 
 # Model
 
-Host -> Registration(s) -> Registrant(s) -> Contact
+Event -> Registration(s) -> Registrant(s) -> Contact
 
-A Registration is a fieldable entity that is associated with a Host entity,
+A Registration is a fieldable entity that is associated with an Event entity,
 and maintains relationships to Contacts via Registrant entities.
 Each Registrant holds the relationship between one Registration and one Contact.
 Registrant entities are fieldable, and thus can hold meta information about how

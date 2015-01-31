@@ -1,0 +1,19 @@
+administer rng:
+  title: 'Administer RNG.'
+  description: 'Manage settings for RNG.'
+  restrict access: TRUE
+
+administer event types:
+  title: 'Administer event types.'
+  description: 'Manage which entity bundles are designated as events.'
+  restrict access: TRUE
+
+administer registration types:
+  title: 'Admnister all registration types'
+  description: 'Create, and perform any action on registration types.'
+  restrict access: TRUE
+
+administer registration entity:
+  title: 'Administer all registration entities.'
+  description: 'Create, and perform any action on all registrations.'
+  restrict access: TRUE

@@ -1,1 +1,38 @@
 <?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * ID of an `entity_reference` field attached to an event bundle.
+ *
+ * Specifies the registration type of registrations that can be created for
+ * an event. This field which references registration_type entities.
+ */
+const RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE = 'rng_registration_type';
+
+/**
+ * Implements hook_help().
+ */
+function rng_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'rng.registration_type.overview':
+      $output = '<p>' . t('Each registration type is a form that is filled to create a registration. Events can choose which registration type to use for its registrations.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Get event type config for an event bundle.
+ *
+ * Use this to test whether an entity bundle is an event type.
+ *
+ * @param string $entity_type
+ *   An entity type ID.
+ * @param string $bundle
+ *   A bundle ID.
+ *
+ * @return \Drupal\rng\EventTypeConfigInterface|null
+ */
+function rng_entity_bundle($entity_type, $bundle) {
+  return entity_load('event_type_config', "$entity_type.$bundle");
+}

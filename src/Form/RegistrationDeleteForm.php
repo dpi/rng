@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\rng\Form\RegistrationDeleteForm.
+ */
+
+namespace Drupal\rng\Form;
+
+use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+/**
+ * Form for deleting a registration.
+ */
+class RegistrationDeleteForm extends ContentEntityConfirmFormBase {
+  /**
+   * {@inheritdoc}
+   */
+  public function getQuestion() {
+    return t('Are you sure you want to delete this registration?');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCancelUrl() {
+    return $this->entity->urlInfo();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfirmText() {
+    return t('Delete');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->entity->delete();
+    drupal_set_message(t('Registration deleted.'));
+    $form_state->setRedirect('<front>');
+  }
+
+}

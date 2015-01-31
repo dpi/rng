@@ -1,0 +1,30 @@
+rng.registration_type.*:
+  type: config_entity
+  label: 'Registration type'
+  mapping:
+    label:
+      type: label
+      label: 'Name'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    description:
+      type: text
+      label: 'Description'
+
+rng.event_type.*.*:
+  type: config_entity
+  label: 'Event bundle settings'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Bundle'
+    mirror_update_permission:
+      type: boolean
+      label: 'Mirror update permission from event to manage registrations permission.'
