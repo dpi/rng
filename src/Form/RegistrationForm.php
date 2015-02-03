@@ -21,11 +21,11 @@ class RegistrationForm extends ContentEntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $registration = $this->getEntity();
 
-    if (!$registration->isNew()) {
-      $form['#title'] = $this->t('Edit registration %label', array(
-        '%label' => $registration->label(),
-      ));
-    }
+    $event = $registration->getEvent();
+    $form['#title'] = $this->t(
+      $registration->isNew() ? 'Create Registration' : 'Edit Registration',
+      array('%event_label' => $event->label(), '%event_id' => $event->id(), '%registration_id' => $registration ->id())
+    );
 
     $form = parent::form($form, $form_state, $registration);
 

@@ -26,6 +26,9 @@ interface RegistrationInterface extends ContentEntityInterface {
    * Set associated event.
    *
    * @param EntityInterface $entity
+   *
+   * @return \Drupal\rng\RegistrationInterface
+   *   Returns registration for chaining.
    */
   public function setEvent(EntityInterface $entity);
 

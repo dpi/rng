@@ -84,6 +84,10 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
     return NULL;
   }
 
+  public function label() {
+    return !empty($this->id->value) ? t('Registration @id', array('@id' => $this->id->value)) : t('New registration');
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -121,27 +125,31 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setLabel(t('Event'))
       ->setDescription(t('Combined event entity type and entity ID. Example: `node:33`.'))
       ->setSettings(array(
-       'default_value' => '',
-       'max_length' => 255,
-       'text_processing' => 0,
-      ));
-      //->setRequired(TRUE)
-      //->setReadOnly(TRUE);
+        'default_value' => '',
+        'max_length' => 255,
+        'text_processing' => 0,
+      ))
+      ->setReadOnly(TRUE)
+      ->setRevisionable(TRUE) // change to false when https://www.drupal.org/node/2300101 gets in
+      ->setRequired(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))
       ->setDescription(t('Status of the Registration: 0 = cancelled, 1 = active.'))
+      ->setTranslatable(FALSE)
       ->setRevisionable(TRUE)
       ->setDefaultValue(TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
       ->setDescription(t('The time that the Registration was created.'))
-      ->setRevisionable(TRUE);
+      ->setTranslatable(FALSE)
+      ->setRevisionable(TRUE); // change to false when https://www.drupal.org/node/2300101 gets in
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Updated on'))
       ->setDescription(t('The time that the Registration last updated.'))
+      ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 
     return $fields;
