@@ -10,7 +10,7 @@ namespace Drupal\rng\Plugin\Derivative;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
 
 /**
  * Provides dynamic tasks for RNG.
@@ -24,13 +24,13 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
   protected $entityManager;
 
   /**
-   * Constructs a RouteSubscriber object.
+   * Constructs a RNGLocalTasks object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   *   The route provider.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
+  public function __construct(RouteProviderInterface $route_provider) {
+    $this->routeProvider = $route_provider;
   }
 
   /**
@@ -38,7 +38,7 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
-      $container->get('entity.manager')
+      $container->get('router.route_provider')
     );
   }
 
@@ -53,12 +53,11 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
         continue;
       }
 
-      $entity_type = $this->entityManager->getDefinition($event_type_config->entity_type);
-
-      $this->derivatives[$id]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.register';
-      $this->derivatives[$id]['base_route'] = $entity_type->getLinkTemplate('canonical');
-      $this->derivatives[$id]['title'] = t('New Registration');
-
+      if ($this->routeProvider->getRouteByName('entity.' . $event_type_config->entity_type . '.canonical')) {
+        $this->derivatives[$id]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.register';
+        $this->derivatives[$id]['base_route'] = 'entity.' . $event_type_config->entity_type . '.canonical';
+        $this->derivatives[$id]['title'] = t('New Registration');
+      }
     }
     return $this->derivatives;
   }

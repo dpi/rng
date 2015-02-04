@@ -24,8 +24,8 @@ class RNGController extends ControllerBase implements ContainerInjectionInterfac
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The matched route.
    *
-   * @return array
-   *   A registration form.
+   * @return array A registration form.
+   * A registration form.
    */
   public function add_registration(RouteMatchInterface $route_match) {
     $parameters = $route_match->getParameters();

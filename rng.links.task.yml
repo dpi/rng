@@ -9,13 +9,13 @@ entity.registration.canonical:
   weight: 0
 
 entity.registration.edit:
-  route_name: entity.registration.edit
+  route_name: entity.registration.edit_form
   base_route: entity.registration.canonical
   title: 'Edit'
   weight: 10
 
 entity.registration.delete:
-  route_name: entity.registration.delete
+  route_name: entity.registration.delete_form
   base_route: entity.registration.canonical
   title: 'Delete'
   weight: 20

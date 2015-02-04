@@ -41,33 +41,30 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     foreach (entity_load_multiple('event_type_config') as $event_type_config) {
       $entity_type = $this->entityManager->getDefinition($event_type_config->entity_type);
-      if ($route_name = $entity_type->getLinkTemplate('canonical')) {
-        if ($canonical_route = $collection->get($route_name)) {
-          $canonical_path = $canonical_route->getPath();
-          // Add register tab
-          $route = new Route(
-            $canonical_path . '/register',
-            array(
-              '_controller' => '\Drupal\rng\Controller\RNGController::add_registration',
-              '_title' => 'Register for event',
-              //'event' =>
-            ),
-            array(
-              '_entity_is_event' => 'TRUE',
-              '_new_registrations' => 'TRUE',
-              // @todo '_user_can_register_for_event'
-            ),
-            array(
-              '_event_parameter' => $event_type_config->entity_type,
-              'parameters' => array(
-                $event_type_config->entity_type => array(
-                  'type' => 'entity:' . $event_type_config->entity_type,
-                ),
+      if ($canonical_path = $entity_type->getLinkTemplate('canonical')) {
+        // Add register tab
+        $route = new Route(
+          $canonical_path . '/register',
+          array(
+            '_controller' => '\Drupal\rng\Controller\RNGController::add_registration',
+            '_title' => 'Register for event',
+            //'event' =>
+          ),
+          array(
+            '_entity_is_event' => 'TRUE',
+            '_new_registrations' => 'TRUE',
+            // @todo '_user_can_register_for_event'
+          ),
+          array(
+            '_event_parameter' => $event_type_config->entity_type,
+            'parameters' => array(
+              $event_type_config->entity_type => array(
+                'type' => 'entity:' . $event_type_config->entity_type,
               ),
-            )
-          );
-          $collection->add("rng.event." . $event_type_config->entity_type . ".register", $route);
-        }
+            ),
+          )
+        );
+        $collection->add("rng.event." . $event_type_config->entity_type . ".register", $route);
       }
     }
   }

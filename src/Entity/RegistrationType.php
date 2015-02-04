@@ -32,8 +32,9 @@ use Drupal\rng\RegistrationTypeInterface;
  *     "label" = "label"
  *   },
  *   links = {
- *     "edit-form" = "entity.registration_type.edit",
- *     "delete-form" = "entity.registration_type.delete"
+ *     "canonical" = "/admin/structure/rng/registration_types/manage/{registration_type}",
+ *     "edit-form" = "/admin/structure/rng/registration_types/manage/{registration_type}",
+ *     "delete-form" = "/admin/structure/rng/registration_types/manage/{registration_type}/delete",
  *   }
  * )
  */

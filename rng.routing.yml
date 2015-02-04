@@ -9,7 +9,7 @@ entity.registration.canonical:
   requirements:
     _entity_access: 'registration.view'
 
-entity.registration.edit:
+entity.registration.edit_form:
   path: '/registration/{registration}/edit'
   defaults:
     _entity_form: 'registration.edit'
@@ -17,7 +17,7 @@ entity.registration.edit:
   requirements:
     _entity_access: 'registration.edit'
 
-entity.registration.delete:
+entity.registration.delete_form:
   path: '/registration/{registration}/delete'
   defaults:
     _entity_form: 'registration.delete'
@@ -34,7 +34,7 @@ entity.registration_type.add:
   requirements:
     _permission: 'administer registration types'
 
-entity.registration_type.edit:
+entity.registration_type.edit_form:
   path: '/admin/structure/rng/registration_types/manage/{registration_type}'
   defaults:
     _entity_form: 'registration_type.edit'
@@ -42,7 +42,7 @@ entity.registration_type.edit:
   requirements:
     _permission: 'administer registration types'
 
-entity.registration_type.delete:
+entity.registration_type.delete_form:
   path: '/admin/structure/rng/registration_types/manage/{registration_type}/delete'
   defaults:
     _entity_form: 'registration_type.delete'
@@ -68,7 +68,7 @@ entity.event_type_config.add:
   requirements:
     _permission: 'administer event types'
 
-entity.event_type_config.edit:
+entity.event_type_config.edit_form:
   path: '/admin/config/rng/event_types/manage/{event_type_config}/edit'
   defaults:
     _entity_form: 'event_type_config.edit'
@@ -76,7 +76,7 @@ entity.event_type_config.edit:
   requirements:
     _permission: 'administer event types'
 
-entity.event_type_config.delete:
+entity.event_type_config.delete_form:
   path: '/admin/config/rng/event_types/manage/{event_type_config}/delete'
   defaults:
     _entity_form: 'event_type_config.delete'

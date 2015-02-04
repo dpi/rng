@@ -28,6 +28,7 @@ use Drupal\rng\RegistrationInterface;
  *     "id" = "id",
  *     "revision" = "vid",
  *     "bundle" = "type",
+ *     "langcode" = "langcode",
  *     "uuid" = "uuid"
  *   },
  *   handlers = {
@@ -44,11 +45,11 @@ use Drupal\rng\RegistrationInterface;
  *   admin_permission = "administer registration entity",
  *   permission_granularity = "bundle",
  *   links = {
- *     "canonical" = "entity.registration.canonical",
- *     "edit-form" = "entity.registration.edit",
- *     "delete-form" = "entity.registration.delete"
+ *     "canonical" = "/registration/{registration}",
+ *     "edit-form" = "/registration/{registration}/edit",
+ *     "delete-form" = "/registration/{registration}/delete"
  *   },
- *   field_ui_base_route = "entity.registration_type.edit"
+ *   field_ui_base_route = "entity.registration_type.edit_form"
  * )
  */
 class Registration extends ContentEntityBase implements RegistrationInterface {
