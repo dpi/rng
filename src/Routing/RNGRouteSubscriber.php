@@ -48,15 +48,15 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
           array(
             '_controller' => '\Drupal\rng\Controller\RNGController::add_registration',
             '_title' => 'Register for event',
-            //'event' =>
+            // Tell controller which parameter the event entity is stored.
+            'event' => $event_type_config->entity_type,
           ),
           array(
-            '_entity_is_event' => 'TRUE',
-            '_new_registrations' => 'TRUE',
+            '_entity_is_event',
+            '_new_registrations',
             // @todo '_user_can_register_for_event'
           ),
           array(
-            '_event_parameter' => $event_type_config->entity_type,
             'parameters' => array(
               $event_type_config->entity_type => array(
                 'type' => 'entity:' . $event_type_config->entity_type,

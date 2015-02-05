@@ -18,14 +18,10 @@ use Symfony\Component\Routing\Route;
  */
 class EventRegistrationAllowedCheck implements AccessInterface {
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
-    $parameters = $route_match->getParameters();
-
-    if (($event_entity_type = $route->getOption('_event_parameter')) && $parameters->has($event_entity_type)) {
-      $event_entity = $parameters->get($event_entity_type);
-      // @todo: Check if event is accepting new registrations
+    if (($event = $route->getDefault('event')) && $event = $route_match->getParameter($event)) {
+      // @todo
       return AccessResult::allowed();
     }
-
-    return AccessResult::neutral();
+    return AccessResult::forbidden();
   }
 }
