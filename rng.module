@@ -6,9 +6,39 @@ use Drupal\Core\Routing\RouteMatchInterface;
  * ID of an `entity_reference` field attached to an event bundle.
  *
  * Specifies the registration type of registrations that can be created for
- * an event. This field which references registration_type entities.
+ * an event. This field references registration_type entities.
  */
 const RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE = 'rng_registration_type';
+
+/**
+ * ID of an `boolean` field attached to an event bundle.
+ *
+ * Whether an event is accepting new registrations.
+ */
+const RNG_FIELD_EVENT_TYPE_STATUS = 'rng_status';
+
+/**
+ * ID of an `integer` field attached to an event bundle.
+ *
+ * The absolute maximum number of registrations that can be created
+ * for an event. A negative or missing value indicates unlimited capacity.
+ */
+const RNG_FIELD_EVENT_TYPE_CAPACITY = 'rng_capacity';
+
+/**
+ * ID of an `email` field attached to an event bundle.
+ *
+ * Reply-to address for e-mails sent from an event.
+ */
+const RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO = 'rng_reply_to';
+
+/**
+ * ID of an `boolean` field attached to an event bundle.
+ *
+ * Whether an event allows a registrant to associate with multiple
+ * registrations. An empty value reverts to the site default.
+ */
+const RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS = 'rng_registrants_duplicate';
 
 /**
  * Implements hook_help().

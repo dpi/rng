@@ -52,8 +52,8 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
             'event' => $event_type_config->entity_type,
           ),
           array(
-            '_entity_is_event',
-            '_new_registrations',
+            '_event' => 'TRUE',
+            '_registrations_allowed' => 'TRUE',
             // @todo '_user_can_register_for_event'
           ),
           array(

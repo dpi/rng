@@ -12,7 +12,6 @@ use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Route;
-use \Drupal\Core\Entity\EntityInterface;
 
 /**
  * Checks that an entity is an event type.

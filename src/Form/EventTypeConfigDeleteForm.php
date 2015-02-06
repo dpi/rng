@@ -44,18 +44,9 @@ class EventTypeConfigDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-
-    // Delete field on bundle
-    $field = FieldConfig::loadByName($this->entity->entity_type, $this->entity->bundle, RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE);
-
-    if ($field) {
-      $field->delete();
-    }
-
     drupal_set_message(t('Event type %label was deleted.', array(
       '%label' => $this->entity->label(),
     )));
-
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

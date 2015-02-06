@@ -10,7 +10,6 @@ namespace Drupal\rng\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\rng\EventTypeConfigInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 
 /**
@@ -79,6 +78,19 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
   public $mirror_update_permission;
 
   /**
+   * Fields to add to event bundles.
+   *
+   * @var array
+   */
+  var $fields = array(
+    RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
+    RNG_FIELD_EVENT_TYPE_STATUS,
+    RNG_FIELD_EVENT_TYPE_CAPACITY,
+    RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO,
+    RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS,
+  );
+
+  /**
    * {@inheritdoc}
    */
   public function id() {
@@ -90,42 +102,22 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-
     if (!$update) {
-      $field_storage = FieldStorageConfig::loadByName($this->entity_type, RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE);
-      if (!$field_storage) {
-        $field_storage = entity_create('field_storage_config', array(
-          'field_name' => RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
-          'type' => 'entity_reference',
-          'entity_type' => $this->entity_type,
-          'cardinality' => 1,
-          'settings' => array(
-            'target_type' => 'registration_type',
-          ),
-        ));
-        $field_storage->save();
+      module_load_include('inc', 'rng', 'rng.field.defaults');
+      foreach ($this->fields as $field) {
+        rng_add_event_field_storage($field, $this->entity_type);
+        rng_add_event_field_config($field, $this->entity_type, $this->bundle);
       }
-
-      $field = FieldConfig::loadByName($this->entity_type, $this->bundle, RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE);
-      if (!$field) {
-        $field = entity_create('field_config', array(
-          'field_name' => RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
-          'entity_type' => $this->entity_type,
-          'bundle' => $this->bundle,
-          'label' => 'Registration type',
-          'settings' => array('handler' => 'default'),
-        ));
-        $field->save();
-      }
-
-      entity_get_display($this->entity_type, $this->bundle, 'default')
-        ->setComponent(RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE)
-        ->save();
-      entity_get_form_display($this->entity_type, $this->bundle, 'default')
-        ->setComponent(RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE, array(
-          'type' => 'entity_reference_autocomplete',
-        ))
-        ->save();
     }
+  }
+
+  public function delete() {
+    foreach ($this->fields as $field) {
+      $field = FieldConfig::loadByName($this->entity_type, $this->bundle, $field);
+      if ($field) {
+        $field->delete();
+      }
+    }
+    parent::delete();
   }
 }
