@@ -25,6 +25,14 @@ entity.registration.delete_form:
   requirements:
     _entity_access: 'registration.delete'
 
+entity.registration.registrants:
+  path: '/registration/{registration}/registrants'
+  defaults:
+    _entity_form: 'registration.registrants'
+    _title: 'Edit identities'
+  requirements:
+    _permission: 'administer rng'
+
 # registration_type entities
 entity.registration_type.add:
   path: '/admin/structure/rng/registration_types/add'

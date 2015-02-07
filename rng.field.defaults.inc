@@ -48,8 +48,8 @@ function rng_add_event_field_storage($field_name, $entity_type) {
       $definition = array(
         'type' => 'boolean',
         'settings' => array(
-          'on_label' => t('Allow duplicate registrations for this event.'),
-          'off_label' => t('Do not allow duplicate registrations for this event.'),
+          'on_label' => t('Allow duplicate registrants for this event.'),
+          'off_label' => t('Do not allow duplicate registrants for this event.'),
         ),
       );
       break;

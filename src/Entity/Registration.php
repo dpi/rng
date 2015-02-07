@@ -40,7 +40,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "default" = "Drupal\rng\Form\RegistrationForm",
  *       "add" = "Drupal\rng\Form\RegistrationForm",
  *       "edit" = "Drupal\rng\Form\RegistrationForm",
- *       "delete" = "Drupal\rng\Form\RegistrationDeleteForm"
+ *       "delete" = "Drupal\rng\Form\RegistrationDeleteForm",
+ *       "registrants" = "Drupal\rng\Form\RegistrationRegistrantEditForm"
  *     }
  *   },
  *   bundle_entity_type = "registration_type",
@@ -166,5 +167,21 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
     if (!$this->getEvent() instanceof ContentEntityBase) {
       throw new EntityMalformedException('Invalid or missing event on registration.');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    // Delete associated registrants.
+    $registrant_ids = \Drupal::entityQuery('registrant')
+      ->condition('registration', $this->id(), '=')
+      ->execute();
+    $registrants = entity_load_multiple('registrant', $registrant_ids);
+    foreach ($registrants as $registrant) {
+      $registrant->delete();
+    }
+
+    parent::delete();
   }
 }

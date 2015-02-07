@@ -46,6 +46,17 @@ class RegistrationForm extends ContentEntityForm {
       drupal_set_message(t('Registration was updated.', $t_args));
     }
 
+    // Add registrant
+    // @todo: remove hard coded current user.
+    if ($is_new) {
+      $user = $this->currentUser();
+      $registrant = entity_create('registrant', array(
+        'registration' => $registration,
+        RNG_FIELD_REGISTRANT_IDENTITY => array('target_id' => $user->id()),
+      ));
+      $registrant->save();
+    }
+
     if ($registration->id()) {
       if ($registration->access('view')) {
         $form_state->setRedirect(

@@ -34,6 +34,17 @@ class EventRegistrationAllowedCheck implements AccessInterface {
         }
       }
 
+      if (empty($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value)) {
+        $registration_count = \Drupal::entityQuery('registrant')
+          ->condition(RNG_FIELD_REGISTRANT_IDENTITY . '.target_id', $account->id(), '=')
+          ->condition('registration.entity.event', $event->getEntityTypeId() . ':' . $event->id(), '=')
+          ->count()
+          ->execute();
+        if ($registration_count) {
+          return AccessResult::forbidden();
+        }
+      }
+
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();

@@ -14,21 +14,21 @@ later date.
  * Registration type: bundle entity for Registrations.
  * Registration: an entity that associates with one Event, and has at least
    one child Registrant. Each Registration has at least one owner Registrant.
- * Registrant: an entity that maintains a relationship between a Registration and
-   a Contact.
- * Contact: any entity that has implemented a method for contacting itself, core
-   implements the User entity, although RNG provides another entity which is used
-   for anonymous purposes.
+ * Registrant: an entity that maintains a relationship between a Registration
+   and an Identity.
+ * Identity: any entity that has implemented a method for contact, core 
+   implements the User entity, although RNG provides another entity which is
+   used for anonymous purposes.
  * EventTypeConfig: and entity maintaining configuration, and default values
    for EventConfig. Each EventTypeConfig is associated with an event bundle.
    This type exists pending [#2361775].
 
 # Model
 
-Event -> Registration(s) -> Registrant(s) -> Contact
+Event -> Registration(s) -> Registrant(s) -> Identity
 
 A Registration is a fieldable entity that is associated with an Event entity,
-and maintains relationships to Contacts via Registrant entities.
-Each Registrant holds the relationship between one Registration and one Contact.
-Registrant entities are fieldable, and thus can hold meta information about how
-a contact relates to a Registration.
+and maintains relationships to Identities via Registrant entities.
+Each Registrant holds the relationship between one Registration and one 
+Identity. Registrant entities are fieldable, and thus can hold meta information
+about how an Identity relates to a Registration.
