@@ -19,3 +19,8 @@ entity.registration.delete:
   base_route: entity.registration.canonical
   title: 'Delete'
   weight: 20
+
+rng.config.registrant:
+  route_name: rng.config.registrant
+  title: 'Settings'
+  base_route: rng.config.registrant

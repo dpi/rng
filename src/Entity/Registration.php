@@ -11,6 +11,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\RegistrationInterface;
+use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the registration entity class.
@@ -154,5 +156,15 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setRevisionable(TRUE);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    if (!$this->getEvent() instanceof ContentEntityBase) {
+      throw new EntityMalformedException('Invalid or missing event on registration.');
+    }
   }
 }
