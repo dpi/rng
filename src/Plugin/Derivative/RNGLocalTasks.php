@@ -48,13 +48,13 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     foreach (entity_load_multiple('event_type_config') as $event_type_config) {
       // Only need one task per entity type.
-      $id = 'rng.event.' . $event_type_config->entity_type .'register';
+      $id = 'rng.event.' . $event_type_config->entity_type .'register.type_list';
       if (isset($this->derivatives[$id])) {
         continue;
       }
 
       if ($this->routeProvider->getRouteByName('entity.' . $event_type_config->entity_type . '.canonical')) {
-        $this->derivatives[$id]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.register';
+        $this->derivatives[$id]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.register.type_list';
         $this->derivatives[$id]['base_route'] = 'entity.' . $event_type_config->entity_type . '.canonical';
         $this->derivatives[$id]['title'] = t('New Registration');
       }

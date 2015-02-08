@@ -76,6 +76,7 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
       $definition = array(
         'label' => 'Registration type',
         'settings' => array('handler' => 'default'),
+        'description' => t('Select which registration types are valid for this event.'),
       );
 
       $form_display = entity_get_form_display($entity_type, $bundle, 'default')
@@ -96,6 +97,7 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     case RNG_FIELD_EVENT_TYPE_CAPACITY:
       $definition = array(
         'label' => 'Maximum registrations',
+        'description' => t('Maximum amount of registrations for this event. Leave empty for unlimited.'),
         'settings' => array(
           'min' => -1
         )

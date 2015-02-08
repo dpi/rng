@@ -42,12 +42,12 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
     foreach (entity_load_multiple('event_type_config') as $event_type_config) {
       $entity_type = $this->entityManager->getDefinition($event_type_config->entity_type);
       if ($canonical_path = $entity_type->getLinkTemplate('canonical')) {
-        // Add register tab
+        // Register
         $route = new Route(
           $canonical_path . '/register',
           array(
-            '_controller' => '\Drupal\rng\Controller\RNGController::add_registration',
-            '_title' => 'Register for event',
+            '_controller' => '\Drupal\rng\Controller\RNGController::RegistrationAddPage',
+            '_title' => 'Register',
             // Tell controller which parameter the event entity is stored.
             'event' => $event_type_config->entity_type,
           ),
@@ -60,6 +60,32 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
             'parameters' => array(
               $event_type_config->entity_type => array(
                 'type' => 'entity:' . $event_type_config->entity_type,
+              ),
+            ),
+          )
+        );
+        $collection->add("rng.event." . $event_type_config->entity_type . ".register.type_list", $route);
+
+        // Register w/ Registration Type
+        $route = new Route(
+          $canonical_path . '/register/{registration_type}',
+          array(
+            '_controller' => '\Drupal\rng\Controller\RNGController::RegistrationAdd',
+            '_title_callback' => '\Drupal\rng\Controller\RNGController::addPageTitle',
+            'event' => $event_type_config->entity_type,
+          ),
+          array(
+            '_event' => 'TRUE',
+            '_registrations_allowed' => 'TRUE',
+            '_event_registration_type' => 'TRUE',
+          ),
+          array(
+            'parameters' => array(
+              $event_type_config->entity_type => array(
+                'type' => 'entity:' . $event_type_config->entity_type,
+              ),
+              'registration_type' => array(
+                'type' => 'entity:registration_type',
               ),
             ),
           )

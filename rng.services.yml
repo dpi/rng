@@ -19,3 +19,8 @@ services:
     arguments: ['@entity.manager']
     tags:
       - { name: access_check, applies_to: _registrations_allowed }
+  access_check.rng.event_registrations_type:
+    class: Drupal\rng\Access\RegistrationAddRegistrationTypeCheck
+    arguments: ['@entity.manager']
+    tags:
+      - { name: access_check, applies_to: _event_registration_type }

@@ -20,12 +20,17 @@ class RegistrationForm extends ContentEntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $registration = $this->getEntity();
-
     $event = $registration->getEvent();
-    $form['#title'] = $this->t(
-      $registration->isNew() ? 'Create Registration' : 'Edit Registration',
-      array('%event_label' => $event->label(), '%event_id' => $event->id(), '%registration_id' => $registration ->id())
-    );
+
+    if (!$registration->isNew()) {
+      $form['#title'] = $this->t('Edit Registration',
+        array(
+          '%event_label' => $event->label(),
+          '%event_id' => $event->id(),
+          '%registration_id' => $registration->id()
+        )
+      );
+    }
 
     $form = parent::form($form, $form_state, $registration);
 
@@ -49,10 +54,10 @@ class RegistrationForm extends ContentEntityForm {
     // Add registrant
     // @todo: remove hard coded current user.
     if ($is_new) {
-      $user = $this->currentUser();
+      $user = entity_load('user', $this->currentUser()->id());
       $registrant = entity_create('registrant', array(
         'registration' => $registration,
-        RNG_FIELD_REGISTRANT_IDENTITY => array('target_id' => $user->id()),
+        RNG_FIELD_REGISTRANT_IDENTITY => array('entity' => $user),
       ));
       $registrant->save();
     }
