@@ -23,6 +23,10 @@ class EventRegistrationAllowedCheck implements AccessInterface {
         return AccessResult::forbidden();
       }
 
+      if ($event->{RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE}->isEmpty()) {
+        return AccessResult::forbidden();
+      }
+
       $capacity = $event->{RNG_FIELD_EVENT_TYPE_CAPACITY}->value;
       if ($capacity != '' && is_numeric($capacity) && $capacity > -1) {
         $registration_count = \Drupal::entityQuery('registration')

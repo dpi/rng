@@ -105,7 +105,7 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'label' => 'Allow duplicate registrants',
-        'description' => t('Allows a registrant to create more than one registration on this event.'),
+        'description' => t('Allows a registrant to create more than one registration for this event.'),
       );
       break;
   }

@@ -59,10 +59,14 @@ class EventSettingsForm extends FormBase {
     }
 
     $form['event'] = array(
-      '#type' => 'details',
-      '#title' => t('Event settings'),
-      '#open' => TRUE,
+      '#weight' => 0,
     );
+
+    $form['advanced'] = array(
+      '#type' => 'vertical_tabs',
+      '#weight' => 100,
+    );
+
     $display->buildForm($entity, $form['event'], $form_state);
 
     foreach ($fields as $weight => $field_name) {
