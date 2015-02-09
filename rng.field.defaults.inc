@@ -9,6 +9,8 @@
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 function rng_add_event_field_storage($field_name, $entity_type) {
   if ($field_storage = FieldStorageConfig::loadByName($entity_type, $field_name)) {
@@ -23,6 +25,7 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'settings' => array(
           'target_type' => 'registration_type',
         ),
+        'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
     case RNG_FIELD_EVENT_TYPE_STATUS:
@@ -78,21 +81,11 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         'settings' => array('handler' => 'default'),
         'description' => t('Select which registration types are valid for this event.'),
       );
-
-      $form_display = entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field_name, array(
-          'type' => 'entity_reference_autocomplete',
-        ));
       break;
     case RNG_FIELD_EVENT_TYPE_STATUS:
       $definition = array(
         'label' => 'Accept new registrations',
       );
-
-      $form_display = entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field_name, array(
-          'type' => 'boolean_checkbox',
-        ));
       break;
     case RNG_FIELD_EVENT_TYPE_CAPACITY:
       $definition = array(
@@ -102,36 +95,18 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
           'min' => -1
         )
       );
-
-      $form_display = entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field_name, array(
-          'type' => 'number',
-        ));
       break;
     case RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO:
       $definition = array(
         'label' => t('Reply-to e-mail address'),
         'description' => t('E-mail address that appears as reply-to when emails are sent from this event. Leave empty to use site default.'),
       );
-
-      $form_display = entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field_name, array(
-          'type' => 'email_default',
-          'settings' => array(
-            'placeholder' => t('Leave empty to use site default.'),
-          ),
-        ));
       break;
     case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'label' => 'Allow duplicate registrants',
         'description' => t('Allows a registrant to create more than one registration on this event.'),
       );
-
-      $form_display = entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field_name, array(
-          'type' => 'boolean_checkbox',
-        ));
       break;
   }
 
@@ -144,11 +119,52 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     );
     $field->save();
 
-    if (isset($display)) {
-      $display->save();
-    }
-    if (isset($form_display)) {
-      $form_display->save();
-    }
+    //$form_display = entity_get_form_display($entity_type, $bundle, 'default');
+    //rng_add_event_form_display_defaults($form_display, $field_name)->save();
   }
+}
+
+/**
+ * Add field form defaults to a display entity.
+ *
+ * @param EntityFormDisplayInterface $form_display
+ *   A form display.
+ * @param string $field_name
+ *   The field name.
+ *
+ * @return EntityFormDisplayInterface
+ *   The modified form display.
+ */
+function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_display, $field_name = '') {
+  switch ($field_name) {
+    case RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE:
+      $form_display->setComponent($field_name, array(
+        'type' => 'options_select',
+      ));
+      break;
+    case RNG_FIELD_EVENT_TYPE_STATUS:
+      $form_display->setComponent($field_name, array(
+        'type' => 'boolean_checkbox',
+      ));
+      break;
+    case RNG_FIELD_EVENT_TYPE_CAPACITY:
+      $form_display->setComponent($field_name, array(
+        'type' => 'number',
+      ));
+      break;
+    case RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO:
+      $form_display->setComponent($field_name, array(
+        'type' => 'email_default',
+        'settings' => array(
+        'placeholder' => t('Leave empty to use site default.'),
+        ),
+      ));
+      break;
+    case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
+      $form_display->setComponent($field_name, array(
+        'type' => 'boolean_checkbox',
+      ));
+      break;
+  }
+  return $form_display;
 }

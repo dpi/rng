@@ -42,17 +42,38 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
     foreach (entity_load_multiple('event_type_config') as $event_type_config) {
       $entity_type = $this->entityManager->getDefinition($event_type_config->entity_type);
       if ($canonical_path = $entity_type->getLinkTemplate('canonical')) {
+        // Manage Event
+        $route = new Route(
+          $canonical_path . '/event',
+          array(
+            '_form' => '\Drupal\rng\Form\EventSettingsForm',
+            '_title' => 'Manage event',
+            // Tell controller which parameter the event entity is stored.
+            'event' => $event_type_config->entity_type,
+          ),
+          array(
+            '_rng_event' => 'TRUE',
+          ),
+          array(
+            'parameters' => array(
+              $event_type_config->entity_type => array(
+                'type' => 'entity:' . $event_type_config->entity_type,
+              ),
+            ),
+          )
+        );
+        $collection->add("rng.event." . $event_type_config->entity_type . ".event", $route);
+
         // Register
         $route = new Route(
           $canonical_path . '/register',
           array(
             '_controller' => '\Drupal\rng\Controller\RNGController::RegistrationAddPage',
             '_title' => 'Register',
-            // Tell controller which parameter the event entity is stored.
             'event' => $event_type_config->entity_type,
           ),
           array(
-            '_event' => 'TRUE',
+            '_rng_event' => 'TRUE',
             '_registrations_allowed' => 'TRUE',
             // @todo '_user_can_register_for_event'
           ),
@@ -75,7 +96,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
             'event' => $event_type_config->entity_type,
           ),
           array(
-            '_event' => 'TRUE',
+            '_rng_event' => 'TRUE',
             '_registrations_allowed' => 'TRUE',
             '_event_registration_type' => 'TRUE',
           ),
