@@ -34,6 +34,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "uuid" = "uuid"
  *   },
  *   handlers = {
+ *     "views_data" = "Drupal\rng\Views\RegistrationViewsData",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\rng\RegistrationAccessControlHandler",
  *     "form" = {
@@ -146,13 +147,13 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
-      ->setDescription(t('The time that the Registration was created.'))
+      ->setDescription(t('Time the Registration was created.'))
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE); // change to false when https://www.drupal.org/node/2300101 gets in
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Updated on'))
-      ->setDescription(t('The time that the Registration last updated.'))
+      ->setDescription(t('The time Registration was last updated.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 
