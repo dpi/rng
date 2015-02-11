@@ -37,6 +37,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "views_data" = "Drupal\rng\Views\RegistrationViewsData",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\rng\RegistrationAccessControlHandler",
+ *     "list_builder" = "\Drupal\rng\RegistrationListBuilder",
  *     "form" = {
  *       "default" = "Drupal\rng\Form\RegistrationForm",
  *       "add" = "Drupal\rng\Form\RegistrationForm",

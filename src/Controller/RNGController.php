@@ -97,4 +97,15 @@ class RNGController extends ControllerBase implements ContainerInjectionInterfac
   public function addPageTitle(RegistrationTypeInterface $registration_type) {
     return $this->t('Create @label', array('@label' => $registration_type->label()));
   }
+
+  /**
+   * Provides a list of registrations for an event.
+   *
+   * @param string $event
+   *   The parameter to find the event entity.
+   */
+  public function listing(RouteMatchInterface $route_match, $event) {
+    $event_entity = $route_match->getParameter($event);
+    return $this->entityManager()->getListBuilder('registration')->render($event_entity);
+  }
 }
