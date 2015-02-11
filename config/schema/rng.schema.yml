@@ -26,5 +26,5 @@ rng.event_type.*.*:
       type: string
       label: 'Bundle'
     mirror_update_permission:
-      type: boolean
+      type: string
       label: 'Mirror update permission from event to manage registrations permission.'

@@ -86,7 +86,7 @@ class EventTypeConfigForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => t('Mirror manage registrations with update permission'),
       '#description' => t('Allow users to <strong>manage registrations</strong> if they have <strong>update</strong> permission on an event entity.'),
-      '#default_value' => $event_type_config->mirror_update_permission,
+      '#default_value' => ((boolean)(isset($event_type_config->mirror_update_permission) ? $event_type_config->mirror_update_permission : TRUE)),
     );
 
     return $form;
@@ -105,7 +105,8 @@ class EventTypeConfigForm extends EntityForm {
       list($event_type_config->entity_type, $event_type_config->bundle) = explode('.', $bundle);
     }
 
-    $event_type_config->mirror_update_permission = $form_state->getValue('mirror_update');
+    // Set to the access operation for event.
+    $event_type_config->mirror_update_permission = $form_state->getValue('mirror_update') ? 'update' : '';
 
     $status = $event_type_config->save();
 

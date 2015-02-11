@@ -53,6 +53,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
           ),
           array(
             '_rng_event' => 'TRUE',
+            '_rng_event_manage' => 'TRUE',
           ),
           array(
             'parameters' => array(
