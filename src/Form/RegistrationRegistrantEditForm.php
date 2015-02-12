@@ -40,7 +40,7 @@ class RegistrationRegistrantEditForm extends ContentEntityForm {
     $rows = array();
     foreach ($registrants as $registrant) {
       $row = array();
-      $identity = $registrant->{RNG_FIELD_REGISTRANT_IDENTITY}->entity;
+      $identity = $registrant->getIdentity();
       if ($identity instanceof EntityInterface) {
         $url = $identity->urlInfo();
         $row[] = $this->l($identity->label(), $url);

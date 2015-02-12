@@ -57,8 +57,8 @@ class RegistrationForm extends ContentEntityForm {
       $user = entity_load('user', $this->currentUser()->id());
       $registrant = entity_create('registrant', array(
         'registration' => $registration,
-        RNG_FIELD_REGISTRANT_IDENTITY => array('entity' => $user),
       ));
+      $registrant->setIdentity($user);
       $registrant->save();
     }
 

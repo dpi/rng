@@ -49,7 +49,8 @@ class RegistrationListBuilder extends EntityListBuilder {
   public function load() {
     if (isset($this->event)) {
       $registration_ids = \Drupal::entityQuery('registration')
-        ->condition('event', $this->event->getEntityTypeId() . ':' . $this->event->id() , '=')
+        ->condition('event__target_type', $this->event->getEntityTypeId(), '=')
+        ->condition('event__target_id', $this->event->id(), '=')
         ->execute();
       return entity_load_multiple('registration', $registration_ids);
     }

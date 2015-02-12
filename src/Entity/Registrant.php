@@ -8,6 +8,7 @@
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\RegistrantInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -35,6 +36,21 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * {@inheritdoc}
    */
+  public function getIdentity() {
+    return $this->get('identity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentity(EntityInterface $entity) {
+    $this->set('identity', array('entity' => $entity));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Registrant ID'))
@@ -52,7 +68,14 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       ->setSetting('target_type', 'registration')
       ->setReadOnly(TRUE);
 
-    // @todo: the identity
+    $fields['identity'] = BaseFieldDefinition::create('dynamic_entity_reference')
+      ->setLabel(t('Identity'))
+      ->setDescription(t('The identity for this registrant.'))
+      ->setSetting('exclude_entity_types', 'true')
+      ->setSetting('entity_type_ids', array('registrant', 'registration'))
+      ->setDescription(t('The person associated with this registrant.'))
+      ->setReadOnly(TRUE);
+
     return $fields;
   }
 }

@@ -40,9 +40,17 @@ class RegistrationDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->entity->delete();
-    drupal_set_message(t('Registration deleted.'));
-    $form_state->setRedirect('<front>');
-  }
+    $registration = $this->entity;
+    $registration->delete();
+    $event = $registration->getEvent();
 
+    drupal_set_message(t('Registration deleted.'));
+
+    if ($urlInfo = $event->urlInfo()) {
+      $form_state->setRedirectUrl($urlInfo);
+    }
+    else {
+      $form_state->setRedirect('<front>');
+    }
+  }
 }

@@ -41,14 +41,6 @@ const RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO = 'rng_reply_to';
 const RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS = 'rng_registrants_duplicate';
 
 /**
- * ID of an `entity_reference` field attached to registrant bundle.
- *
- * A reference to an identity entity.
- * @todo: change to 'rng_identity'
- */
-const RNG_FIELD_REGISTRANT_IDENTITY = 'field_identity';
-
-/**
  * Implements hook_help().
  */
 function rng_help($route_name, RouteMatchInterface $route_match) {

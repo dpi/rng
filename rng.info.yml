@@ -5,3 +5,4 @@ package: RNG
 core: 8.x
 dependencies:
   - entity_reference
+  - dynamic_entity_reference

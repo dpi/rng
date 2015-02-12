@@ -89,5 +89,8 @@ class EventSettingsForm extends FormBase {
     $event = $form_state->get('event');
     $form_state->get('form_display')->extractFormValues($event, $form, $form_state);
     $event->save();
+
+    $t_args = array('%event_label' => $event->label());
+    drupal_set_message(t('Event settings updated.', $t_args));
   }
 }

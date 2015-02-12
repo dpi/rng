@@ -7,6 +7,7 @@
 
 namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -61,33 +62,16 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getEventEntityInfo() {
-    $entity_info = explode(':', $this->get('event')->value);
-    if (count($entity_info) == 2) {
-      return array(
-        'entity_type' => $entity_info[0],
-        'entity_id' => $entity_info[1]
-      );
-    }
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEvent(EntityInterface $entity) {
-    $this->set('event', $entity->getEntityTypeId() . ':' . $entity->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getEvent() {
-    if ($info = $this->getEventEntityInfo()) {
-      return entity_load($info['entity_type'], $info['entity_id']);
-    }
-    return NULL;
+    return $this->get('event')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setEvent(ContentEntityInterface $entity) {
+    $this->set('event', array('entity' => $entity));
+    return $this;
   }
 
   public function label() {
@@ -126,18 +110,14 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setDescription(t('The registration language code.'))
       ->setRevisionable(TRUE);
 
-    // Todo: Replace with DER.
-    $fields['event'] = BaseFieldDefinition::create('string')
+    $fields['event'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Event'))
-      ->setDescription(t('Combined event entity type and entity ID. Example: `node:33`.'))
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ))
-      ->setReadOnly(TRUE)
+      ->setDescription(t('The registration type.'))
+      ->setSetting('exclude_entity_types', 'true')
+      ->setSetting('entity_type_ids', array('registrant', 'registration'))
+      ->setDescription(t('The relationship between this registration and an event.'))
       ->setRevisionable(TRUE) // change to false when https://www.drupal.org/node/2300101 gets in
-      ->setRequired(TRUE);
+      ->setReadOnly(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))

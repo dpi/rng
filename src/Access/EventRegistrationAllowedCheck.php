@@ -30,7 +30,8 @@ class EventRegistrationAllowedCheck implements AccessInterface {
       $capacity = $event->{RNG_FIELD_EVENT_TYPE_CAPACITY}->value;
       if ($capacity != '' && is_numeric($capacity) && $capacity > -1) {
         $registration_count = \Drupal::entityQuery('registration')
-          ->condition('event', $event->getEntityTypeId() . ':' . $event->id(), '=')
+          ->condition('event__target_type', $event->getEntityTypeId(), '=')
+          ->condition('event__target_id', $event->id(), '=')
           ->count()
           ->execute();
         if ($registration_count >= $capacity) {
@@ -40,8 +41,10 @@ class EventRegistrationAllowedCheck implements AccessInterface {
 
       if (empty($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value)) {
         $registration_count = \Drupal::entityQuery('registrant')
-          ->condition(RNG_FIELD_REGISTRANT_IDENTITY . '.target_id', $account->id(), '=')
-          ->condition('registration.entity.event', $event->getEntityTypeId() . ':' . $event->id(), '=')
+          ->condition('identity__target_type', 'user', '=')
+          ->condition('identity__target_id', $account->id(), '=')
+          ->condition('registration.entity.event__target_type', $event->getEntityTypeId(), '=')
+          ->condition('registration.entity.event__target_id', $event->id(), '=')
           ->count()
           ->execute();
         if ($registration_count) {
