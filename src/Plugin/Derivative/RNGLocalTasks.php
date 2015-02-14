@@ -46,32 +46,56 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
+    $this->derivatives = array();
     foreach (entity_load_multiple('event_type_config') as $event_type_config) {
       // Only need one task per entity type.
-      $id_register = 'rng.event.' . $event_type_config->entity_type .'.register.type_list';
-      if (isset($this->derivatives[$id_register])) {
+      $event_default = 'rng.event.' . $event_type_config->entity_type . '.event.default';
+      if (array_key_exists($event_default, $this->derivatives)) {
         continue;
       }
 
       if ($this->routeProvider->getRouteByName('entity.' . $event_type_config->entity_type . '.canonical')) {
-        $id_event = 'rng.event.' . $event_type_config->entity_type .'.event';
-        $this->derivatives[$id_event]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.event';
-        $this->derivatives[$id_event]['base_route'] = 'entity.' . $event_type_config->entity_type . '.canonical';
-        $this->derivatives[$id_event]['title'] = t('Manage Event');
-        $this->derivatives[$id_event]['weight'] = t(30);
+        $this->derivatives[$event_default] = array(
+          'title' => t('Event'),
+          'base_route' => 'entity.' . $event_type_config->entity_type . '.canonical',
+          'route_name' => 'rng.event.' . $event_type_config->entity_type . '.event',
+          'weight' => 30,
+        );
 
-        $id_registration_list = 'rng.event.' . $event_type_config->entity_type .'.registrations';
-        $this->derivatives[$id_registration_list]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.registrations';
-        $this->derivatives[$id_registration_list]['base_route'] = 'entity.' . $event_type_config->entity_type . '.canonical';
-        $this->derivatives[$id_registration_list]['title'] = t('Registration List');
-        $this->derivatives[$id_registration_list]['weight'] = t(35);
+        $this->derivatives['rng.event.' . $event_type_config->entity_type . '.event.settings'] = array(
+          'title' => t('Settings'),
+          'route_name' => $this->derivatives[$event_default]['route_name'],
+          'parent_id' => 'rng.local_tasks:' . $event_default,
+          'weight' => 10,
+        );
 
-        $this->derivatives[$id_register]['route_name'] = 'rng.event.' . $event_type_config->entity_type . '.register.type_list';
-        $this->derivatives[$id_register]['base_route'] = 'entity.' . $event_type_config->entity_type . '.canonical';
-        $this->derivatives[$id_register]['title'] = t('New Registration');
-        $this->derivatives[$id_register]['weight'] = t(40);
+        $this->derivatives['rng.event.' . $event_type_config->entity_type . '.event.groups'] = array(
+          'title' => t('Groups'),
+          'route_name' => 'rng.event.' . $event_type_config->entity_type . '.groups',
+          'parent_id' => 'rng.local_tasks:' . $event_default,
+          'weight' => 20,
+        );
+
+        $this->derivatives['rng.event.' . $event_type_config->entity_type . '.registrations'] = array(
+          'title' => t('Registration List'),
+          'route_name' => 'rng.event.' . $event_type_config->entity_type . '.registrations',
+          'base_route' => 'entity.' . $event_type_config->entity_type . '.canonical',
+          'weight' => 35,
+        );
+
+        $this->derivatives['rng.event.' . $event_type_config->entity_type . '.register.type_list'] = array(
+          'route_name' => 'rng.event.' . $event_type_config->entity_type . '.register.type_list',
+          'base_route' => 'entity.' . $event_type_config->entity_type . '.canonical',
+          'title' => t('Register'),
+          'weight' => 40,
+        );
       }
     }
-    return $this->derivatives;
+
+    foreach ($this->derivatives as &$entry) {
+      $entry += $base_plugin_definition;
+    }
+
+    return parent::getDerivativeDefinitions($base_plugin_definition);
   }
 }

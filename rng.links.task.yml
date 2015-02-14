@@ -1,6 +1,6 @@
 rng.local_tasks:
-  deriver: 'Drupal\rng\Plugin\Derivative\RNGLocalTasks'
-  weight: 100
+  class: \Drupal\Core\Menu\LocalTaskDefault
+  deriver: \Drupal\rng\Plugin\Derivative\RNGLocalTasks
 
 entity.registration.canonical:
   route_name: entity.registration.canonical

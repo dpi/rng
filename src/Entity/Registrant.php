@@ -70,10 +70,9 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     $fields['identity'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Identity'))
-      ->setDescription(t('The identity for this registrant.'))
+      ->setDescription(t('The person associated with this registrant.'))
       ->setSetting('exclude_entity_types', 'true')
       ->setSetting('entity_type_ids', array('registrant', 'registration'))
-      ->setDescription(t('The person associated with this registrant.'))
       ->setReadOnly(TRUE);
 
     return $fields;
