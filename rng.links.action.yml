@@ -1,3 +1,7 @@
+rng.local_actions:
+  class: \Drupal\Core\Menu\LocalActionDefault
+  deriver: \Drupal\rng\Plugin\Derivative\RNGLocalActions
+
 rng.registration_type.add:
   route_name: entity.registration_type.add
   title: 'Add registration type'

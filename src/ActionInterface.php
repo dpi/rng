@@ -21,6 +21,14 @@ interface ActionInterface extends ContentEntityInterface {
   public function getRule();
 
   /**
+   * Sets the rule for the action.
+   *
+   * @return ActionInterface
+   *   Return this object for chaining.
+   */
+  public function setRule(RuleInterface $rule);
+
+  /**
    * Gets the action ID.
    *
    * @return string
@@ -29,12 +37,28 @@ interface ActionInterface extends ContentEntityInterface {
   public function getActionID();
 
   /**
+   * Sets the action plugin ID.
+   *
+   * @return ActionInterface
+   *   Return this object for chaining.
+   */
+  public function setActionID($action_id);
+
+  /**
    * Gets the configuration for the action.
    *
    * @return array
    *   Configuration for the action.
    */
   public function getConfiguration();
+
+  /**
+   * Sets the plugin configuration.
+   *
+   * @return ActionInterface
+   *   Return this object for chaining.
+   */
+  public function setConfiguration(array $configuration);
 
   /**
    * Execute the action.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Controller\RNGController.
+ * Contains \Drupal\rng\Controller\RegistrationController.
  */
 
 namespace Drupal\rng\Controller;
@@ -15,9 +15,9 @@ use Drupal\rng\RegistrationTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Controller for RNG.
+ * Controller for registration entities.
  */
-class RNGController extends ControllerBase implements ContainerInjectionInterface {
+class RegistrationController extends ControllerBase implements ContainerInjectionInterface {
   /**
    * Generates a list of registration types for an event.
    *

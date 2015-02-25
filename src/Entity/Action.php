@@ -13,6 +13,7 @@ use Drupal\rng\ActionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\rng\RuleInterface;
 
 /**
  * Defines the event action entity.
@@ -49,8 +50,24 @@ class Action extends ContentEntityBase implements ActionInterface {
   /**
    * {@inheritdoc}
    */
+  public function setRule(RuleInterface $rule) {
+    $this->set('rule', array('entity' => $rule));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getActionID() {
     return $this->get('action')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setActionID($action_id) {
+    $this->set('action', $action_id);
+    return $this;
   }
 
   /**
@@ -64,7 +81,8 @@ class Action extends ContentEntityBase implements ActionInterface {
    * {@inheritdoc}
    */
   public function setConfiguration(array $configuration) {
-    return $this->set('configuration', $configuration);
+    $this->set('configuration', $configuration);
+    return $this;
   }
 
   /**

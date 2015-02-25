@@ -21,7 +21,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @Action(
  *   id = "rng_registrant_email",
- *   label = @Translation("Registrant e-mail"),
+ *   label = @Translation("Send registrant e-mail"),
  *   type = "registration"
  * )
  */
