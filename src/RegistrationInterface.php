@@ -29,4 +29,12 @@ interface RegistrationInterface extends ContentEntityInterface {
    *   Returns registration for chaining.
    */
   public function setEvent(ContentEntityInterface $entity);
+
+  /**
+   * Get registrants for the registration.
+   *
+   * @return RegistrantInterface[]
+   *   An array of registrant entities.
+   */
+  public function getRegistrants();
 }

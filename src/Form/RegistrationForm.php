@@ -39,15 +39,18 @@ class RegistrationForm extends ContentEntityForm {
 
   public function save(array $form, FormStateInterface $form_state) {
     $registration = $this->getEntity();
+    $event = $registration->getEvent();
     $is_new = $registration->isNew();
     $registration->save();
 
     $t_args = array('@type' => $registration->bundle(), '%label' => $registration->label(), '%id' => $registration->id());
 
     if ($is_new) {
+      $trigger_id = 'entity:registration:new';
       drupal_set_message(t('Registration has been created.', $t_args));
     }
     else {
+      $trigger_id = 'entity:registration:update';
       drupal_set_message(t('Registration was updated.', $t_args));
     }
 
@@ -61,6 +64,11 @@ class RegistrationForm extends ContentEntityForm {
       $registrant->setIdentity($user);
       $registrant->save();
     }
+
+    rng_rule_trigger($trigger_id, array(
+      'event' => $event,
+      'registration' => $registration,
+    ));
 
     if ($registration->id()) {
       if ($registration->access('view')) {

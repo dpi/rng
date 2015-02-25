@@ -67,3 +67,27 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
 function rng_entity_bundle($entity_type, $bundle) {
   return entity_load('event_type_config', "$entity_type.$bundle");
 }
+
+/**
+ * Trigger rules.
+ *
+ * @param string $trigger_id
+ * @param array $context
+ */
+function rng_rule_trigger($trigger_id, $context = array()) {
+  $event = $context['event'];
+
+  $rule_ids = \Drupal::entityQuery('rng_rule')
+    ->condition('event__target_type', $event->getEntityTypeId(), '=')
+    ->condition('event__target_id', $event->id(), '=')
+    ->condition('trigger_id', $trigger_id, '=')
+    ->execute();
+
+  foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
+    /* @var \Drupal\rng\RuleInterface $rule */
+    foreach($rule->getActions() as $action) {
+      // @todo: get contexts for $rule; ensure they exist on $context.
+      $action->execute($context);
+    }
+  }
+}

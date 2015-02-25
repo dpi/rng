@@ -2,6 +2,7 @@ rng.local_tasks:
   class: \Drupal\Core\Menu\LocalTaskDefault
   deriver: \Drupal\rng\Plugin\Derivative\RNGLocalTasks
 
+# Registrations
 entity.registration.canonical:
   route_name: entity.registration.canonical
   base_route: entity.registration.canonical
@@ -26,6 +27,14 @@ entity.registration.registrants:
   title: 'Identities'
   weight: 15
 
+# Actions
+entity.rng_action.edit:
+  route_name: entity.rng_action.edit_form
+  base_route: entity.rng_action.edit_form
+  title: 'Edit'
+  weight: 10
+
+# RNG Configuration
 rng.config.registrant:
   route_name: rng.config.registrant
   title: 'Settings'

@@ -81,6 +81,16 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRegistrants() {
+    $registrant_ids = \Drupal::entityQuery('registrant')
+      ->condition('registration', $this->id(), '=')
+      ->execute();
+    return entity_load_multiple('registrant', $registrant_ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Registration ID'))

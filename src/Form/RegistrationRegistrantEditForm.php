@@ -32,10 +32,7 @@ class RegistrationRegistrantEditForm extends ContentEntityForm {
       array('@label' => $registration->label())
     );
 
-    $registrant_ids = \Drupal::entityQuery('registrant')
-      ->condition('registration', $registration->id(), '=')
-      ->execute();
-    $registrants = entity_load_multiple('registrant', $registrant_ids);
+    $registrants = $registration->getRegistrants();
 
     $rows = array();
     foreach ($registrants as $registrant) {

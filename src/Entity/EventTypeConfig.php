@@ -111,6 +111,9 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function delete() {
     foreach ($this->fields as $field) {
       $field = FieldConfig::loadByName($this->entity_type, $this->bundle, $field);

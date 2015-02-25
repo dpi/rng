@@ -2,18 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Lists\RegistrationGroupListBuilder.
+ * Contains \Drupal\rng\Lists\RuleListBuilder.
  */
 
 namespace Drupal\rng\Lists;
 
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 
 /**
- * Builds a list of registration groups.
+ * Builds a list of rng rules.
  */
-class RegistrationGroupListBuilder extends EntityListBuilder {
+class RuleListBuilder extends EntityListBuilder {
   /**
    * The event entity.
    *
@@ -32,7 +33,7 @@ class RegistrationGroupListBuilder extends EntityListBuilder {
       $this->event = $event;
     }
     $render['table'] = parent::render();
-    $render['table']['#empty'] = t('No groups found for this event.');
+    $render['table']['#empty'] = t('No rules found for this event.');
     return $render;
   }
 
@@ -41,11 +42,11 @@ class RegistrationGroupListBuilder extends EntityListBuilder {
    */
   public function load() {
     if (isset($this->event)) {
-      $group_ids = \Drupal::entityQuery('registration_group')
+      $rule_ids = \Drupal::entityQuery('rng_rule')
         ->condition('event__target_type', $this->event->getEntityTypeId(), '=')
         ->condition('event__target_id', $this->event->id(), '=')
         ->execute();
-      return $this->storage->loadMultiple($group_ids);
+      return $this->storage->loadMultiple($rule_ids);
     }
     return parent::load();
   }
@@ -69,17 +70,38 @@ class RegistrationGroupListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = t('Label');
-    $header['description'] = t('Description');
-    return $header + parent::buildHeader();
+    $header['id'] = t('id');
+    $header['trigger'] = t('Trigger ID');
+    $header['conditions'] = t('Conditions');
+    $header['actions'] = t('Actions');
+    return $header;
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['label'] = $entity->label();
-    $row['description'] = $entity->getDescription();
-    return $row + parent::buildRow($entity);
+    $row['id'] = $entity->id();
+    $row['trigger'] = $entity->getTriggerID();
+
+    $conditions = array();
+    $row['conditions']['data'] = array(
+      '#theme' => 'links',
+      '#links' => $conditions
+    );
+
+    $actions = array();
+    foreach ($entity->getActions() as $action) {
+      $actions[] = array(
+        'title' => $this->t('Edit @action_id', array('@action_id' => $action->id())),
+        'weight' => 10,
+        'url' => $action->urlInfo('edit-form'),
+      );
+    }
+    $row['actions']['data'] = array(
+      '#theme' => 'links',
+      '#links' => $actions
+    );
+    return $row;
   }
 }

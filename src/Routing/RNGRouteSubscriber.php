@@ -87,6 +87,28 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add('rng.event.' . $event_type_config->entity_type . '.groups', $route);
 
+        // Groups
+        $route = new Route(
+          $canonical_path . '/event/rules',
+          array(
+            '_controller' => '\Drupal\rng\Controller\RuleController::listing',
+            '_title' => 'Rules',
+            'event' => $event_type_config->entity_type,
+          ),
+          array(
+            '_rng_event' => 'TRUE',
+            '_rng_event_manage' => 'TRUE',
+          ),
+          array(
+            'parameters' => array(
+              $event_type_config->entity_type => array(
+                'type' => 'entity:' . $event_type_config->entity_type,
+              ),
+            ),
+          )
+        );
+        $collection->add('rng.event.' . $event_type_config->entity_type . '.rules', $route);
+
         // Registration list
         $route = new Route(
           $canonical_path . '/registrations',
