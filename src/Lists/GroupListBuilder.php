@@ -2,18 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Lists\RegistrationGroupListBuilder.
+ * Contains \Drupal\rng\Lists\GroupListBuilder.
  */
 
 namespace Drupal\rng\Lists;
 
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Mail\MailFormatHelper;
 
 /**
  * Builds a list of registration groups.
  */
-class RegistrationGroupListBuilder extends EntityListBuilder {
+class GroupListBuilder extends EntityListBuilder {
   /**
    * The event entity.
    *
@@ -31,6 +32,12 @@ class RegistrationGroupListBuilder extends EntityListBuilder {
     if (isset($event)) {
       $this->event = $event;
     }
+    $render['description'] = [
+      '#prefix' => '<p>',
+      '#markup' => $this->t('Groups allow you to organize registrations. Some pre-made groups are automatically applied to registrations.'),
+      '#suffix' => '</p>',
+    ];
+
     $render['table'] = parent::render();
     $render['table']['#empty'] = t('No groups found for this event.');
     return $render;
@@ -79,7 +86,7 @@ class RegistrationGroupListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
-    $row['description'] = $entity->getDescription();
+    $row['description'] = MailFormatHelper::htmlToText($entity->getDescription());
     return $row + parent::buildRow($entity);
   }
 }

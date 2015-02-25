@@ -131,11 +131,11 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add('rng.event.' . $event_type_config->entity_type . '.messages.send', $route);
 
-        // Groups
+        // Group list
         $route = new Route(
           $canonical_path . '/event/groups',
           array(
-            '_controller' => '\Drupal\rng\Controller\RegistrationGroupController::listing',
+            '_controller' => '\Drupal\rng\Controller\GroupController::listing',
             '_title' => 'Groups',
             'event' => $event_type_config->entity_type,
           ),
@@ -151,7 +151,29 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
             ),
           )
         );
-        $collection->add('rng.event.' . $event_type_config->entity_type . '.groups', $route);
+        $collection->add('rng.event.' . $event_type_config->entity_type . '.group.list', $route);
+
+        // Group add
+        $route = new Route(
+          $canonical_path . '/event/groups/add',
+          array(
+            '_controller' => '\Drupal\rng\Controller\GroupController::GroupAdd',
+            '_title' => 'Add group',
+            'event' => $event_type_config->entity_type,
+          ),
+          array(
+            '_rng_event' => 'TRUE',
+            '_rng_event_manage' => 'TRUE',
+          ),
+          array(
+            'parameters' => array(
+              $event_type_config->entity_type => array(
+                'type' => 'entity:' . $event_type_config->entity_type,
+              ),
+            ),
+          )
+        );
+        $collection->add('rng.event.' . $event_type_config->entity_type . '.group.add', $route);
 
         // Registration list
         $route = new Route(

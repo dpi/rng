@@ -69,12 +69,11 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
         'appears_on' => array("rng.event.$entity_type.messages"),
       );
 
-      /*
       $this->derivatives["rng.event.$entity_type.event.group.add"] = array(
         'title' => $this->t('Add group'),
-        'route_name' => "rng.event.$entity_type.groups",
-        'appears_on' => array("rng.event.$entity_type.groups"),
-      );*/
+        'route_name' => "rng.event.$entity_type.group.add",
+        'appears_on' => array("rng.event.$entity_type.group.list"),
+      );
     }
 
     foreach ($this->derivatives as &$entry) {

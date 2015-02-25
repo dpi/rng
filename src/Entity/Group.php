@@ -2,14 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Entity\RegistrationGroup.
+ * Contains \Drupal\rng\Entity\Group.
  */
 
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\rng\RegistrationGroupInterface;
+use Drupal\rng\GroupInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -21,7 +20,13 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *   id = "registration_group",
  *   label = @Translation("Registration group"),
  *   handlers = {
- *     "list_builder" = "\Drupal\rng\Lists\RegistrationGroupListBuilder",
+ *     "list_builder" = "\Drupal\rng\Lists\GroupListBuilder",
+ *     "form" = {
+ *       "default" = "Drupal\rng\Form\GroupForm",
+ *       "add" = "Drupal\rng\Form\GroupForm",
+ *       "edit" = "Drupal\rng\Form\GroupForm",
+ *       "delete" = "Drupal\rng\Form\GroupDeleteForm",
+ *     },
  *   },
  *   admin_permission = "administer rng",
  *   base_table = "registration_group",
@@ -34,10 +39,13 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *     "langcode" = "langcode"
  *   },
  *   links = {
+ *     "canonical" = "/rng/group/{registration_group}/edit",
+ *     "edit-form" = "/rng/group/{registration_group}/edit",
+ *     "delete-form" = "/rng/group/{registration_group}/delete"
  *   }
  * )
  */
-class RegistrationGroup extends ContentEntityBase implements RegistrationGroupInterface {
+class Group extends ContentEntityBase implements GroupInterface {
   /**
    * {@inheritdoc}
    */
@@ -88,10 +96,12 @@ class RegistrationGroup extends ContentEntityBase implements RegistrationGroupIn
 
     $fields['event'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Identity'))
-      // @todo: DER does not support bundle types. (yet?)
-      //->setDescription(t('Set to an event type bundle to make this group available to all events of this type or set to an event entity to make it available only to a single event.'))
-      ->setDescription(t('Select event to associate this group.'))
-      ->setRequired(TRUE)
+      ->setDescription(t('The groups event, or leave empty for global.'))
+      ->setReadOnly(TRUE);
+
+    $fields['locked'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Locked'))
+      ->setDescription(t('Locked groups are usually managed by code.'))
       ->setReadOnly(TRUE);
 
     $fields['label'] = BaseFieldDefinition::create('string')
@@ -115,12 +125,6 @@ class RegistrationGroup extends ContentEntityBase implements RegistrationGroupIn
       ->setLabel(t('Description'))
       ->setDescription(t('A description of the group.'))
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'text_default',
-        'weight' => 50,
-      ))
-      ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'text_textfield',
         'weight' => 50,

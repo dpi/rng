@@ -9,6 +9,7 @@ namespace Drupal\rng\Form;
 
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -78,6 +79,14 @@ class MessageActionForm extends FormBase {
     $form['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Send'),
+    );
+    $form['actions']['cancel'] = array(
+      '#type' => 'link',
+      '#title' => $this->t('Cancel'),
+      '#url' => Url::fromRoute(
+        'rng.event.' . $event->getEntityTypeId() . '.messages',
+        array($event->getEntityTypeId() => $event->id())
+      ),
     );
 
     return $form;

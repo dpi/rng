@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RegistrationGroupInterface.
+ * Contains \Drupal\rng\GroupInterface.
  */
 
 namespace Drupal\rng;
@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Provides an interface defining a registration group entity.
  */
-interface RegistrationGroupInterface extends ContentEntityInterface {
+interface GroupInterface extends ContentEntityInterface {
   /**
    * Get associated event.
    *
@@ -45,7 +45,7 @@ interface RegistrationGroupInterface extends ContentEntityInterface {
    * @param string $description
    *   The description.
    *
-   * @return \Drupal\rng\RegistrationGroupInterface
+   * @return \Drupal\rng\GroupInterface
    *   Returns group for chaining.
    */
   public function setDescription($description);
