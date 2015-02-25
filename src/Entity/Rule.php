@@ -26,8 +26,13 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *   },
  *   handlers = {
  *     "list_builder" = "\Drupal\rng\Lists\RuleListBuilder",
+ *     "form" = {
+ *       "delete" = "Drupal\rng\Form\RuleDeleteForm",
+ *     },
  *   },
+ *   admin_permission = "administer rng",
  *   links = {
+ *     "delete-form" = "/rng/rule/{rng_rule}/delete"
  *   }
  * )
  */

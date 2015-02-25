@@ -54,27 +54,12 @@ class RuleListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    if ($entity->access('view') && $entity->hasLinkTemplate('canonical')) {
-      $operations['view'] = array(
-        'title' => $this->t('View'),
-        'weight' => 0,
-        'url' => $entity->urlInfo('canonical'),
-      );
-    }
-    return $operations;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildHeader() {
     $header['id'] = t('id');
     $header['trigger'] = t('Trigger ID');
     $header['conditions'] = t('Conditions');
     $header['actions'] = t('Actions');
-    return $header;
+    return $header + parent::buildHeader();
   }
 
   /**
@@ -102,6 +87,7 @@ class RuleListBuilder extends EntityListBuilder {
       '#theme' => 'links',
       '#links' => $actions
     );
-    return $row;
+    return $row + parent::buildRow($entity);
   }
+
 }

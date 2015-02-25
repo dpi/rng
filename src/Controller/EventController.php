@@ -57,6 +57,12 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
               'url' => $action->urlInfo('edit-form'),
             );
           }
+          if ($rule->access('delete') && $rule->hasLinkTemplate('delete-form')) {
+            $operations['delete'] = array(
+              'title' => t('Delete'),
+              'url' => $rule->urlInfo('delete-form'),
+            );
+          }
         }
 
         $row['operations']['data'] = array(

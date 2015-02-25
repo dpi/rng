@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Form\GroupDeleteForm.
+ * Contains \Drupal\rng\Form\RuleDeleteForm.
  */
 
 namespace Drupal\rng\Form;
@@ -12,14 +12,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form for deleting a registration group.
+ * Form for deleting a rng rule.
  */
-class GroupDeleteForm extends ContentEntityConfirmFormBase {
+class RuleDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete this group?');
+    return t('Are you sure you want to delete this rule?');
   }
 
   /**
@@ -40,15 +40,14 @@ class GroupDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $group = $this->entity;
-    $group->delete();
-    $event = $group->getEvent();
+    $rule = $this->entity;
+    $rule->delete();
+    $event = $rule->getEvent();
 
-    drupal_set_message(t('Group deleted.'));
+    drupal_set_message(t('Rule deleted.'));
 
-    $form_state->setRedirect(
-      'rng.event.' . $event->getEntityTypeId() . '.group.list',
-      array($event->getEntityTypeId() => $event->id())
-    );
+    if ($urlInfo = $event->urlInfo()) {
+      $form_state->setRedirectUrl($urlInfo);
+    }
   }
 }

@@ -60,21 +60,6 @@ class GroupListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    if ($entity->access('view') && $entity->hasLinkTemplate('canonical')) {
-      $operations['view'] = array(
-        'title' => $this->t('View'),
-        'weight' => 0,
-        'url' => $entity->urlInfo('canonical'),
-      );
-    }
-    return $operations;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildHeader() {
     $header['label'] = t('Label');
     $header['description'] = t('Description');
