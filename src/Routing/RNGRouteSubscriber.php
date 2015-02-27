@@ -9,10 +9,8 @@ namespace Drupal\rng\Routing;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
-use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Dynamic RNG routes.

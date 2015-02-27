@@ -9,7 +9,6 @@ namespace Drupal\rng\Form;
 
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\rng\ActionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,7 +23,7 @@ class ActionForm extends ContentEntityForm {
   /**
    * Constructs a new action form.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param \Drupal\Core\Action\ActionManager
    *   The action manager.
    */
   public function __construct(ActionManager $actionManager) {

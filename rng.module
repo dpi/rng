@@ -1,7 +1,6 @@
 <?php
 
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\rng\Plugin\Derivative\RNGLocalTasks;
 
 /**
  * ID of an `entity_reference` field attached to an event bundle.

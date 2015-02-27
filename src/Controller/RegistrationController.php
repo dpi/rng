@@ -12,7 +12,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\rng\RegistrationTypeInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller for registration entities.

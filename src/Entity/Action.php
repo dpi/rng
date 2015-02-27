@@ -8,11 +8,9 @@
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\ActionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\rng\RuleInterface;
 
 /**
@@ -26,16 +24,16 @@ use Drupal\rng\RuleInterface;
  *     "id" = "id",
  *   },
  *   admin_permission = "administer rng",
- *   links = {
- *     "canonical" = "/registration/{registration}/edit",
- *     "edit-form" = "/registration/{registration}/edit",
- *   },
  *   handlers = {
  *     "form" = {
  *       "default" = "Drupal\rng\Form\ActionForm",
  *       "add" = "Drupal\rng\Form\ActionForm",
  *       "edit" = "Drupal\rng\Form\ActionForm",
  *     },
+ *   },
+ *   links = {
+ *     "canonical" = "/rng/action/{rng_action}/edit",
+ *     "edit-form" = "/rng/action/{rng_action}/edit",
  *   }
  * )
  */
