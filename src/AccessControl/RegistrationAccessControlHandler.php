@@ -21,7 +21,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    *
-   * @param RegistrationInterface $entity
+   * @param \Drupal\rng\RegistrationInterface $entity
    *   A registration entity.
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
@@ -42,7 +42,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    *
-   * @param RegistrationTypeInterface $entity_bundle
+   * @param \Drupal\rng\RegistrationTypeInterface $entity_bundle
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array(), $return_as_object = FALSE) {
     // @todo, needs customisation at event level.
