@@ -23,6 +23,15 @@ interface RegistrantInterface extends ContentEntityInterface {
   public function getIdentity();
 
   /**
+   * Get associated identity entity keys.
+   *
+   * @return array|NULL
+   *   An array with the keys entity_type and entity_id, or NULL if the identity
+   *   does not exist.
+   */
+  public function getIdentityId();
+
+  /**
    * Set associated identity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -31,4 +40,12 @@ interface RegistrantInterface extends ContentEntityInterface {
    *   Returns registrant for chaining.
    */
   public function setIdentity(EntityInterface $entity);
+
+  /**
+   * Checks if the identity is the registrant.
+   *
+   * @return boolean
+   *   Whether the identity is the registrant.
+   */
+  public function hasIdentity(EntityInterface $entity);
 }

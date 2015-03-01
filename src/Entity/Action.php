@@ -25,6 +25,7 @@ use Drupal\rng\RuleInterface;
  *   },
  *   admin_permission = "administer rng",
  *   handlers = {
+ *     "access" = "Drupal\rng\AccessControl\EventAccessControlHandler",
  *     "form" = {
  *       "default" = "Drupal\rng\Form\ActionForm",
  *       "add" = "Drupal\rng\Form\ActionForm",

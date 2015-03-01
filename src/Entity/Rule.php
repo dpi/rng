@@ -23,6 +23,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "id" = "id",
  *   },
  *   handlers = {
+ *     "access" = "Drupal\rng\AccessControl\EventAccessControlHandler",
  *     "list_builder" = "\Drupal\rng\Lists\RuleListBuilder",
  *     "form" = {
  *       "delete" = "Drupal\rng\Form\RuleDeleteForm",

@@ -8,6 +8,7 @@
 namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\RegistrationInterface;
@@ -36,7 +37,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   handlers = {
  *     "views_data" = "Drupal\rng\Views\RegistrationViewsData",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "access" = "Drupal\rng\RegistrationAccessControlHandler",
+ *     "access" = "Drupal\rng\AccessControl\RegistrationAccessControlHandler",
  *     "list_builder" = "\Drupal\rng\RegistrationListBuilder",
  *     "form" = {
  *       "default" = "Drupal\rng\Form\RegistrationForm",
@@ -58,6 +59,14 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * )
  */
 class Registration extends ContentEntityBase implements RegistrationInterface {
+
+  /**
+   * A cache of registrants.
+   *
+   * @var integer[]
+   */
+  protected $registrant_ids;
+
   /**
    * {@inheritdoc}
    */
@@ -80,11 +89,34 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRegistrantIds() {
+    if (!isset($this->registrant_ids)) {
+      $this->registrant_ids = \Drupal::entityQuery('registrant')
+        ->condition('registration', $this->id(), '=')
+        ->execute();
+    }
+    return $this->registrant_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRegistrants() {
-    $registrant_ids = \Drupal::entityQuery('registrant')
-      ->condition('registration', $this->id(), '=')
-      ->execute();
-    return entity_load_multiple('registrant', $registrant_ids);
+    return entity_load_multiple('registrant', $this->getRegistrantIds());
+  }
+
+  /**
+   *
+   * @param EntityInterface $entity
+   */
+  public function hasIdentity(EntityInterface $entity) {
+    $keys = array($entity->getEntityTypeId(), $entity->id());
+    foreach ($this->getRegistrants() as $registrant) {
+      if ($registrant->hasIdentity($entity)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**

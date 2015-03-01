@@ -20,6 +20,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *   id = "registration_group",
  *   label = @Translation("Registration group"),
  *   handlers = {
+ *     "access" = "Drupal\rng\AccessControl\EventAccessControlHandler",
  *     "list_builder" = "\Drupal\rng\Lists\GroupListBuilder",
  *     "form" = {
  *       "default" = "Drupal\rng\Form\GroupForm",
