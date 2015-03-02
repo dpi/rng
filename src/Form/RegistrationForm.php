@@ -41,16 +41,46 @@ class RegistrationForm extends ContentEntityForm {
         '#description' => $this->t('Select an identity to associate with this registration.'),
         '#open' => TRUE,
       ];
-      $self_id = 'user:' . $current_user->id();
+      $default_identity = $self_id = 'user:' . $current_user->id();
       $form['identity_information']['identity'] = [
         '#type' => 'radios',
         '#title' => $this->t('Identity'),
-        '#options' => array(
-          $self_id => t('My account: %username', array('%username' => $current_user->getUsername())),
-        ),
-        '#default_value' => $self_id,
         '#required' => TRUE,
       ];
+
+      // Self
+      $form['identity_information']['identity']['self'] = [
+        '#type' => 'radio',
+        '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
+        '#return_value' => $self_id,
+        '#parents' => array('identity'),
+        '#default_value' => $default_identity,
+      ];
+
+      $entity_types = array('user' => t('User'));
+      foreach ($entity_types as $entity_type => $label) {
+        $element = 'other_' . $entity_type;
+        $form['identity_information']['identity'][$element] = [
+          '#prefix' => '<div class="form-item container-inline">',
+          '#suffix' => '</div>'
+        ];
+        $form['identity_information']['identity'][$element]['radio'] = [
+          '#type' => 'radio',
+          '#title' => $label,
+          '#return_value' => "$entity_type:*",
+          '#parents' => array('identity'),
+          '#default_value' => $default_identity,
+        ];
+        $form['identity_information']['identity'][$element][$entity_type] = [
+          '#type' => 'entity_autocomplete',
+          '#title' => $label,
+          '#title_display' => 'invisible',
+          '#target_type' => $entity_type,
+          '#tags' => FALSE,
+          '#parents' => array('entity', $entity_type),
+        ];
+      }
+
       $form['identity_information']['redirect_identities'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Add additional identities after saving.'),
@@ -91,6 +121,13 @@ class RegistrationForm extends ContentEntityForm {
 
       // Add registrant
       list($entity_type, $entity_id) = explode(':', $form_state->getValue('identity'));
+      if ($entity_id == '*') {
+        $references = $form_state->getValue('entity');
+        if (is_numeric($references[$entity_type])) {
+          $entity_id = $references[$entity_type];
+        }
+      }
+
       $identity = entity_load($entity_type, $entity_id);
       if ($identity) {
         $registrant = entity_create('registrant', array(

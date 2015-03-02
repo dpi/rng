@@ -15,7 +15,7 @@ entity.registration.edit_form:
     _entity_form: 'registration.edit'
     _title: 'Edit registration'
   requirements:
-    _entity_access: 'registration.edit'
+    _entity_access: 'registration.update'
 
 entity.registration.delete_form:
   path: '/registration/{registration}/delete'
@@ -74,7 +74,7 @@ entity.registration_group.edit_form:
     _entity_form: 'registration_group.edit'
     _title: 'Edit registration group'
   requirements:
-    _entity_access: 'registration_group.edit'
+    _entity_access: 'registration_group.update'
 
 entity.registration_group.delete_form:
   path: '/rng/group/{registration_group}/delete'
@@ -97,10 +97,10 @@ entity.rng_rule.delete_form:
 entity.rng_action.edit_form:
   path: '/rng/action/{rng_action}/edit'
   defaults:
-    _entity_form: 'rng_action.edit'
+    _entity_form: 'rng_action.update'
     _title: 'Edit action'
   requirements:
-    _entity_access: 'rng_action.edit'
+    _entity_access: 'rng_action.update'
 
 # event_type_config entities
 entity.event_type_config.add:
