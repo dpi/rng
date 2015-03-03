@@ -78,16 +78,37 @@ class RegistrationListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['counter'] = '';
     $header['type'] = $this->t('Type');
+    $header['groups'] = $this->t('Groups');
     $header['created'] = $this->t('Created');
     return $header + parent::buildHeader();
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param RegistrationInterface $entity
+   *   A registration entity.
    */
   public function buildRow(EntityInterface $entity) {
     $row['counter'] = ++$this->row_counter;
     $row['type'] = $entity->type->entity->label();
+
+    $row['groups']['data'] = array(
+      '#theme' => 'item_list',
+      '#items' => [],
+      '#attributes' => ['class' => ['inline']],
+    );
+    foreach ($entity->getGroups() as $group) {
+      $text = '@group_label';
+      $t_args = ['@group_id' => $group->id(), '@group_label' => $group->label()];
+      $options = ['context' => ['source' => $group->getSource()]];
+      $row['groups']['data']['#items'][] = $this->t(
+        $group->isUserGenerated() ? $text : "<em>$text</em>",
+        $t_args,
+        $options
+      );
+    }
+
     $row['created'] = format_date($entity->created->value);
     return $row + parent::buildRow($entity);
   }

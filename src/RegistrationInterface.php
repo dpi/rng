@@ -24,7 +24,7 @@ interface RegistrationInterface extends ContentEntityInterface {
   /**
    * Set associated event.
    *
-   * @param EntityInterface $entity
+   * @param ContentEntityInterface $entity
    *
    * @return \Drupal\rng\RegistrationInterface
    *   Returns registration for chaining.
@@ -50,8 +50,55 @@ interface RegistrationInterface extends ContentEntityInterface {
   /**
    * Searches registrants on this registration for an identity.
    *
+   * @param $identity
+   *   The identity to search.
+   *
    * @return boolean
    *   Whether the identity is a registrant.
    */
-  public function hasIdentity(EntityInterface $entity);
+  public function hasIdentity(EntityInterface $identity);
+
+  /**
+   * Shortcut to add a registrant entity.
+   *
+   * Take care to ensure the identity is not already on the registration.
+   *
+   * @param $identity
+   *   The identity to add.
+   *
+   * @return RegistrantInterface
+   *   The newly created registrant.
+   */
+  public function addIdentity(EntityInterface $identity);
+
+  /**
+   * Get groups for the registration.
+   *
+   * @return GroupInterface[]
+   *   An array of registration_group entities.
+   */
+  public function getGroups();
+
+  /**
+   * Add a group to the registration.
+   *
+   * @param GroupInterface $group
+   *   The group to add.
+   *
+   * @return \Drupal\rng\RegistrationInterface
+   *   Returns registration for chaining.
+   */
+  public function addGroup(GroupInterface $group);
+
+  /**
+   * Remove a group from the registration.
+   *
+   * @param GroupInterface $group
+   *   The group to remove.
+   *
+   * @return \Drupal\rng\RegistrationInterface
+   *   Returns registration for chaining.
+   */
+  public function removeGroup(GroupInterface $group);
+
 }

@@ -14,6 +14,14 @@ use Drupal\Core\Access\AccessResult;
 const RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE = 'rng_registration_type';
 
 /**
+ * ID of an `entity_reference` field attached to an event bundle.
+ *
+ * Specifies the groups that are applied to new registrations. This field
+ * references registration_group entities.
+ */
+const RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS = 'rng_registration_groups';
+
+/**
  * ID of an `boolean` field attached to an event bundle.
  *
  * Whether an event is accepting new registrations.

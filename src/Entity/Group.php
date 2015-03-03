@@ -20,7 +20,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *   id = "registration_group",
  *   label = @Translation("Registration group"),
  *   handlers = {
- *     "access" = "Drupal\rng\AccessControl\EventAccessControlHandler",
+ *     "access" = "Drupal\rng\AccessControl\GroupAccessControlHandler",
  *     "list_builder" = "\Drupal\rng\Lists\GroupListBuilder",
  *     "form" = {
  *       "default" = "Drupal\rng\Form\GroupForm",
@@ -57,8 +57,30 @@ class Group extends ContentEntityBase implements GroupInterface {
   /**
    * {@inheritdoc}
    */
-  public function setEvent(ContentEntityInterface $entity) {
-    $this->set('event', array('entity' => $entity));
+  public function setEvent(ContentEntityInterface $entity = NULL) {
+    $this->set('event', ['entity' => $entity]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUserGenerated() {
+    return $this->getSource() === NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSource() {
+    return $this->get('source')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSource($module = NULL) {
+    $this->set('source', ['value' => $module]);
     return $this;
   }
 
@@ -73,7 +95,7 @@ class Group extends ContentEntityBase implements GroupInterface {
    * {@inheritdoc}
    */
   public function setDescription($description) {
-    $this->set('description', array('value' => $value));
+    $this->set('description', ['value' => $description]);
   }
 
   /**
@@ -88,21 +110,21 @@ class Group extends ContentEntityBase implements GroupInterface {
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
-      ->setDescription(t('The registrant UUID.'))
+      ->setDescription(t('The group UUID.'))
       ->setReadOnly(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
-      ->setDescription(t('The registration language code.'));
+      ->setDescription(t('The group language code.'));
 
     $fields['event'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Identity'))
       ->setDescription(t('The groups event, or leave empty for global.'))
       ->setReadOnly(TRUE);
 
-    $fields['locked'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Locked'))
-      ->setDescription(t('Locked groups are usually managed by code.'))
+    $fields['source'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Source module'))
+      ->setDescription(t('The module which created this group. Or NULL if it is user created.'))
       ->setReadOnly(TRUE);
 
     $fields['label'] = BaseFieldDefinition::create('string')

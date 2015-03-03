@@ -15,12 +15,17 @@ use Drupal\rng\GroupInterface;
  * Form controller for registration groups.
  */
 class GroupForm extends ContentEntityForm {
+
+  /**
+   * @var \Drupal\rng\GroupInterface
+   */
+  protected $entity;
+
   /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state, GroupInterface $group = NULL) {
-    $group = $this->getEntity();
-    $event = $group->getEvent();
+    $group = $this->entity;
 
     if (!$group->isNew()) {
       $form['#title'] = $this->t('Edit group %label',
@@ -36,7 +41,8 @@ class GroupForm extends ContentEntityForm {
   }
 
   public function save(array $form, FormStateInterface $form_state) {
-    $group = $this->getEntity();
+    $group = $this->entity
+      ->setSource(NULL);
     $event = $group->getEvent();
     $is_new = $group->isNew();
     $group->save();

@@ -37,6 +37,7 @@ class EventSettingsForm extends FormBase {
       RNG_FIELD_EVENT_TYPE_CAPACITY,
       RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO,
       RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
+      RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS,
     );
 
     $display = EntityFormDisplay::collectRenderDisplay($entity, 'default');

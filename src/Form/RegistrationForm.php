@@ -14,6 +14,12 @@ use Drupal\Core\Form\FormStateInterface;
  * Form controller for registrations.
  */
 class RegistrationForm extends ContentEntityForm {
+
+  /**
+   * @var \Drupal\rng\RegistrationInterface
+   */
+  protected $entity;
+
   /**
    * {@inheritdoc}
    */
@@ -44,6 +50,7 @@ class RegistrationForm extends ContentEntityForm {
       $default_identity = $self_id = 'user:' . $current_user->id();
       $form['identity_information']['identity'] = [
         '#type' => 'radios',
+        '#options' => NULL,
         '#title' => $this->t('Identity'),
         '#required' => TRUE,
       ];
@@ -108,7 +115,7 @@ class RegistrationForm extends ContentEntityForm {
   }
 
   public function save(array $form, FormStateInterface $form_state) {
-    $registration = $this->getEntity();
+    $registration = $this->entity;
     $event = $registration->getEvent();
     $is_new = $registration->isNew();
     $registration->save();
@@ -128,13 +135,8 @@ class RegistrationForm extends ContentEntityForm {
         }
       }
 
-      $identity = entity_load($entity_type, $entity_id);
-      if ($identity) {
-        $registrant = entity_create('registrant', array(
-          'registration' => $registration,
-        ));
-        $registrant->setIdentity($identity);
-        $registrant->save();
+      if ($identity = entity_load($entity_type, $entity_id)) {
+        $registrant = $registration->addIdentity($identity);
       }
     }
     else {

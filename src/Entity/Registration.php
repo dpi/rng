@@ -11,6 +11,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\rng\GroupInterface;
 use Drupal\rng\RegistrationInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -106,17 +107,58 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   }
 
   /**
-   *
-   * @param EntityInterface $entity
+   * {@inheritdoc}
    */
-  public function hasIdentity(EntityInterface $entity) {
-    $keys = array($entity->getEntityTypeId(), $entity->id());
+  public function hasIdentity(EntityInterface $identity) {
+    $keys = array($identity->getEntityTypeId(), $identity->id());
     foreach ($this->getRegistrants() as $registrant) {
-      if ($registrant->hasIdentity($entity)) {
+      if ($registrant->hasIdentity($identity)) {
         return TRUE;
       }
     }
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addIdentity(EntityInterface $identity) {
+    if ($this->hasIdentity($identity)) {
+      // Identity already exists on this registration.
+      throw new \Exception('Duplicate identity on registration');
+    }
+    if ($this->isNew()) {
+      // Registration needs an ID before a registrant can be saved.
+      throw new \Exception('Registration not saved');
+    }
+    return entity_create('registrant', ['registration' => $this])
+      ->setIdentity($identity)
+      ->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGroups() {
+    return $this->groups->referencedEntities();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addGroup(GroupInterface $group) {
+    $this->groups->appendItem($group);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeGroup(GroupInterface $group) {
+    if(($key = array_search($group, $this->getGroups())) !== false) {
+      $this->groups->removeItem($key);
+    }
+    return $this;
   }
 
   /**
@@ -159,6 +201,12 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setDescription(t('The relationship between this registration and an event.'))
       ->setRevisionable(TRUE) // change to false when https://www.drupal.org/node/2300101 gets in
       ->setReadOnly(TRUE);
+
+    $fields['groups'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Groups'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setDescription(t('The groups the registration is assigned.'))
+      ->setSetting('target_type', 'registration_group');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))

@@ -84,6 +84,7 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
    */
   var $fields = array(
     RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
+    RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS,
     RNG_FIELD_EVENT_TYPE_STATUS,
     RNG_FIELD_EVENT_TYPE_CAPACITY,
     RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO,

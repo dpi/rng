@@ -62,6 +62,7 @@ class GroupListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = t('Label');
+    $header['source'] = t('Source');
     $header['description'] = t('Description');
     return $header + parent::buildHeader();
   }
@@ -71,6 +72,7 @@ class GroupListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
+    $row['source'] = $entity->isUserGenerated() ? t('User') : t('System');
     $row['description'] = MailFormatHelper::htmlToText($entity->getDescription());
     return $row + parent::buildRow($entity);
   }

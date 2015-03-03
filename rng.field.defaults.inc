@@ -28,6 +28,15 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
+    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
+      $definition = array(
+        'type' => 'entity_reference',
+        'settings' => array(
+          'target_type' => 'registration_group',
+        ),
+        'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      );
+      break;
     case RNG_FIELD_EVENT_TYPE_STATUS:
       $definition = array(
         'type' => 'boolean',
@@ -51,8 +60,8 @@ function rng_add_event_field_storage($field_name, $entity_type) {
       $definition = array(
         'type' => 'boolean',
         'settings' => array(
-          'on_label' => t('Allow duplicate registrants for this event.'),
-          'off_label' => t('Do not allow duplicate registrants for this event.'),
+          'on_label' => t('Allow duplicate registrants for this event'),
+          'off_label' => t('Do not allow duplicate registrants for this event'),
         ),
       );
       break;
@@ -80,6 +89,13 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         'label' => 'Registration type',
         'settings' => array('handler' => 'default'),
         'description' => t('Select which registration types are valid for this event.'),
+      );
+      break;
+    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
+      $definition = array(
+        'label' => 'Registration groups',
+        'settings' => array('handler' => 'default'),
+        'description' => t('New registrations will be added to these groups.'),
       );
       break;
     case RNG_FIELD_EVENT_TYPE_STATUS:
@@ -118,9 +134,6 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
       ) + $definition
     );
     $field->save();
-
-    //$form_display = entity_get_form_display($entity_type, $bundle, 'default');
-    //rng_add_event_form_display_defaults($form_display, $field_name)->save();
   }
 }
 
@@ -138,6 +151,11 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
 function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_display, $field_name = '') {
   switch ($field_name) {
     case RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE:
+      $form_display->setComponent($field_name, array(
+        'type' => 'options_select',
+      ));
+      break;
+    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
       $form_display->setComponent($field_name, array(
         'type' => 'options_select',
       ));

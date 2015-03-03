@@ -75,18 +75,18 @@ class RuleListBuilder extends EntityListBuilder {
       '#links' => $conditions
     );
 
-    $actions = array();
+    $row['actions']['data'] = array(
+      '#theme' => 'links',
+      '#links' => [],
+      '#attributes' => ['class' => ['links', 'inline']],
+    );
     foreach ($entity->getActions() as $action) {
-      $actions[] = array(
-        'title' => $this->t('Edit @action_id', array('@action_id' => $action->id())),
-        'weight' => 10,
+      $row['actions']['data']['#links'][] = array(
+        'title' => $this->t('Edit', ['@action_id' => $action->id(), '@action' => $action->getActionID()]),
         'url' => $action->urlInfo('edit-form'),
       );
     }
-    $row['actions']['data'] = array(
-      '#theme' => 'links',
-      '#links' => $actions
-    );
+
     return $row + parent::buildRow($entity);
   }
 
