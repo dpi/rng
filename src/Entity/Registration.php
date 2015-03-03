@@ -238,6 +238,10 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
     if (!$this->getEvent() instanceof ContentEntityBase) {
       throw new EntityMalformedException('Invalid or missing event on registration.');
     }
+    // Add group defaults event settings.
+    foreach ($event = $this->getEvent()->{RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS} as $group) {
+      $this->addGroup($group->entity);
+    }
   }
 
   /**

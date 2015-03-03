@@ -101,7 +101,7 @@ class RegistrationListBuilder extends EntityListBuilder {
     foreach ($entity->getGroups() as $group) {
       $text = '@group_label';
       $t_args = ['@group_id' => $group->id(), '@group_label' => $group->label()];
-      $options = ['context' => ['source' => $group->getSource()]];
+      $options['context'] = $group->isUserGenerated() ? 'system' : 'user';
       $row['groups']['data']['#items'][] = $this->t(
         $group->isUserGenerated() ? $text : "<em>$text</em>",
         $t_args,
