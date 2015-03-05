@@ -145,7 +145,7 @@ class RegistrationForm extends ContentEntityForm {
         $form['identity_information']['identity']['self'] = [
           '#type' => 'radio',
           '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
-          '#return_value' => $self_id,
+          '#return_value' => 'user:' . $current_user->id(),
           '#parents' => array('identity'),
           '#default_value' => TRUE,
           '#weight' => -100,
