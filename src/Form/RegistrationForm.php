@@ -8,6 +8,9 @@
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -21,12 +24,41 @@ class RegistrationForm extends ContentEntityForm {
   protected $entity;
 
   /**
+   * The selection plugin manager.
+   *
+   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager
+   */
+  protected $selectionManager;
+
+  /**
+   * Constructs a registration form.
+   *
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager $selection_manager
+   *   The selection plugin manager.
+   */
+  public function __construct(EntityManagerInterface $entity_manager, SelectionPluginManager $selection_manager) {
+    parent::__construct($entity_manager);
+    $this->selectionManager = $selection_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.manager'),
+      $container->get('plugin.manager.entity_reference_selection')
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $registration = $this->getEntity();
     $event = $registration->getEvent();
-    $current_user = $this->currentUser();
 
     if (!$registration->isNew()) {
       $form['#title'] = $this->t('Edit Registration',
@@ -47,7 +79,6 @@ class RegistrationForm extends ContentEntityForm {
         '#description' => $this->t('Select an identity to associate with this registration.'),
         '#open' => TRUE,
       ];
-      $default_identity = 'user:*';
       $form['identity_information']['identity'] = [
         '#type' => 'radios',
         '#options' => NULL,
@@ -55,55 +86,82 @@ class RegistrationForm extends ContentEntityForm {
         '#required' => TRUE,
       ];
 
-      // Provide a self-register option.
-      if ($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value) {
-        $allow_self = TRUE;
-      } else {
+      $self = FALSE; // create a register radio option for current user.
+      $current_user = $this->currentUser();
+
+      // list of entity reference field types, ordered by radio default priority
+      $entity_types = ['user'];
+
+      // Radio order is alphabetical. (ex: self)
+      $sorted = $entity_types;
+      ksort($sorted);
+      foreach ($sorted as $entity_type_id) {
         $options = [
-          'target_type' => 'user',
+          'target_type' => $entity_type_id,
           'handler' => 'rng:register',
           'handler_settings' => ['event' => $event],
         ];
-        $allow_self = (boolean)\Drupal::service('plugin.manager.entity_reference_selection')
-          ->getInstance($options)
-          ->validateReferenceableEntities([$current_user->id()]);
+
+        /* @var $selection \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
+        $selection = $this->selectionManager->getInstance($options);
+        $count = $selection->countReferenceableEntities();
+
+        if ($entity_type_id == 'user') {
+          // if duplicate registrants is allowed || user is not already a registrant.
+          if ($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value || count($selection->validateReferenceableEntities([$current_user->id()]))) {
+            $self = TRUE;
+            $count--;
+          }
+        }
+
+        if ($count > 0) {
+          $entity_type = $this->entityManager->getDefinition($entity_type_id);
+
+          $form['identity_information']['identity'][$entity_type_id] = [
+            '#prefix' => '<div class="form-item container-inline">',
+            '#suffix' => '</div>'
+          ];
+          $form['identity_information']['identity'][$entity_type_id]['radio'] = [
+            '#type' => 'radio',
+            '#title' => $entity_type->getLabel(),
+            '#return_value' => "$entity_type_id:*",
+            '#parents' => array('identity'),
+            '#default_value' => '',
+          ];
+          $form['identity_information']['identity'][$entity_type_id]['autocomplete'] = [
+            '#type' => 'entity_autocomplete',
+            '#title' => $entity_type->getLabel(),
+            '#title_display' => 'invisible',
+            '#target_type' => $entity_type_id,
+            '#selection_handler' => 'rng:register',
+            '#selection_settings' => ['event' => $event],
+            '#tags' => FALSE,
+            '#parents' => array('entity', $entity_type_id),
+          ];
+        }
       }
 
-      if ($allow_self) {
-        $default_identity = $self_id = 'user:' . $current_user->id();
+      if ($self) {
         $form['identity_information']['identity']['self'] = [
           '#type' => 'radio',
           '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
           '#return_value' => $self_id,
           '#parents' => array('identity'),
-          '#default_value' => $default_identity,
+          '#default_value' => TRUE,
+          '#weight' => -100,
         ];
       }
-
-      $entity_types = array('user' => t('User'));
-      foreach ($entity_types as $entity_type => $label) {
-        $element = 'other_' . $entity_type;
-        $form['identity_information']['identity'][$element] = [
-          '#prefix' => '<div class="form-item container-inline">',
-          '#suffix' => '</div>'
-        ];
-        $form['identity_information']['identity'][$element]['radio'] = [
-          '#type' => 'radio',
-          '#title' => $label,
-          '#return_value' => "$entity_type:*",
-          '#parents' => array('identity'),
-          '#default_value' => $default_identity,
-        ];
-        $form['identity_information']['identity'][$element][$entity_type] = [
-          '#type' => 'entity_autocomplete',
-          '#title' => $label,
-          '#title_display' => 'invisible',
-          '#target_type' => $entity_type,
-          '#selection_handler' => 'rng:register',
-          '#selection_settings' => ['event' => $event],
-          '#tags' => FALSE,
-          '#parents' => array('entity', $entity_type),
-        ];
+      else {
+        // Self will always be default, if it exists.
+        // Otherwise apply default based on $entity_types array order.
+        foreach ($entity_types as $entity_type_id) {
+          // Not all $entity_types are created, depends if there are any
+          // referenceable entities.
+          if (isset($form['identity_information']['identity'][$entity_type_id])) {
+            $form['identity_information']['identity'][$entity_type_id]['radio']['#default_value'] = TRUE;
+            break;
+          }
+        }
       }
 
       $form['identity_information']['redirect_identities'] = [
