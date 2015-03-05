@@ -93,15 +93,15 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       }
     }
 
+    // Determine if current user has access to any un-registered identities.
     if (empty($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value)) {
-      $registration_count = \Drupal::entityQuery('registrant')
-        ->condition('identity__target_type', 'user', '=')
-        ->condition('identity__target_id', $account->id(), '=')
-        ->condition('registration.entity.event__target_type', $event->getEntityTypeId(), '=')
-        ->condition('registration.entity.event__target_id', $event->id(), '=')
-        ->count()
-        ->execute();
-      if ($registration_count) {
+      $options = [
+        'target_type' => 'user',
+        'handler' => 'rng:register',
+        'handler_settings' => ['event' => $event],
+      ];
+      $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
+      if (!$handler->countReferenceableEntities()) {
         return AccessResult::neutral();
       }
     }

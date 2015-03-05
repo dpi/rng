@@ -15,7 +15,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  * Provides specific access control for registration groups.
  *
  * @EntityReferenceSelection(
- *   id = "rng:registration_group:event",
+ *   id = "default:registration_group",
  *   label = @Translation("Registration group selection"),
  *   entity_types = {"registration_group"},
  *   group = "default",
@@ -33,6 +33,7 @@ class RegistrationGroupSelection extends SelectionBase {
         ->condition('event__target_type', $event->getEntityTypeId(), '=')
         ->condition('event__target_id', $event->id(), '=');
       $query->condition($group);
+      $query->condition('source', NULL, 'IS NULL');
     }
     return $query;
   }

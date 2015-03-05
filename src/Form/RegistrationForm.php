@@ -47,7 +47,7 @@ class RegistrationForm extends ContentEntityForm {
         '#description' => $this->t('Select an identity to associate with this registration.'),
         '#open' => TRUE,
       ];
-      $default_identity = $self_id = 'user:' . $current_user->id();
+      $default_identity = 'user:*';
       $form['identity_information']['identity'] = [
         '#type' => 'radios',
         '#options' => NULL,
@@ -55,14 +55,30 @@ class RegistrationForm extends ContentEntityForm {
         '#required' => TRUE,
       ];
 
-      // Self
-      $form['identity_information']['identity']['self'] = [
-        '#type' => 'radio',
-        '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
-        '#return_value' => $self_id,
-        '#parents' => array('identity'),
-        '#default_value' => $default_identity,
-      ];
+      // Provide a self-register option.
+      if ($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value) {
+        $allow_self = TRUE;
+      } else {
+        $options = [
+          'target_type' => 'user',
+          'handler' => 'rng:register',
+          'handler_settings' => ['event' => $event],
+        ];
+        $allow_self = (boolean)\Drupal::service('plugin.manager.entity_reference_selection')
+          ->getInstance($options)
+          ->validateReferenceableEntities([$current_user->id()]);
+      }
+
+      if ($allow_self) {
+        $default_identity = $self_id = 'user:' . $current_user->id();
+        $form['identity_information']['identity']['self'] = [
+          '#type' => 'radio',
+          '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
+          '#return_value' => $self_id,
+          '#parents' => array('identity'),
+          '#default_value' => $default_identity,
+        ];
+      }
 
       $entity_types = array('user' => t('User'));
       foreach ($entity_types as $entity_type => $label) {
@@ -83,6 +99,8 @@ class RegistrationForm extends ContentEntityForm {
           '#title' => $label,
           '#title_display' => 'invisible',
           '#target_type' => $entity_type,
+          '#selection_handler' => 'rng:register',
+          '#selection_settings' => ['event' => $event],
           '#tags' => FALSE,
           '#parents' => array('entity', $entity_type),
         ];
