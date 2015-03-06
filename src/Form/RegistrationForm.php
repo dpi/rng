@@ -57,6 +57,7 @@ class RegistrationForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
+    $current_user = $this->currentUser();
     $registration = $this->getEntity();
     $event = $registration->getEvent();
 
@@ -87,7 +88,6 @@ class RegistrationForm extends ContentEntityForm {
       ];
 
       $self = FALSE; // create a register radio option for current user.
-      $current_user = $this->currentUser();
 
       // list of entity reference field types, ordered by radio default priority
       $entity_types = ['user'];
