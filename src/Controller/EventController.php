@@ -94,7 +94,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     /* @var $rule \Drupal\rng\RuleInterface */
     foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
       $row = [];
-      $scope_global = TRUE;
+      $data_types = [];
 
       foreach ($rule->getConditions() as $condition) {
         $plugin_id = $condition->getPluginId();
@@ -117,10 +117,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         // entity:registration context.
         $handler = $this->conditionManager->createInstance($plugin_id, $config);
         foreach ($handler->getContextDefinitions() as $context) {
-          if ($context->getDataType() == 'entity:registration') {
-            $scope_global = FALSE;
-            break;
-          }
+          $data_types[] = $context->getDataType();
         };
 
         // Support one condition for now.
@@ -132,7 +129,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
 
         $ops = ['create' => NULL, 'view' => NULL, 'update' => NULL, 'delete' => NULL];
         foreach (array_keys($ops) as $op) {
-          $row['operation' . $op] = !empty($conf['operations'][$op]) ? $this->t($op) : '';
+          $message = !empty($conf['operations'][$op]) ? $this->t($op) : '-';
+          $row['operation_' . $op] = ($op == 'create' && in_array('entity:registration', $data_types)) ? $this->t('<em>N/A</em>') : $message;
         }
 
         $row['action_operations']['data'] = ['#type' => 'operations'];
@@ -144,7 +142,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           ];
         }
 
-        if ($scope_global) {
+        if (!in_array('entity:registration', $data_types) || in_array('rng:event', $data_types)) {
           $row[] = $this->t('<strong>Warning:</strong> selecting view, update, or delete grants operations for any registration on this event.');
         }
         else {

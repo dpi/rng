@@ -18,7 +18,10 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "rng_user_role",
  *   label = @Translation("User Role"),
  *   context = {
- *     "user" = @ContextDefinition("entity:user", label = @Translation("User"))
+ *     "user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = TRUE
+ *     )
  *   }
  * )
  *
@@ -33,6 +36,8 @@ class UserRole extends CoreUserRole implements RNGConditionInterface  {
     //$form['roles']['#title'] = $this->t('When the user has all of the following roles');
     $form['roles']['#title'] = $this->t('When the user has any one of the following roles');
     $form['roles']['#options'] = array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names(TRUE));
+    // disable authenticated until condition evaluates as AND.
+    unset($form['roles']['#options']['authenticated']);
     return $form;
   }
 

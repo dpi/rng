@@ -31,7 +31,7 @@ entity.registration.registrants:
     _entity_form: 'registration.registrants'
     _title: 'Edit identities'
   requirements:
-    _permission: 'administer rng'
+    _entity_access: 'registration.update'
 
 # registration_type entities
 entity.registration_type.add:

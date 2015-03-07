@@ -25,9 +25,6 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
    *   A registration entity.
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    // @todo, needs customisation at event level.
-    //        currently lets user do whatever he likes to registration as long
-    //        as he is a registrant.
     $account = $this->prepareUser($account);
 
     if (!$account->isAnonymous() && in_array($operation, array('view', 'update', 'delete'))) {
@@ -37,9 +34,12 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       $event = $entity->getEvent();
 
       // Event access rules.
+      $user = entity_load('user', $account->id());
       $context_values = [
         'rng:event' => $event,
-        'entity:user' => entity_load('user', $account->id())
+        'rng:identity' => $user,
+        'entity:registration' => $entity,
+        'entity:user' => $user,
       ];
 
       $rule_ids = \Drupal::entityQuery('rng_rule')
