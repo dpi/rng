@@ -97,7 +97,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       $scope_global = TRUE;
 
       foreach ($rule->getConditions() as $condition) {
-        $plugin_id = $condition->getActionID();
+        $plugin_id = $condition->getPluginId();
         $config = $condition->getConfiguration();
 
 
@@ -201,7 +201,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
         $row = array();
-        $action_id = $action->getActionID();
+        $action_id = $action->getPluginId();
         if (in_array($action_id, $communication_actions)) {
           $definition = $manager->getDefinition($action_id);
           $row['trigger'] = $rule->getTriggerID();

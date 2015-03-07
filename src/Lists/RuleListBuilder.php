@@ -103,7 +103,7 @@ class RuleListBuilder extends EntityListBuilder {
     );
     foreach ($entity->getConditions() as $condition) {
       $row['conditions']['data']['#links'][] = array(
-        'title' => $this->t('Edit', ['@condition_id' => $condition->id(), '@condition' => $condition->getActionID()]),
+        'title' => $this->t('Edit', ['@condition_id' => $condition->id(), '@condition' => $condition->getPluginId()]),
         'url' => $condition->urlInfo('edit-form'),
         'query' => $this->destination,
       );
@@ -116,7 +116,7 @@ class RuleListBuilder extends EntityListBuilder {
     );
     foreach ($entity->getActions() as $action) {
       $row['actions']['data']['#links'][] = array(
-        'title' => $this->t('Edit', ['@action_id' => $action->id(), '@action' => $action->getActionID()]),
+        'title' => $this->t('Edit', ['@action_id' => $action->id(), '@action' => $action->getPluginId()]),
         'url' => $action->urlInfo('edit-form'),
         'query' => $this->destination,
       );

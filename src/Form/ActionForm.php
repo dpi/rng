@@ -76,7 +76,7 @@ class ActionForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->entity->getConfiguration();
     $manager = $this->entity->getType() == 'condition' ? 'conditionManager' : 'actionManager';
-    $this->plugin = $this->{$manager}->createInstance($this->entity->getActionID(), $config);
+    $this->plugin = $this->{$manager}->createInstance($this->entity->getPluginId(), $config);
     return parent::buildForm($form, $form_state);
   }
 

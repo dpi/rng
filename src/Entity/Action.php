@@ -72,14 +72,14 @@ class Action extends ContentEntityBase implements ActionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getActionID() {
+  public function getPluginId() {
     return $this->get('action')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setActionID($action_id) {
+  public function setPluginId($action_id) {
     $this->set('action', $action_id);
     return $this;
   }
@@ -102,8 +102,16 @@ class Action extends ContentEntityBase implements ActionInterface {
   /**
    * {@inheritdoc}
    */
+  public function createInstance() {
+    $condition_manager = \Drupal::service('plugin.manager.' . $this->getType());
+    return $condition_manager->createInstance($this->getPluginId(), $this->getConfiguration());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function execute(array $context) {
-    $action_id = $this->getActionID();
+    $action_id = $this->getPluginId();
     $action_configuration = $this->getConfiguration();
 
     $manager = \Drupal::service('plugin.manager.action');

@@ -48,23 +48,23 @@ interface ActionInterface extends ContentEntityInterface {
   public function setType($type);
 
   /**
-   * Gets the action ID.
+   * Gets the plugin ID.
    *
    * @return string
-   *   The action ID.
+   *   The plugin ID.
    */
-  public function getActionID();
+  public function getPluginId();
 
   /**
-   * Sets the action plugin ID.
+   * Sets the plugin ID.
    *
-   * @param string $action_id
-   *   The action plugin ID.
+   * @param string $plugin_id
+   *   The plugin ID.
    *
    * @return ActionInterface
    *   Return this object for chaining.
    */
-  public function setActionID($action_id);
+  public function setPluginId($plugin_id);
 
   /**
    * Gets the configuration for the action.
@@ -81,6 +81,20 @@ interface ActionInterface extends ContentEntityInterface {
    *   Return this object for chaining.
    */
   public function setConfiguration(array $configuration);
+
+  /**
+   * Gets the configuration for the action.
+   *
+   * This should only be used if the caller does not have access to dependency
+   * injection.
+   *
+   * @todo: change @return when condition and action plugins have a better
+   * @todo: common class.
+   *
+   * @return \Drupal\Core\Condition\ConditionPluginBase|\Drupal\Core\Action\ConfigurableActionBase|NULL
+   *   A condition or action plugin. Or NULL if the plugin does not exist.
+   */
+  public function createInstance();
 
   /**
    * Execute the action.

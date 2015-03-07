@@ -34,11 +34,65 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       if ($account->hasPermission('administer rng')) {
         return AccessResult::allowed()->cachePerRole();
       }
-      $user = entity_load('user', $account->id());
-      if ($entity->hasIdentity($user)) {
-        return AccessResult::allowed();
+      $event = $entity->getEvent();
+
+      // Event access rules.
+      $context_values = [
+        'rng:event' => $event,
+        'entity:user' => entity_load('user', $account->id())
+      ];
+
+      $rule_ids = \Drupal::entityQuery('rng_rule')
+        ->condition('event__target_type', $event->getEntityTypeId(), '=')
+        ->condition('event__target_id', $event->id(), '=')
+        ->condition('trigger_id', 'rng_event.register', '=')
+        ->execute();
+
+      /* @var $rule \Drupal\rng\RuleInterface */
+      foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
+        $actions = $rule->getActions();
+        $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
+          if ($action->getPluginId() == 'registration_operations') {
+            $config = $action->getConfiguration();
+            return !empty($config['operations'][$operation]);
+          }
+          return FALSE;
+        });
+
+        // If there are at least one registration_operations action granting
+        // $operation.
+        if ($action = array_shift($operations_actions)) {
+          $success = 0;
+          $conditions = $rule->getConditions();
+          foreach ($conditions as $condition_storage) {
+            $condition = $condition_storage->createInstance();
+
+            foreach ($condition->getContextDefinitions() as $name => $context) {
+              $data_type = $context->getDataType();
+              if (isset($context_values[$data_type])) {
+                $condition->setContextValue($name, $context_values[$data_type]);
+              }
+              else if ($context->isRequired()) {
+                break 2;
+              }
+            }
+
+            if ($condition->evaluate()) {
+              $success++;
+            }
+            else {
+              break;
+            }
+          }
+
+          // All conditions must evaluate true.
+          if (count($conditions) && count($conditions) == $success) {
+            return AccessResult::allowed();
+          }
+        }
       }
     }
+
     return AccessResult::neutral();
   }
 

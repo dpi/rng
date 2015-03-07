@@ -59,19 +59,23 @@ class RegisterUserSelection extends UserSelection {
 
       // @todo move to event wrapper
       $condition_count = 0;
-      $action_manager = \Drupal::service('plugin.manager.condition');
+      $condition_manager = \Drupal::service('plugin.manager.condition');
       foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
-        foreach ($rule->getActions() as $action) {
-          if ($action->getActionID() == 'registration_operations') {
-            $conf = $action->getConfiguration();
-            if (!empty($conf['operations']['create'])) {
-              foreach ($rule->getConditions() as $condition) {
-                $condition_count++;
-                $condition_instance = $action_manager->createInstance($condition->getActionID(), $condition->getConfiguration());
-                $condition_instance->alterQuery($query);
-              }
-            }
-            break;
+        $operation = 'create';
+        $actions = $rule->getActions();
+        $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
+          if ($action->getPluginId() == 'registration_operations') {
+            $config = $action->getConfiguration();
+            return !empty($config['operations'][$operation]);
+          }
+          return FALSE;
+        });
+
+        if ($action = array_shift($operations_actions)) {
+          foreach ($rule->getConditions() as $condition) {
+            $condition_count++;
+            $condition_instance = $condition_manager->createInstance($condition->getPluginId(), $condition->getConfiguration());
+            $condition_instance->alterQuery($query);
           }
         }
       }
