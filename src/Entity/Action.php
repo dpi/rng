@@ -57,6 +57,21 @@ class Action extends ContentEntityBase implements ActionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getType() {
+    return $this->get('type')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setType($type) {
+    $this->set('type', $type);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getActionID() {
     return $this->get('action')->value;
   }
@@ -112,6 +127,13 @@ class Action extends ContentEntityBase implements ActionInterface {
       ->setReadOnly(TRUE)
       ->setRequired(TRUE)
       ->setSetting('target_type', 'rng_rule');
+
+    // hijack action entity for conditions...
+    $fields['type'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Type'))
+      ->setDescription(t('Whether this is an action or condition.'))
+      ->setRequired(TRUE)
+      ->setReadOnly(TRUE);
 
     $fields['action'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Action'))

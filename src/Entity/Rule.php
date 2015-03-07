@@ -64,9 +64,21 @@ class Rule extends ContentEntityBase implements RuleInterface {
   /**
    * {@inheritdoc}
    */
+  public function getConditions() {
+    $action_ids = \Drupal::entityQuery('rng_action')
+      ->condition('rule', $this->id(), '=')
+      ->condition('type', 'condition', '=')
+      ->execute();
+    return entity_load_multiple('rng_action', $action_ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getActions() {
     $action_ids = \Drupal::entityQuery('rng_action')
       ->condition('rule', $this->id(), '=')
+      ->condition('type', 'action', '=')
       ->execute();
     return entity_load_multiple('rng_action', $action_ids);
   }

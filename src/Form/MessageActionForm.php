@@ -7,11 +7,12 @@
 
 namespace Drupal\rng\Form;
 
-use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Action\ActionManager;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -25,13 +26,23 @@ class MessageActionForm extends FormBase {
   protected $actionPlugin;
 
   /**
-   * Constructs a new BanAdmin object.
+   * The entity manager.
    *
-   * @param \Drupal\Code\Action\ActionManager $action_manager
-   *   The action manager.
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
-  public function __construct(ActionManager $action_manager) {
+  protected $entityManager;
+
+  /**
+   * Constructs a new MessageActionForm object.
+   *
+   * @param \Drupal\Core\Action\ActionManager $action_manager
+   *   The action manager.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   */
+  public function __construct(ActionManager $action_manager, EntityManagerInterface $entity_manager) {
     $this->actionPlugin = $action_manager->createInstance('rng_registrant_email');
+    $this->entityManager = $entity_manager;
   }
 
   /**
@@ -39,7 +50,8 @@ class MessageActionForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.action')
+      $container->get('plugin.manager.action'),
+      $container->get('entity.manager')
     );
   }
 
@@ -92,14 +104,16 @@ class MessageActionForm extends FormBase {
     return $form;
   }
 
-
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->actionPlugin->submitConfigurationForm($form, $form_state);
-    $action = entity_create('rng_action');
+
+    /* @var $action \Drupal\rng\ActionInterface */
+    $action = $this->entityManager->getStorage('rng_action')->create();
     $action->setActionID($this->actionPlugin->getPluginId());
     $action->setConfiguration($this->actionPlugin->getConfiguration());
-    $event = $form_state->get('event');
+    $action->setType('action');
 
+    $event = $form_state->get('event');
     $trigger = $form_state->getValue('trigger');
     if ($trigger == 'now') {
       $registration_ids = \Drupal::entityQuery('registration')
@@ -116,7 +130,7 @@ class MessageActionForm extends FormBase {
       }
     }
     else {
-      $rule = entity_create('rng_rule', array(
+      $rule = $this->entityManager->getStorage('rng_rule')->create(array(
         'event' => array('entity' => $event),
         'trigger_id' => $trigger,
       ));

@@ -63,6 +63,19 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.event", $route);
 
+        // Access
+        $route = new Route(
+          $canonical_path . '/event/access',
+          array(
+            '_controller' => '\Drupal\rng\Controller\EventController::listing_access',
+            '_title' => 'Access',
+            'event' => $entity_type,
+          ),
+          $manage_requirements,
+          $options
+        );
+        $collection->add("rng.event.$entity_type.access", $route);
+
         // Rules
         $route = new Route(
           $canonical_path . '/event/rules',

@@ -9,6 +9,8 @@ namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -17,6 +19,33 @@ use Drupal\Core\Routing\RouteMatchInterface;
  * Configure event settings.
  */
 class EventSettingsForm extends FormBase {
+
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * Constructs a new MessageActionForm object.
+   *
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   */
+  public function __construct(EntityManagerInterface $entity_manager) {
+    $this->entityManager = $entity_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.manager')
+    );
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -89,6 +118,39 @@ class EventSettingsForm extends FormBase {
     $event = $form_state->get('event');
     $form_state->get('form_display')->extractFormValues($event, $form, $form_state);
     $event->save();
+
+    // Create base register rules if none exist.
+    $rule_count = \Drupal::entityQuery('rng_rule')
+      ->condition('event__target_type', $event->getEntityTypeId(), '=')
+      ->condition('event__target_id', $event->id(), '=')
+      ->condition('trigger_id', 'rng_event.register', '=')
+      ->count()
+      ->execute();
+
+    if (!$rule_count) {
+      $rule = $this->entityManager->getStorage('rng_rule')->create(array(
+        'event' => array('entity' => $event),
+        'trigger_id' => 'rng_event.register',
+      ));
+      $rule->save();
+
+      $condition = $this->entityManager->getStorage('rng_action')->create(array(
+        'rule' => array('entity' => $rule),
+        'action' => 'rng_user_role',
+        'configuration' => ['roles' => ['authenticated' => 'authenticated']],
+      ));
+      $condition->setType('condition');
+      $condition->save();
+
+      // Allow any user to create a registration on the event.
+      $action = $this->entityManager->getStorage('rng_action')->create(array(
+        'rule' => array('entity' => $rule),
+        'action' => 'registration_operations',
+        'configuration' => ['operations' => ['create' => TRUE]],
+      ));
+      $action->setType('action');
+      $action->save();
+    }
 
     $t_args = array('%event_label' => $event->label());
     drupal_set_message(t('Event settings updated.', $t_args));

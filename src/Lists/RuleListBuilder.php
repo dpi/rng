@@ -64,16 +64,25 @@ class RuleListBuilder extends EntityListBuilder {
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\rng\RuleInterface $entity
+   *   A rule entity.
    */
   public function buildRow(EntityInterface $entity) {
     $row['id'] = $entity->id();
     $row['trigger'] = $entity->getTriggerID();
 
-    $conditions = array();
     $row['conditions']['data'] = array(
       '#theme' => 'links',
-      '#links' => $conditions
+      '#links' => [],
+      '#attributes' => ['class' => ['links', 'inline']],
     );
+    foreach ($entity->getConditions() as $condition) {
+      $row['conditions']['data']['#links'][] = array(
+        'title' => $this->t('Edit', ['@condition_id' => $condition->id(), '@condition' => $condition->getActionID()]),
+        'url' => $condition->urlInfo('edit-form'),
+      );
+    }
 
     $row['actions']['data'] = array(
       '#theme' => 'links',

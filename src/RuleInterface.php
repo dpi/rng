@@ -35,4 +35,12 @@ interface RuleInterface extends ContentEntityInterface {
    *   An array of action entities.
    */
   public function getActions();
+
+  /**
+   * Get conditions for the rule.
+   *
+   * @return ActionInterface[]
+   *   An array of action entities.
+   */
+  public function getConditions();
 }

@@ -29,6 +29,25 @@ interface ActionInterface extends ContentEntityInterface {
   public function setRule(RuleInterface $rule);
 
   /**
+   * Gets the action type.
+   *
+   * @return string
+   *   The action type.
+   */
+  public function getType();
+
+  /**
+   * Sets the action type.
+   *
+   * @param string $type
+   *   The type of action: 'action' or 'condition'.
+   *
+   * @return ActionInterface
+   *   Return this object for chaining.
+   */
+  public function setType($type);
+
+  /**
    * Gets the action ID.
    *
    * @return string
@@ -38,6 +57,9 @@ interface ActionInterface extends ContentEntityInterface {
 
   /**
    * Sets the action plugin ID.
+   *
+   * @param string $action_id
+   *   The action plugin ID.
    *
    * @return ActionInterface
    *   Return this object for chaining.

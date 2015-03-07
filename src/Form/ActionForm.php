@@ -9,25 +9,55 @@ namespace Drupal\rng\Form;
 
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\rng\ActionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form controller for rng actions.
  */
 class ActionForm extends ContentEntityForm {
-  /* @var ActionInterface $entity */
-  var $entity;
+  /**
+   * The action entity.
+   *
+   * @var \Drupal\rng\ActionInterface
+   */
+  protected $entity;
+
+  /**
+   * The plugin entity.
+   *
+   * @todo: change when condition and action have a better common class.
+   *
+   * @var \Drupal\Core\Plugin\ContextAwarePluginBase
+   */
+  protected $plugin;
+
+  /**
+   * The action manager service.
+   *
+   * @var \Drupal\Core\Action\ActionManager
+   */
+  protected $actionManager;
+
+  /**
+   * The condition manager service.
+   *
+   * @var \Drupal\Core\Condition\ConditionManager
+   */
+  protected $conditionManager;
 
   /**
    * Constructs a new action form.
    *
-   * @param \Drupal\Core\Action\ActionManager
+   * @param \Drupal\Core\Action\ActionManager $actionManager
    *   The action manager.
+   * @param \Drupal\Core\Condition\ConditionManager $conditionManager
+   *   The condition manager.
    */
-  public function __construct(ActionManager $actionManager) {
+  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager) {
     $this->actionManager = $actionManager;
+    $this->conditionManager = $conditionManager;
   }
 
   /**
@@ -35,7 +65,8 @@ class ActionForm extends ContentEntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.action')
+      $container->get('plugin.manager.action'),
+      $container->get('plugin.manager.condition')
     );
   }
 
@@ -44,7 +75,8 @@ class ActionForm extends ContentEntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->entity->getConfiguration();
-    $this->plugin = $this->actionManager->createInstance($this->entity->getActionID(), $config);
+    $manager = $this->entity->getType() == 'condition' ? 'conditionManager' : 'actionManager';
+    $this->plugin = $this->{$manager}->createInstance($this->entity->getActionID(), $config);
     return parent::buildForm($form, $form_state);
   }
 
@@ -52,11 +84,11 @@ class ActionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    $action = $this->getEntity();
+    $action = $this->entity;
     if (!$action->isNew()) {
-      $form['#title'] = $this->t('Edit Action',
+      $form['#title'] = $this->t('Edit @type',
         array(
-          '%action_id' => $action->id()
+          '@type' => $action->getType(),
         )
       );
     }

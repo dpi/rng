@@ -71,6 +71,13 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'weight' => 10,
         );
 
+        $this->derivatives["rng.event.$entity_type.event.access"] = array(
+          'title' => t('Access'),
+          'route_name' => "rng.event.$entity_type.access",
+          'parent_id' => 'rng.local_tasks:' . $event_default,
+          'weight' => 20,
+        );
+
         $this->derivatives["rng.event.$entity_type.event.rules"] = array(
           'title' => t('Rules'),
           'route_name' => "rng.event.$entity_type.rules",
