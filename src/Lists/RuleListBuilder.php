@@ -18,9 +18,16 @@ class RuleListBuilder extends EntityListBuilder {
   /**
    * The event entity.
    *
-   * @var EntityInterface
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $event;
+
+  /**
+   * Route to redirect after performing operations linked from this list.
+   *
+   * @var array
+   */
+  protected $destination;
 
   /**
    * {@inheritdoc}
@@ -32,6 +39,12 @@ class RuleListBuilder extends EntityListBuilder {
     if (isset($event)) {
       $this->event = $event;
     }
+    $this->destination = drupal_get_destination();
+    $render['description'] = [
+      '#prefix' => '<p>',
+      '#markup' => $this->t('This rule list is for debugging purposes. There are better lists found in the <strong>Access</strong> and <strong>Messages</strong> tabs.'),
+      '#suffix' => '</p>',
+    ];
     $render['table'] = parent::render();
     $render['table']['#empty'] = t('No rules found for this event.');
     return $render;
@@ -49,6 +62,17 @@ class RuleListBuilder extends EntityListBuilder {
       return $this->storage->loadMultiple($rule_ids);
     }
     return parent::load();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperations(EntityInterface $entity) {
+    $operations = parent::getOperations($entity);
+    foreach ($operations as &$operation) {
+      $operation['query'] = $this->destination;
+    }
+    return $operations;
   }
 
   /**
@@ -81,6 +105,7 @@ class RuleListBuilder extends EntityListBuilder {
       $row['conditions']['data']['#links'][] = array(
         'title' => $this->t('Edit', ['@condition_id' => $condition->id(), '@condition' => $condition->getActionID()]),
         'url' => $condition->urlInfo('edit-form'),
+        'query' => $this->destination,
       );
     }
 
@@ -93,6 +118,7 @@ class RuleListBuilder extends EntityListBuilder {
       $row['actions']['data']['#links'][] = array(
         'title' => $this->t('Edit', ['@action_id' => $action->id(), '@action' => $action->getActionID()]),
         'url' => $action->urlInfo('edit-form'),
+        'query' => $this->destination,
       );
     }
 

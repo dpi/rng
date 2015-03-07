@@ -70,6 +70,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
    */
   public function listing_access(RouteMatchInterface $route_match, $event) {
     $event = $route_match->getParameter($event);
+    $destination = drupal_get_destination();
     $build = [];
     $rows = [];
     $header = [
@@ -103,18 +104,14 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $definition = $this->conditionManager->getDefinition($plugin_id);
         $row['condition'] = $definition['label'];
 
-        // Links
-        $operations = [];
-        if ($condition->access('edit') && $condition->hasLinkTemplate('edit-form')) {
-          $operations['edit'] = array(
+        $row['condition_operations']['data'] = ['#type' => 'operations'];
+        if ($condition->access('edit')) {
+          $row['condition_operations']['data']['#links']['edit'] = [
             'title' => t('Edit'),
             'url' => $condition->urlInfo('edit-form'),
-          );
+            'query' => $destination,
+          ];
         }
-        $row['condition_operations']['data'] = array(
-          '#type' => 'operations',
-          '#links' => $operations,
-        );
 
         // Warn user actions apply to all registrations if conditions have no
         // entity:registration context.
@@ -138,18 +135,14 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           $row['operation' . $op] = !empty($conf['operations'][$op]) ? $this->t($op) : '';
         }
 
-        // Links
-        $operations = [];
-        if ($action->access('edit') && $action->hasLinkTemplate('edit-form')) {
-          $operations['edit'] = array(
+        $row['action_operations']['data'] = ['#type' => 'operations'];
+        if ($action->access('edit')) {
+          $row['action_operations']['data']['#links']['edit'] = [
             'title' => t('Edit'),
             'url' => $action->urlInfo('edit-form'),
-          );
+            'query' => $destination,
+          ];
         }
-        $row['action_operations']['data'] = array(
-          '#type' => 'operations',
-          '#links' => $operations,
-        );
 
         if ($scope_global) {
           $row[] = $this->t('<strong>Warning:</strong> selecting view, update, or delete grants operations for any registration on this event.');
@@ -178,11 +171,17 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
   /**
    * Displays a list of actions which are message or communication related.
    *
+   * @param RouteMatchInterface $route_match
+   *   The current route.
    * @param string $event
    *   The parameter to find the event entity.
+   *
+   * @return array
+   *   A render array.
    */
   public function listing_messages(RouteMatchInterface $route_match, $event) {
     $event = $route_match->getParameter($event);
+    $destination = drupal_get_destination();
     $build = array();
     $header = array(t('When'), t('Do'), t('Operations'));
     $rows = array();
@@ -202,35 +201,41 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
         $row = array();
-        $operations = array();
         $action_id = $action->getActionID();
-        $action_configuration = $action->getConfiguration();
         if (in_array($action_id, $communication_actions)) {
           $definition = $manager->getDefinition($action_id);
           $row['trigger'] = $rule->getTriggerID();
           $row['action']['data'] = $definition['label'];
-          // operations
-          if ($action->access('edit') && $action->hasLinkTemplate('edit-form')) {
-            $operations['edit'] = array(
+
+          $row['operations']['data'] = ['#type' => 'operations'];
+          if ($action->access('edit')) {
+            $row['operations']['data']['#links']['edit'] = [
               'title' => t('Edit'),
               'url' => $action->urlInfo('edit-form'),
-            );
+              'query' => $destination,
+            ];
           }
-          if ($rule->access('delete') && $rule->hasLinkTemplate('delete-form')) {
-            $operations['delete'] = array(
+          if ($rule->access('delete')) {
+            $row['operations']['data']['#links']['delete'] = [
               'title' => t('Delete'),
               'url' => $rule->urlInfo('delete-form'),
-            );
+              'query' => $destination,
+            ];
           }
         }
+        else {
+          continue;
+        }
 
-        $row['operations']['data'] = array(
-          '#type' => 'operations',
-          '#links' => $operations,
-        );
         $rows[] = $row;
       }
     }
+
+    $build['description'] = [
+      '#prefix' => '<p>',
+      '#markup' => $this->t('These messages will be sent when a trigger occurs.'),
+      '#suffix' => '</p>',
+    ];
 
     $build['action_list'] = array(
       '#type' => 'table',
