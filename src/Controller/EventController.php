@@ -81,7 +81,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
 
     $build['description'] = [
       '#prefix' => '<p>',
-      '#markup' => $this->t('The following rules determine access rights for registrations.'),
+      '#markup' => $this->t('The following rules determine who is eligible to register.'),
       '#suffix' => '</p>',
     ];
 
