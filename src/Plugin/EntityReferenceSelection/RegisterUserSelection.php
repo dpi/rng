@@ -27,6 +27,7 @@ class RegisterUserSelection extends UserSelection {
    */
   protected function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
     $query = parent::buildEntityQuery($match, $match_operator);
+    $entity_type = $this->entityManager->getDefinition($this->configuration['target_type']);
 
     if (!isset($this->configuration['handler_settings']['event'])) {
       throw new \Exception('Registration identity selection handler requires event context.');
@@ -47,7 +48,6 @@ class RegisterUserSelection extends UserSelection {
       }
 
       $entity_ids[] = 0; // Remove anonymous user.
-      $entity_type = $this->entityManager->getDefinition($this->configuration['target_type']);
       $query->condition($entity_type->getKey('id'), $entity_ids, 'NOT IN');
     }
 
@@ -83,6 +83,43 @@ class RegisterUserSelection extends UserSelection {
 
     // Cancel the query if there are no conditions.
     if (!$condition_count) {
+      $query->condition($entity_type->getKey('id') , NULL, 'IS NULL');
+      return $query;
+    }
+
+    // Apply proxy registration permissions for the current user.
+    $proxy_count = 0;
+    $all_users = FALSE; // if user can register `authenticated` users.
+    $group = $query->orConditionGroup();
+
+    // Self
+    if ($this->currentUser->hasPermission('rng register self')) {
+      $proxy_count++;
+      $group->condition($entity_type->getKey('id'), $this->currentUser->id(), '=');
+    }
+
+    foreach (user_roles(TRUE) as $role) {
+      $role_id = $role->id();
+      if ($this->currentUser->hasPermission("rng register role $role_id")) {
+        if ($role_id == 'authenticated') {
+          $all_users = TRUE;
+          break;
+        }
+        else {
+          $proxy_count++;
+          $group->condition('roles', $role_id, '=');
+        }
+      }
+    }
+
+    if ($all_users) {
+      // Do not add any conditions
+    }
+    else if ($proxy_count) {
+      $query->condition($group);
+    }
+    else {
+      // cancel the query
       $query->condition($entity_type->getKey('id') , NULL, 'IS NULL');
     }
 

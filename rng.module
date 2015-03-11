@@ -4,6 +4,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * ID of an `entity_reference` field attached to an event bundle.
@@ -75,6 +76,20 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
     }
   }
   return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'user_admin_permissions') {
+    // Disable registrations for anonymous users.
+    foreach ($form['permissions'] as $permission_id => &$permission) {
+      if (strstr($permission_id, 'rng register')) {
+        $permission['anonymous']['#disabled'] = TRUE;
+      }
+    }
+  }
 }
 
 /**

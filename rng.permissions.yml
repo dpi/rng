@@ -17,3 +17,6 @@ administer registration entity:
   title: 'Administer all registration entities.'
   description: 'Create, and perform any action on all registrations.'
   restrict access: TRUE
+
+permission_callbacks:
+  - \Drupal\rng\RNGPermissions::eventProxyRolePermissions
