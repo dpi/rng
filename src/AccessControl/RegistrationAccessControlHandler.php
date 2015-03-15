@@ -10,6 +10,7 @@ namespace Drupal\rng\AccessControl;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\rng\RuleInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessException;
@@ -28,6 +29,31 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   public function __construct(EntityTypeInterface $entity_type) {
     parent::__construct($entity_type);
     $this->eventManager = \Drupal::service('rng.event_manager');
+  }
+
+  /**
+   * Checks if any operation actions on a rule grant $operation access.
+   *
+   * This does not evaluate conditions.
+   *
+   * @param \Drupal\rng\RuleInterface $rule
+   *   A rule entity.
+   * @param string $operation
+   *   A registration operation.
+   *
+   * @return bool
+   *   Whether $operation is granted by the actions.
+   */
+  protected function ruleGrantsOperation(RuleInterface $rule, $operation) {
+    $actions = $rule->getActions();
+    $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
+      if ($action->getPluginId() == 'registration_operations') {
+        $config = $action->getConfiguration();
+        return !empty($config['operations'][$operation]);
+      }
+      return FALSE;
+    });
+    return (boolean)count($operations_actions);
   }
 
   /**
@@ -56,45 +82,8 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
 
       $rules = $this->eventManager->getMeta($event)->getRules();
       foreach($rules as $rule) {
-        $actions = $rule->getActions();
-        $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
-          if ($action->getPluginId() == 'registration_operations') {
-            $config = $action->getConfiguration();
-            return !empty($config['operations'][$operation]);
-          }
-          return FALSE;
-        });
-
-        // If there are at least one registration_operations action granting
-        // $operation.
-        if ($action = array_shift($operations_actions)) {
-          $success = 0;
-          $conditions = $rule->getConditions();
-          foreach ($conditions as $condition_storage) {
-            $condition = $condition_storage->createInstance();
-
-            foreach ($condition->getContextDefinitions() as $name => $context) {
-              $data_type = $context->getDataType();
-              if (isset($context_values[$data_type])) {
-                $condition->setContextValue($name, $context_values[$data_type]);
-              }
-              else if ($context->isRequired()) {
-                break 2;
-              }
-            }
-
-            if ($condition->evaluate()) {
-              $success++;
-            }
-            else {
-              break;
-            }
-          }
-
-          // All conditions must evaluate true.
-          if (count($conditions) && count($conditions) == $success) {
-            return AccessResult::allowed();
-          }
+        if ($this->ruleGrantsOperation($rule, $operation) && $rule->evaluateConditions($context_values)) {
+          return AccessResult::allowed();
         }
       }
     }
@@ -105,7 +94,8 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\rng\RegistrationTypeInterface $entity_bundle
+   * @param \Drupal\rng\RegistrationTypeInterface|NULL $entity_bundle
+   *   A registration type. Or NULL if it is a registration type listing.
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array(), $return_as_object = FALSE) {
     if (!isset($context['event'])) {

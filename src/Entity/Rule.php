@@ -10,6 +10,8 @@ namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\rng\RuleInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Component\Plugin\Exception\ContextException;
+use Drupal\Component\Utility\String;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -36,6 +38,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Rule extends ContentEntityBase implements RuleInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -86,6 +89,42 @@ class Rule extends ContentEntityBase implements RuleInterface {
   /**
    * {@inheritdoc}
    */
+  public function evaluateConditions($context_values = []) {
+    // @todo: move evaluation and context to Action/Condition hybrid entity when
+    // @todo:   action plugins get better context integration.
+    $success = 0;
+    $conditions = $this->getConditions();
+    foreach ($conditions as $condition_storage) {
+      $condition = $condition_storage->createInstance();
+
+      // Add all context to the conditions
+      foreach ($condition->getContextDefinitions() as $name => $context) {
+        $data_type = $context->getDataType();
+        if (isset($context_values[$data_type])) {
+          $condition->setContextValue($name, $context_values[$data_type]);
+        }
+        else if ($context->isRequired()) {
+          throw new ContextException(String::format("Missing context @type for condition @plugin_id on rule #@rule_id.", array('@type' => $data_type, '@plugin_id' => $condition_storage->getPluginId(), '@rule_id' => $this->id())));
+        }
+      }
+
+      if ($condition->evaluate()) {
+        $success++;
+      }
+      else {
+        // Cancel evaluating remaining conditions
+        return FALSE;
+      }
+    }
+
+    // Will fail if there are no conditions. Conditions are counted if the
+    // plugin loads correctly.
+    return count($conditions) && $success == count($conditions);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Rule ID'))
@@ -114,4 +153,5 @@ class Rule extends ContentEntityBase implements RuleInterface {
 
     return $fields;
   }
+
 }

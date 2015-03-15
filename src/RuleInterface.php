@@ -6,12 +6,14 @@
  */
 
 namespace Drupal\rng;
+
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Provides an interface for event rule entities.
  */
 interface RuleInterface extends ContentEntityInterface {
+
   /**
    * Gets the event entity.
    *
@@ -43,4 +45,20 @@ interface RuleInterface extends ContentEntityInterface {
    *   An array of action entities.
    */
   public function getConditions();
+
+  /**
+   * Evaluates all conditions on the rule.
+   *
+   * @param array $context_values
+   *   Context to pass to conditions.
+   *
+   * @return bool Whether all conditions evaluate true.
+   *   Whether all conditions evaluate true. Evaluation will fail if there are
+   *   no conditions associated with the rule.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   *   If a context value is missing for any condition.
+   */
+  public function evaluateConditions($context_values = []);
+
 }
