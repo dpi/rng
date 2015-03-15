@@ -16,6 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Dynamic RNG routes.
  */
 class RNGRouteSubscriber extends RouteSubscriberBase {
+
   /**
    * The entity type manager
    *
@@ -75,6 +76,19 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
           $options
         );
         $collection->add("rng.event.$entity_type.access", $route);
+
+        // Reset access to default
+        $route = new Route(
+          $canonical_path . '/event/access/reset',
+          array(
+            '_form' => '\Drupal\rng\Form\EventAccessResetForm',
+            '_title' => 'Reset access to default',
+            'event' => $entity_type,
+          ),
+          $manage_requirements,
+          $options
+        );
+        $collection->add("rng.event.$entity_type.access.reset", $route);
 
         // Rules
         $route = new Route(
@@ -188,4 +202,5 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
       }
     }
   }
+
 }

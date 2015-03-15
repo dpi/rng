@@ -47,7 +47,7 @@ class MessageActionForm extends FormBase {
    *   The action manager.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
-   * @param EventManager $event_manager
+   * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
   public function __construct(ActionManager $action_manager, EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {

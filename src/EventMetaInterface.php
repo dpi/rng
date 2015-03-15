@@ -223,4 +223,10 @@ interface EventMetaInterface {
    */
   function countProxyIdentities();
 
+  /**
+   * Adds default access rules to the event.
+   *
+   * Access rules determine registration operation grants.
+   */
+  function addDefaultAccess();
 }

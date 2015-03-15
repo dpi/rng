@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides local action for RNG.
  */
 class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -63,6 +64,13 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
 
     foreach ($entity_type_config as $entity_type => $bundles) {
       // Only need one set of actions per entity type.
+
+      $this->derivatives["rng.event.$entity_type.event.access.reset"] = array(
+        'title' => $this->t('Reset access to default'),
+        'route_name' => "rng.event.$entity_type.access.reset",
+        'appears_on' => array("rng.event.$entity_type.access"),
+      );
+
       $this->derivatives["rng.event.$entity_type.event.message.send"] = array(
         'title' => $this->t('Send message'),
         'route_name' => "rng.event.$entity_type.messages.send",
@@ -82,4 +90,5 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
 
     return $this->derivatives;
   }
+
 }

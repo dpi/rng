@@ -33,9 +33,9 @@ class EventMeta implements EventMetaInterface {
   /**
    * Constructs a new EventMeta object.
    *
-   * @param EntityManager $entity_manager
+   * @param \Drupal\Core\Entity\EntityManager $entity_manager
    *   The entity manager.
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.
    */
   function __construct(EntityManager $entity_manager, EntityInterface $entity) {
@@ -239,6 +239,47 @@ class EventMeta implements EventMetaInterface {
     ];
     $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
     return $handler->countReferenceableEntities();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function addDefaultAccess() {
+    // Allow any user to create a registration on the event.
+    $rules['user_role']['conditions']['rng_user_role'] = ['roles' => ['authenticated' => 'authenticated']];
+    $rules['user_role']['actions']['registration_operations'] = ['operations' => ['create' => TRUE]];
+
+    // Allow registrants to edit their registrations.
+    $rules['registrant']['conditions']['rng_registration_identity'] = [];
+    $rules['registrant']['actions']['registration_operations'] = ['operations' => ['view' => TRUE, 'update' => TRUE]];
+
+    // Give event managers all rights.
+    $rules['event_operation']['conditions']['rng_event_operation'] = ['operations' => ['manage event' => TRUE]];
+    $rules['event_operation']['actions']['registration_operations'] = ['operations' => ['create' => TRUE, 'view' => TRUE, 'update' => TRUE, 'delete' => TRUE]];
+
+    foreach ($rules as $rule) {
+      $rng_rule = $this->entityManager->getStorage('rng_rule')->create(array(
+        'event' => array('entity' => $this->getEvent()),
+        'trigger_id' => 'rng_event.register',
+      ));
+      $rng_rule->save();
+      foreach ($rule['conditions'] as $plugin_id => $configuration) {
+        $this->entityManager->getStorage('rng_action')->create([])
+          ->setRule($rng_rule)
+          ->setType('condition')
+          ->setPluginId($plugin_id)
+          ->setConfiguration($configuration)
+          ->save();
+      }
+      foreach ($rule['actions'] as $plugin_id => $configuration) {
+        $this->entityManager->getStorage('rng_action')->create([])
+          ->setRule($rng_rule)
+          ->setType('action')
+          ->setPluginId($plugin_id)
+          ->setConfiguration($configuration)
+          ->save();
+      }
+    }
   }
 
 }
