@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -33,16 +34,26 @@ class MessageActionForm extends FormBase {
   protected $entityManager;
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a new MessageActionForm object.
    *
    * @param \Drupal\Core\Action\ActionManager $action_manager
    *   The action manager.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param EventManager $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(ActionManager $action_manager, EntityManagerInterface $entity_manager) {
+  public function __construct(ActionManager $action_manager, EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {
     $this->actionPlugin = $action_manager->createInstance('rng_registrant_email');
     $this->entityManager = $entity_manager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -51,7 +62,8 @@ class MessageActionForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.action'),
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -116,11 +128,8 @@ class MessageActionForm extends FormBase {
     $event = $form_state->get('event');
     $trigger = $form_state->getValue('trigger');
     if ($trigger == 'now') {
-      $registration_ids = \Drupal::entityQuery('registration')
-        ->condition('event__target_type', $event->getEntityTypeId(), '=')
-        ->condition('event__target_id', $event->id(), '=')
-        ->execute();
-      foreach (entity_load_multiple('registration', $registration_ids) as $registration) {
+      $registrations = $this->eventManager->getMeta($event)->getRegistrations();
+      foreach ($registrations as $registration) {
         $context = array(
           'event' => $event,
           'registration' => $registration,

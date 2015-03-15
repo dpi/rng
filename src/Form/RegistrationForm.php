@@ -10,6 +10,7 @@ namespace Drupal\rng\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
+use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -31,16 +32,26 @@ class RegistrationForm extends ContentEntityForm {
   protected $selectionManager;
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a registration form.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager $selection_manager
    *   The selection plugin manager.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, SelectionPluginManager $selection_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, SelectionPluginManager $selection_manager, EventManagerInterface $event_manager) {
     parent::__construct($entity_manager);
     $this->selectionManager = $selection_manager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -49,7 +60,8 @@ class RegistrationForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
-      $container->get('plugin.manager.entity_reference_selection')
+      $container->get('plugin.manager.entity_reference_selection'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -108,7 +120,7 @@ class RegistrationForm extends ContentEntityForm {
 
         if ($entity_type_id == 'user') {
           // if duplicate registrants is allowed || user is not already a registrant.
-          if ($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value || count($selection->validateReferenceableEntities([$current_user->id()]))) {
+          if ($this->eventManager->getMeta($event)->duplicateRegistrantsAllowed() || count($selection->validateReferenceableEntities([$current_user->id()]))) {
             $self = TRUE;
             $count--;
           }
@@ -221,10 +233,8 @@ class RegistrationForm extends ContentEntityForm {
       $registration->setNewRevision(!$form_state->isValueEmpty('revision'));
     }
 
-    rng_rule_trigger($trigger_id, array(
-      'event' => $event,
-      'registration' => $registration,
-    ));
+    $this->eventManager->getMeta($event)
+      ->trigger($trigger_id, ['registration' => $registration]);
 
     if ($registration->id()) {
       if ($registration->access('view')) {

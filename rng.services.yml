@@ -1,4 +1,8 @@
 services:
+  rng.event_manager:
+    class: Drupal\rng\EventManager
+    arguments: ['@entity.manager']
+    parent: container.trait
   rng.breadcrumb:
     class: Drupal\rng\RegistrationBreadcrumbBuilder
     arguments: ['@entity.manager', '@access_manager', '@current_user']

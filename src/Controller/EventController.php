@@ -9,6 +9,7 @@ namespace Drupal\rng\Controller;
 
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Condition\ConditionManager;
+use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -34,16 +35,26 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
   protected $conditionManager;
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a new action form.
    *
    * @param \Drupal\Core\Action\ActionManager $actionManager
    *   The action manager.
    * @param \Drupal\Core\Condition\ConditionManager $conditionManager
    *   The condition manager.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager) {
+  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager, EventManagerInterface $event_manager) {
     $this->actionManager = $actionManager;
     $this->conditionManager = $conditionManager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -52,7 +63,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.action'),
-      $container->get('plugin.manager.condition')
+      $container->get('plugin.manager.condition'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -85,14 +97,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       '#suffix' => '</p>',
     ];
 
-    $rule_ids = \Drupal::entityQuery('rng_rule')
-      ->condition('event__target_type', $event->getEntityTypeId(), '=')
-      ->condition('event__target_id', $event->id(), '=')
-      ->condition('trigger_id', 'rng_event.register', '=')
-      ->execute();
-
-    /* @var $rule \Drupal\rng\RuleInterface */
-    foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
+    $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register');
+    foreach($rules as $rule) {
       $row = [];
       $data_types = [];
 
@@ -190,12 +196,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     // list of communication related action plugin ids
     $communication_actions = array('rng_registrant_email');
 
-    $rule_ids = \Drupal::entityQuery('rng_rule')
-      ->condition('event__target_type', $event->getEntityTypeId(), '=')
-      ->condition('event__target_id', $event->id(), '=')
-      ->execute();
-
-    foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
+    $rules = $this->eventManager->getMeta($event)->getRules();
+    foreach($rules as $rule) {
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
         $row = array();

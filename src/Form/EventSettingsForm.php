@@ -10,6 +10,7 @@ namespace Drupal\rng\Form;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -28,13 +29,23 @@ class EventSettingsForm extends FormBase {
   protected $entityManager;
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a new MessageActionForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param EventManager $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {
     $this->entityManager = $entity_manager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -42,7 +53,8 @@ class EventSettingsForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -61,12 +73,12 @@ class EventSettingsForm extends FormBase {
     $form_state->set('event', $entity);
 
     $fields = array(
-      RNG_FIELD_EVENT_TYPE_STATUS,
-      RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS,
-      RNG_FIELD_EVENT_TYPE_CAPACITY,
-      RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO,
-      RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
-      RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS,
+      EventManagerInterface::FIELD_STATUS,
+      EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
+      EventManagerInterface::FIELD_CAPACITY,
+      EventManagerInterface::FIELD_EMAIL_REPLY_TO,
+      EventManagerInterface::FIELD_REGISTRATION_TYPE,
+      EventManagerInterface::FIELD_REGISTRATION_GROUPS,
     );
 
     $display = EntityFormDisplay::collectRenderDisplay($entity, 'default');
@@ -120,13 +132,9 @@ class EventSettingsForm extends FormBase {
     $event->save();
 
     // Create base register rules if none exist.
-    $rule_count = \Drupal::entityQuery('rng_rule')
-      ->condition('event__target_type', $event->getEntityTypeId(), '=')
-      ->condition('event__target_id', $event->id(), '=')
-      ->condition('trigger_id', 'rng_event.register', '=')
-      ->count()
-      ->execute();
 
+    $query = $this->eventManager->getMeta($event)->buildRuleQuery();
+    $rule_count = $query->condition('trigger_id', 'rng_event.register', '=')->count()->execute();
     if (!$rule_count) {
       // Allow any user to create a registration on the event.
       $rules['user_role']['conditions']['rng_user_role'] = ['roles' => ['authenticated' => 'authenticated']];

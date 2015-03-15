@@ -10,17 +10,53 @@ namespace Drupal\rng\Lists;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Mail\MailFormatHelper;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\rng\EventManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds a list of registration groups.
  */
 class GroupListBuilder extends EntityListBuilder {
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
   /**
    * The event entity.
    *
    * @var EntityInterface
    */
   protected $event;
+
+  /**
+   * Constructs a new RegistrationListBuilder object.
+   *
+   * {@inheritdoc}
+   *
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
+   */
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EventManagerInterface $event_manager) {
+    parent::__construct($entity_type, $storage);
+    $this->eventManager = $event_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('rng.event_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -48,11 +84,7 @@ class GroupListBuilder extends EntityListBuilder {
    */
   public function load() {
     if (isset($this->event)) {
-      $group_ids = \Drupal::entityQuery('registration_group')
-        ->condition('event__target_type', $this->event->getEntityTypeId(), '=')
-        ->condition('event__target_id', $this->event->id(), '=')
-        ->execute();
-      return $this->storage->loadMultiple($group_ids);
+      return $this->eventManager->getMeta($this->event)->getGroups();
     }
     return parent::load();
   }
@@ -76,4 +108,5 @@ class GroupListBuilder extends EntityListBuilder {
     $row['description'] = MailFormatHelper::htmlToText($entity->getDescription());
     return $row + parent::buildRow($entity);
   }
+
 }

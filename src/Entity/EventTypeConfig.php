@@ -9,6 +9,7 @@ namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\rng\EventTypeConfigInterface;
+use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\field\Entity\FieldConfig;
 
@@ -83,12 +84,12 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
    * @var array
    */
   var $fields = array(
-    RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE,
-    RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS,
-    RNG_FIELD_EVENT_TYPE_STATUS,
-    RNG_FIELD_EVENT_TYPE_CAPACITY,
-    RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO,
-    RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS,
+    EventManagerInterface::FIELD_REGISTRATION_TYPE,
+    EventManagerInterface::FIELD_REGISTRATION_GROUPS,
+    EventManagerInterface::FIELD_STATUS,
+    EventManagerInterface::FIELD_CAPACITY,
+    EventManagerInterface::FIELD_EMAIL_REPLY_TO,
+    EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
   );
 
   /**

@@ -11,19 +11,38 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\rng\EventManagerInterface;
 
 /**
  * Form controller for event config entities.
  */
 class EventTypeConfigForm extends EntityForm {
+
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
   /**
    * Constructs a EventTypeConfigForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {
     $this->entityManager = $entity_manager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -31,7 +50,8 @@ class EventTypeConfigForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -54,7 +74,7 @@ class EventTypeConfigForm extends EntityForm {
       foreach ($this->entityManager->getDefinitions() as $entity_type) {
         if ($entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
           foreach ($this->entityManager->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
-            if (!rng_entity_bundle($entity_type->id(), $bundle)) {
+            if (!$this->eventManager->event_type($entity_type->id(), $bundle)) {
               $bundle_options[$entity_type->getLabel()][$entity_type->id() . '.' . $bundle] = $bundle_info['label'];
             }
           }

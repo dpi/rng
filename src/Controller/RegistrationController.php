@@ -9,6 +9,8 @@ namespace Drupal\rng\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\rng\EventManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\rng\RegistrationTypeInterface;
@@ -17,6 +19,33 @@ use Drupal\rng\RegistrationTypeInterface;
  * Controller for registration entities.
  */
 class RegistrationController extends ControllerBase implements ContainerInjectionInterface {
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
+   * Constructs a new registration controller.
+   *
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
+   */
+  public function __construct(EventManagerInterface $event_manager) {
+    $this->eventManager = $event_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('rng.event_manager')
+    );
+  }
+
   /**
    * Generates a list of registration types for an event.
    *
@@ -29,32 +58,42 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
    * @return array A registration form.
    */
   public function RegistrationAddPage(RouteMatchInterface $route_match, $event) {
-    $render = array();
-    $render[]['#markup'] = '<p>' . t('Select registration type:') . '</p>';
     $event_entity = $route_match->getParameter($event);
-    $registration_types = array();
-    foreach ($event_entity->{RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE} as $registration_type_item) {
-      if ($registration_type = $registration_type_item->entity) {
-        $registration_types[] = $registration_type;
-        $url = new Url('rng.event.'. $event . '.register', array(
-          $event => $event_entity->id(),
-          'registration_type' => $registration_type->id(),
-        ));
-
-        $text = $this->l($registration_type->label(), $url);
-        $text .= !empty($registration_type->description) ? "<p>$registration_type->description</p>" : '<br />';
-        $render[]['#markup'] = $text;
-      }
-    }
-
-    // Skip registration type display if there is only one.
+    $render = [];
+    $registration_types = $this->eventManager->getMeta($event_entity)->getRegistrationTypes();
     if (count($registration_types) == 1) {
       $registration_type = array_shift($registration_types);
       return $this->redirect('rng.event.'. $event . '.register', array(
         $event => $event_entity->id(),
         'registration_type' => $registration_type->id(),
       ));
+    } else {
+      $render['links'] = array(
+        '#title' => $this->t('Select registration type'),
+        '#theme' => 'item_list',
+        '#items' => [],
+      );
     }
+
+    foreach ($registration_types as $registration_type) {
+      $item = [];
+      $url = new Url('rng.event.'. $event . '.register', [
+        $event => $event_entity->id(),
+        'registration_type' => $registration_type->id(),
+      ]);
+      $item[] = [
+        '#type' => 'link',
+        '#title' => $registration_type->label(),
+        '#url' => $url,
+        '#prefix' => '<h3>',
+        '#suffix' => '</h3>',
+      ];
+      if (!empty($registration_type->description)) {
+        $item[] = ['#markup' => $registration_type->description];
+      }
+      $render['links']['#items'][] = $item;
+    }
+
 
     return $render;
   }

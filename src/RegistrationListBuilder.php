@@ -9,11 +9,22 @@ namespace Drupal\rng;
 
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds a list of registrations.
  */
 class RegistrationListBuilder extends EntityListBuilder {
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
   /**
    * Row Counter.
    *
@@ -27,6 +38,30 @@ class RegistrationListBuilder extends EntityListBuilder {
    * @var EntityInterface
    */
   protected $event;
+
+  /**
+   * Constructs a new RegistrationListBuilder object.
+   *
+   * {@inheritdoc}
+   *
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
+   */
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EventManagerInterface $event_manager) {
+    parent::__construct($entity_type, $storage);
+    $this->eventManager = $event_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('rng.event_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -48,11 +83,7 @@ class RegistrationListBuilder extends EntityListBuilder {
    */
   public function load() {
     if (isset($this->event)) {
-      $registration_ids = \Drupal::entityQuery('registration')
-        ->condition('event__target_type', $this->event->getEntityTypeId(), '=')
-        ->condition('event__target_id', $this->event->id(), '=')
-        ->execute();
-      return entity_load_multiple('registration', $registration_ids);
+      return $this->eventManager->getMeta($this->event)->getRegistrations();
     }
     return parent::load();
   }
@@ -112,4 +143,5 @@ class RegistrationListBuilder extends EntityListBuilder {
     $row['created'] = format_date($entity->created->value);
     return $row + parent::buildRow($entity);
   }
+
 }

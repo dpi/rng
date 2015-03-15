@@ -23,6 +23,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  * )
  */
 class RegistrationGroupSelection extends SelectionBase {
+
   /**
    * {@inheritdoc}
    */
@@ -43,4 +44,5 @@ class RegistrationGroupSelection extends SelectionBase {
     //->condition('event__target_type', NULL, 'IS NULL')
     //->condition('event__target_id', NULL, 'IS NULL');
   }
+
 }

@@ -9,6 +9,7 @@
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
@@ -19,7 +20,7 @@ function rng_add_event_field_storage($field_name, $entity_type) {
 
   $definition = array();
   switch ($field_name) {
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE:
+    case EventManagerInterface::FIELD_REGISTRATION_TYPE:
       $definition = array(
         'type' => 'entity_reference',
         'settings' => array(
@@ -28,7 +29,7 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
+    case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $definition = array(
         'type' => 'entity_reference',
         'settings' => array(
@@ -37,7 +38,7 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_STATUS:
+    case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'type' => 'boolean',
         'settings' => array(
@@ -46,17 +47,17 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         ),
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_CAPACITY:
+    case EventManagerInterface::FIELD_CAPACITY:
       $definition = array(
         'type' => 'integer',
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO:
+    case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $definition = array(
         'type' => 'email',
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
+    case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'type' => 'boolean',
         'settings' => array(
@@ -84,26 +85,26 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
 
   $definition = array();
   switch ($field_name) {
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE:
+    case EventManagerInterface::FIELD_REGISTRATION_TYPE:
       $definition = array(
         'label' => 'Registration type',
         'settings' => array('handler' => 'default'),
         'description' => t('Select which registration types are valid for this event.'),
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
+    case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $definition = array(
         'label' => 'Registration groups',
         'settings' => array('handler' => 'default'),
         'description' => t('New registrations will be added to these groups.'),
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_STATUS:
+    case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'label' => 'Accept new registrations',
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_CAPACITY:
+    case EventManagerInterface::FIELD_CAPACITY:
       $definition = array(
         'label' => 'Maximum registrations',
         'description' => t('Maximum amount of registrations for this event. Leave empty for unlimited.'),
@@ -112,13 +113,13 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         )
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO:
+    case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $definition = array(
         'label' => t('Reply-to e-mail address'),
         'description' => t('E-mail address that appears as reply-to when emails are sent from this event. Leave empty to use site default.'),
       );
       break;
-    case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
+    case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'label' => 'Allow duplicate registrants',
         'description' => t('Allows a registrant to create more than one registration for this event.'),
@@ -150,27 +151,27 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
  */
 function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_display, $field_name = '') {
   switch ($field_name) {
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE:
+    case EventManagerInterface::FIELD_REGISTRATION_TYPE:
       $form_display->setComponent($field_name, array(
         'type' => 'options_select',
       ));
       break;
-    case RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS:
+    case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $form_display->setComponent($field_name, array(
         'type' => 'options_select',
       ));
       break;
-    case RNG_FIELD_EVENT_TYPE_STATUS:
+    case EventManagerInterface::FIELD_STATUS:
       $form_display->setComponent($field_name, array(
         'type' => 'boolean_checkbox',
       ));
       break;
-    case RNG_FIELD_EVENT_TYPE_CAPACITY:
+    case EventManagerInterface::FIELD_CAPACITY:
       $form_display->setComponent($field_name, array(
         'type' => 'number',
       ));
       break;
-    case RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO:
+    case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $form_display->setComponent($field_name, array(
         'type' => 'email_default',
         'settings' => array(
@@ -178,7 +179,7 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
         ),
       ));
       break;
-    case RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS:
+    case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $form_display->setComponent($field_name, array(
         'type' => 'boolean_checkbox',
       ));

@@ -9,6 +9,7 @@ namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessException;
@@ -17,6 +18,17 @@ use Drupal\Core\Access\AccessException;
  * Access controller for the registration entity.
  */
 class RegistrationAccessControlHandler extends EntityAccessControlHandler {
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  public function __construct(EntityTypeInterface $entity_type) {
+    parent::__construct($entity_type);
+    $this->eventManager = \Drupal::service('rng.event_manager');
+  }
 
   /**
    * {@inheritdoc}
@@ -42,14 +54,8 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         'entity:user' => $user,
       ];
 
-      $rule_ids = \Drupal::entityQuery('rng_rule')
-        ->condition('event__target_type', $event->getEntityTypeId(), '=')
-        ->condition('event__target_id', $event->id(), '=')
-        ->condition('trigger_id', 'rng_event.register', '=')
-        ->execute();
-
-      /* @var $rule \Drupal\rng\RuleInterface */
-      foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
+      $rules = $this->eventManager->getMeta($event)->getRules();
+      foreach($rules as $rule) {
         $actions = $rule->getActions();
         $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
           if ($action->getPluginId() == 'registration_operations') {
@@ -102,62 +108,37 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
    * @param \Drupal\rng\RegistrationTypeInterface $entity_bundle
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array(), $return_as_object = FALSE) {
-    // @todo, needs customisation at event level.
-    // @todo do event checks on wrapper
-    // @todo cache event checks (access is executed per valid bundle)
-
     if (!isset($context['event'])) {
       throw new AccessException('Requires event context.');
     }
 
-    /* @var $event EntityInterface */
-    $event = $context['event'];
     $account = $this->prepareUser($account);
-
-    if ($entity_bundle) {
-      $registration_types = array_map(function ($element) {
-        return $element['target_id'];
-      }, $event->{RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE}->getValue());
-      if (!in_array($entity_bundle->id(), $registration_types)) {
-        return AccessResult::forbidden();
-      };
-    }
-
     if ($account->isAnonymous()) {
       return AccessResult::neutral();
     }
 
-    if (empty($event->{RNG_FIELD_EVENT_TYPE_STATUS}->value)) {
+    $event_meta = $this->eventManager->getMeta($context['event']);
+
+    // $entity_bundle is omitted for registration type list at
+    // $event_path/register
+    if ($entity_bundle && !$event_meta->registrationTypeIsValid($entity_bundle)) {
+      return AccessResult::neutral();
+    }
+    // There are no registration types configured.
+    else if (!$event_meta->getRegistrationTypeIds()) {
       return AccessResult::neutral();
     }
 
-    if ($event->{RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE}->isEmpty()) {
+    if (!$event_meta->isAcceptingRegistrations()) {
       return AccessResult::neutral();
     }
 
-    $capacity = $event->{RNG_FIELD_EVENT_TYPE_CAPACITY}->value;
-    if ($capacity != '' && is_numeric($capacity) && $capacity > -1) {
-      $registration_count = \Drupal::entityQuery('registration')
-        ->condition('event__target_type', $event->getEntityTypeId(), '=')
-        ->condition('event__target_id', $event->id(), '=')
-        ->count()
-        ->execute();
-      if ($registration_count >= $capacity) {
-        return AccessResult::neutral();
-      }
+    if ($event_meta->remainingCapacity() == 0) {
+      return AccessResult::neutral();
     }
 
-    // Determine if current user has access to any un-registered identities.
-    if (empty($event->{RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS}->value)) {
-      $options = [
-        'target_type' => 'user',
-        'handler' => 'rng:register',
-        'handler_settings' => ['event' => $event],
-      ];
-      $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
-      if (!$handler->countReferenceableEntities()) {
-        return AccessResult::neutral();
-      }
+    if (!$event_meta->duplicateRegistrantsAllowed() && !$event_meta->countProxyIdentities()) {
+      return AccessResult::neutral();
     }
 
     return AccessResult::allowed();

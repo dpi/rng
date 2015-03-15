@@ -7,52 +7,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * ID of an `entity_reference` field attached to an event bundle.
- *
- * Specifies the registration type of registrations that can be created for
- * an event. This field references registration_type entities.
- */
-const RNG_FIELD_EVENT_TYPE_REGISTRATION_TYPE = 'rng_registration_type';
-
-/**
- * ID of an `entity_reference` field attached to an event bundle.
- *
- * Specifies the groups that are applied to new registrations. This field
- * references registration_group entities.
- */
-const RNG_FIELD_EVENT_TYPE_REGISTRATION_GROUPS = 'rng_registration_groups';
-
-/**
- * ID of an `boolean` field attached to an event bundle.
- *
- * Whether an event is accepting new registrations.
- */
-const RNG_FIELD_EVENT_TYPE_STATUS = 'rng_status';
-
-/**
- * ID of an `integer` field attached to an event bundle.
- *
- * The absolute maximum number of registrations that can be created
- * for an event. A negative or missing value indicates unlimited capacity.
- */
-const RNG_FIELD_EVENT_TYPE_CAPACITY = 'rng_capacity';
-
-/**
- * ID of an `email` field attached to an event bundle.
- *
- * Reply-to address for e-mails sent from an event.
- */
-const RNG_FIELD_EVENT_TYPE_EMAIL_REPLY_TO = 'rng_reply_to';
-
-/**
- * ID of an `boolean` field attached to an event bundle.
- *
- * Whether an event allows a registrant to associate with multiple
- * registrations. An empty value reverts to the site default.
- */
-const RNG_FIELD_EVENT_TYPE_ALLOW_DUPLICATE_REGISTRANTS = 'rng_registrants_duplicate';
-
-/**
  * Implements hook_help().
  */
 function rng_help($route_name, RouteMatchInterface $route_match) {
@@ -68,8 +22,10 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
  */
 function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account, $langcode) {
   if ($operation == 'manage event') {
-    $event_config = rng_entity_bundle($entity->getEntityTypeId(), $entity->bundle());
-    if ($event_config && !empty($event_config->mirror_update_permission)) {
+    $event_config = \Drupal::service('rng.event_manager')
+      ->event_type($entity->getEntityTypeId(), $entity->bundle());
+    // Check if we are mirroring another operation, and prevent recursion
+    if ($event_config && !empty($event_config->mirror_update_permission) && $event_config->mirror_update_permission != 'manage event') {
       if ($entity->access($event_config->mirror_update_permission, $account)) {
         return AccessResult::allowed();
       }
@@ -88,46 +44,6 @@ function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       if (strstr($permission_id, 'rng register')) {
         $permission['anonymous']['#disabled'] = TRUE;
       }
-    }
-  }
-}
-
-/**
- * Get event type config for an event bundle.
- *
- * Use this to test whether an entity bundle is an event type.
- *
- * @param string $entity_type
- *   An entity type ID.
- * @param string $bundle
- *   A bundle ID.
- *
- * @return \Drupal\rng\EventTypeConfigInterface|null
- */
-function rng_entity_bundle($entity_type, $bundle) {
-  return entity_load('event_type_config', "$entity_type.$bundle");
-}
-
-/**
- * Trigger rules.
- *
- * @param string $trigger_id
- * @param array $context
- */
-function rng_rule_trigger($trigger_id, $context = array()) {
-  $event = $context['event'];
-
-  $rule_ids = \Drupal::entityQuery('rng_rule')
-    ->condition('event__target_type', $event->getEntityTypeId(), '=')
-    ->condition('event__target_id', $event->id(), '=')
-    ->condition('trigger_id', $trigger_id, '=')
-    ->execute();
-
-  foreach(entity_load_multiple('rng_rule', $rule_ids) as $rule) {
-    /* @var \Drupal\rng\RuleInterface $rule */
-    foreach($rule->getActions() as $action) {
-      // @todo: get contexts for $rule; ensure they exist on $context.
-      $action->execute($context);
     }
   }
 }

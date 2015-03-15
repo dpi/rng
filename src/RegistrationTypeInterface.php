@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\rng;
+
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
