@@ -134,7 +134,7 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  protected function buildQuery($entity_type) {
+  function buildQuery($entity_type) {
     return $this->entityManager->getStorage($entity_type)->getQuery('AND')
       ->condition('event__target_type', $this->getEvent()->getEntityTypeId(), '=')
       ->condition('event__target_id', $this->getEvent()->id(), '=');
