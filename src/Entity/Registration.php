@@ -110,7 +110,6 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function hasIdentity(EntityInterface $identity) {
-    $keys = array($identity->getEntityTypeId(), $identity->id());
     foreach ($this->getRegistrants() as $registrant) {
       if ($registrant->hasIdentity($identity)) {
         return TRUE;
@@ -131,9 +130,11 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       // Registration needs an ID before a registrant can be saved.
       throw new \Exception('Registration not saved');
     }
-    return entity_create('registrant', ['registration' => $this])
-      ->setIdentity($identity)
-      ->save();
+    $registrant = entity_create('registrant', ['registration' => $this])
+      ->setIdentity($identity);
+    $registrant->save();
+    $this->registrant_ids[] = $registrant->id();
+    return $registrant;
   }
 
   /**
