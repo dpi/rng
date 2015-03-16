@@ -50,7 +50,7 @@ interface RuleInterface extends ContentEntityInterface {
    * Evaluates all conditions on the rule.
    *
    * @param array $context_values
-   *   Context to pass to conditions.
+   *   Context to pass to conditions. Keyed by context name.
    *
    * @return bool
    *   Whether all conditions evaluate true. Evaluation will fail if there are

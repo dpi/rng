@@ -100,14 +100,10 @@ class Rule extends ContentEntityBase implements RuleInterface {
         $count++;
       }
 
-      // Add all context to the conditions
-      foreach ($condition->getContextDefinitions() as $name => $context) {
-        $data_type = $context->getDataType();
-        if (isset($context_values[$data_type])) {
-          $condition->setContextValue($name, $context_values[$data_type]);
-        }
-        else if ($context->isRequired()) {
-          throw new ContextException(String::format("Missing context @type for condition @plugin_id on rule #@rule_id.", array('@type' => $data_type, '@plugin_id' => $condition_storage->getPluginId(), '@rule_id' => $this->id())));
+      $context_definitions = ($condition->getContextDefinitions());
+      foreach ($context_values as $name => $value) {
+        if (isset($context_definitions[$name])) {
+          $condition->setContextValue($name, $value);
         }
       }
 

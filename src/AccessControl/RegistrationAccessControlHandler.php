@@ -74,10 +74,9 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       // Event access rules.
       $user = entity_load('user', $account->id());
       $context_values = [
-        'rng:event' => $event,
-        'rng:identity' => $user,
-        'entity:registration' => $entity,
-        'entity:user' => $user,
+        'event' => $event,
+        'registration' => $entity,
+        'user' => $user, // replace with rng_identity.
       ];
 
       $rules = $this->eventManager->getMeta($event)->getRules();

@@ -100,7 +100,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register');
     foreach($rules as $rule) {
       $row = [];
-      $data_types = [];
+      $condition_context = []; // Names of all condition contexts
 
       foreach ($rule->getConditions() as $condition_storage) {
         $condition = $condition_storage->createInstance();
@@ -116,11 +116,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           ];
         }
 
-        // Warn user actions apply to all registrations if conditions have no
-        // entity:registration context.
-        foreach ($condition->getContextDefinitions() as $context) {
-          $data_types[] = $context->getDataType();
-        };
+        $condition_context += array_keys($condition->getContextDefinitions());
 
         // Support one condition for now.
         break;
@@ -132,7 +128,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $ops = ['create' => NULL, 'view' => NULL, 'update' => NULL, 'delete' => NULL];
         foreach (array_keys($ops) as $op) {
           $message = !empty($conf['operations'][$op]) ? $this->t($op) : '-';
-          $row['operation_' . $op] = ($op == 'create' && in_array('entity:registration', $data_types)) ? $this->t('<em>N/A</em>') : $message;
+          $row['operation_' . $op] = ($op == 'create' && in_array('registration', $condition_context)) ? $this->t('<em>N/A</em>') : $message;
         }
 
         $row['action_operations']['data'] = ['#type' => 'operations'];
@@ -144,7 +140,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           ];
         }
 
-        if (!in_array('entity:registration', $data_types) || in_array('rng:event', $data_types)) {
+        // Warn user actions apply to all registrations
+        if (!in_array('registration', $condition_context) || in_array('event', $condition_context)) {
           $row[] = $this->t('<strong>Warning:</strong> selecting view, update, or delete grants operations for any registration on this event.');
         }
         else {

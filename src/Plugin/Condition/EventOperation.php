@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "rng_event_operation",
  *   label = @Translation("Operation on event"),
  *   context = {
- *     "event" = @ContextDefinition("all",
+ *     "event" = @ContextDefinition("entity",
  *       label = @Translation("Event"),
  *       required = FALSE
  *     ),
