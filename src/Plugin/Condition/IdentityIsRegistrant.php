@@ -18,7 +18,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @Condition(
  *   id = "rng_registration_identity",
- *   label = @Translation("Identity is registrant"),
+ *   label = @Translation("Registration has identity"),
  *   context = {
  *     "user" = @ContextDefinition("entity:user",
  *       label = @Translation("Registrant"),
@@ -45,7 +45,7 @@ class IdentityIsRegistrant extends ConditionPluginBase implements RNGConditionIn
    * {@inheritdoc}
    */
   public function summary() {
-    return $this->t('Registration has identity.');
+    return $this->t('Logged-in user is a registrant.');
   }
 
   /**

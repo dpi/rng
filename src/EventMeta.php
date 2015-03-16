@@ -246,7 +246,7 @@ class EventMeta implements EventMetaInterface {
    */
   function addDefaultAccess() {
     // Allow any user to create a registration on the event.
-    $rules['user_role']['conditions']['rng_user_role'] = ['roles' => ['authenticated' => 'authenticated']];
+    $rules['user_role']['conditions']['rng_user_role'] = ['roles' => []];
     $rules['user_role']['actions']['registration_operations'] = ['operations' => ['create' => TRUE]];
 
     // Allow registrants to edit their registrations.

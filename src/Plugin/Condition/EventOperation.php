@@ -37,12 +37,13 @@ use Drupal\Core\Form\FormStateInterface;
  *
  */
 class EventOperation extends ConditionPluginBase implements RNGConditionInterface  {
+
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     // @todo: select an operation.
-    $form['description']['#markup'] = $this->t('For @operation operations.', ['@operation' => implode(' ', array_keys($this->configuration['operations']))]);
+    $form['description']['#markup'] = $this->t('For %operation operations.', ['%operation' => implode(' ', array_keys($this->configuration['operations']))]);
     return $form;
   }
 
@@ -50,24 +51,25 @@ class EventOperation extends ConditionPluginBase implements RNGConditionInterfac
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
-      'operations' => array(),
-    ) + parent::defaultConfiguration();
+    return [
+      'operations' => ['manage event' => TRUE],
+    ] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
   public function summary() {
-    $config = $this->configuration['operations'];
-    $operations = (count($config) > 1) ? implode(', ', $config) : reset($config);
+    $operations_all = $this->configuration['operations'];
+    // Filter operations where value is TRUE
+    $operations = array_filter($operations_all, function ($operation) use ($operations_all) {
+      return $operation;
+    });
 
-    if (!empty($this->configuration['negate'])) {
-      return $this->t('The user is has @operations on event.', array('@operations' => $operations));
-    }
-    else {
-      return $this->t('The user does not have @operations on event.', array('@operations' => $operations));
-    }
+    return $this->t(
+      empty($this->configuration['negate']) ? 'Logged-in user has access to @operations the event.' : 'Logged-in user does not have access @operations the event.',
+      ['@operations' => count($operations) > 1 ? implode(' and ', array_keys($operations)) : key($operations)]
+    );
   }
 
   /**
@@ -87,4 +89,5 @@ class EventOperation extends ConditionPluginBase implements RNGConditionInterfac
    * {@inheritdoc}
    */
   function alterQuery(&$query) {  }
+
 }

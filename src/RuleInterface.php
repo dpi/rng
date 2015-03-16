@@ -33,7 +33,7 @@ interface RuleInterface extends ContentEntityInterface {
   /**
    * Get actions for the rule.
    *
-   * @return ActionInterface[]
+   * @return \Drupal\rng\ActionInterface[]
    *   An array of action entities.
    */
   public function getActions();
@@ -41,7 +41,7 @@ interface RuleInterface extends ContentEntityInterface {
   /**
    * Get conditions for the rule.
    *
-   * @return ActionInterface[]
+   * @return \Drupal\rng\ActionInterface[]
    *   An array of action entities.
    */
   public function getConditions();
@@ -52,7 +52,7 @@ interface RuleInterface extends ContentEntityInterface {
    * @param array $context_values
    *   Context to pass to conditions.
    *
-   * @return bool Whether all conditions evaluate true.
+   * @return bool
    *   Whether all conditions evaluate true. Evaluation will fail if there are
    *   no conditions associated with the rule.
    *

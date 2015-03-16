@@ -102,27 +102,23 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       $row = [];
       $data_types = [];
 
-      foreach ($rule->getConditions() as $condition) {
-        $plugin_id = $condition->getPluginId();
-        $config = $condition->getConfiguration();
+      foreach ($rule->getConditions() as $condition_storage) {
+        $condition = $condition_storage->createInstance();
 
-
-        $definition = $this->conditionManager->getDefinition($plugin_id);
-        $row['condition'] = $definition['label'];
+        $row['condition'] = $condition->summary();
 
         $row['condition_operations']['data'] = ['#type' => 'operations'];
-        if ($condition->access('edit')) {
+        if ($condition_storage->access('edit')) {
           $row['condition_operations']['data']['#links']['edit'] = [
             'title' => t('Edit'),
-            'url' => $condition->urlInfo('edit-form'),
+            'url' => $condition_storage->urlInfo('edit-form'),
             'query' => $destination,
           ];
         }
 
         // Warn user actions apply to all registrations if conditions have no
         // entity:registration context.
-        $handler = $this->conditionManager->createInstance($plugin_id, $config);
-        foreach ($handler->getContextDefinitions() as $context) {
+        foreach ($condition->getContextDefinitions() as $context) {
           $data_types[] = $context->getDataType();
         };
 

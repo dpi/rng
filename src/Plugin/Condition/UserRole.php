@@ -27,6 +27,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  */
 class UserRole extends CoreUserRole implements RNGConditionInterface  {
+
   /**
    * {@inheritdoc}
    */
@@ -34,11 +35,28 @@ class UserRole extends CoreUserRole implements RNGConditionInterface  {
     $form = parent::buildConfigurationForm($form, $form_state);
     // @todo: change to AND
     //$form['roles']['#title'] = $this->t('When the user has all of the following roles');
+    $roles = user_role_names(TRUE);
+    // @todo: update constant in drupal8-beta8 to AccountInterface:: constant
+    unset($roles[DRUPAL_AUTHENTICATED_RID]);
     $form['roles']['#title'] = $this->t('When the user has any one of the following roles');
-    $form['roles']['#options'] = array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names(TRUE));
-    // disable authenticated until condition evaluates as AND.
-    unset($form['roles']['#options']['authenticated']);
+    $form['roles']['#options'] = array_map('\Drupal\Component\Utility\String::checkPlain', $roles);
+    $form['roles']['#description'] = $this->t('If you select no roles, the condition will evaluate to TRUE for all logged-in users.');
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function summary() {
+    if (!$this->configuration['roles']) {
+      return $this->t('User is logged-in.');
+    }
+
+    $roles = array_intersect_key(user_role_names(), $this->configuration['roles']);
+    return $this->t(
+      empty($this->configuration['negate']) ? 'User is a member of @roles' : 'User is not a member of @roles',
+      ['@roles' => count($roles) > 1 ? implode(' and ', $roles) : reset($roles)]
+    );
   }
 
   /**
@@ -56,4 +74,5 @@ class UserRole extends CoreUserRole implements RNGConditionInterface  {
       $query->condition('roles', $roles, 'IN');
     }
   }
+
 }
