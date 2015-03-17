@@ -105,7 +105,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       foreach ($rule->getConditions() as $condition_storage) {
         $condition = $condition_storage->createInstance();
 
-        $row['condition'] = $condition->summary();
+        $row['condition']['data']['#markup'] = $condition->summary();
 
         $row['condition_operations']['data'] = ['#type' => 'operations'];
         if ($condition_storage->access('edit')) {

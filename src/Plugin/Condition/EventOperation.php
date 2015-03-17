@@ -22,10 +22,6 @@ use Drupal\Core\Form\FormStateInterface;
  *   context = {
  *     "event" = @ContextDefinition("entity",
  *       label = @Translation("Event"),
- *       required = FALSE
- *     ),
- *     "registration" = @ContextDefinition("entity:registration",
- *       label = @Translation("Registration"),
  *       required = TRUE
  *     ),
  *     "user" = @ContextDefinition("entity:user",
@@ -60,15 +56,16 @@ class EventOperation extends ConditionPluginBase implements RNGConditionInterfac
    * {@inheritdoc}
    */
   public function summary() {
-    $operations_all = $this->configuration['operations'];
-    // Filter operations where value is TRUE
-    $operations = array_filter($operations_all, function ($operation) use ($operations_all) {
-      return $operation;
-    });
+    $operations = [];
+    foreach ($this->configuration['operations'] as $operation => $granted) {
+      if ($granted) {
+        $operations[] = $this->t("%operation", ['%operation' => $operation]);
+      }
+    }
 
     return $this->t(
-      empty($this->configuration['negate']) ? 'Logged-in user has access to @operations the event.' : 'Logged-in user does not have access @operations the event.',
-      ['@operations' => count($operations) > 1 ? implode(' and ', array_keys($operations)) : key($operations)]
+      !$this->isNegated() ? 'Logged-in user has access to operations on event: !operations' : 'Logged-in user does not have access to operations on event: !operations',
+      ['!operations' => count($operations) > 1 ? implode($this->t(' and '), $operations) : reset($operations)]
     );
   }
 
@@ -79,9 +76,8 @@ class EventOperation extends ConditionPluginBase implements RNGConditionInterfac
     $operation = 'manage event';
     /* @var \Drupal\user\UserInterface $user */
     $user = $this->getContextValue('user');
-    /* @var \Drupal\rng\RegistrationInterface $registration */
-    $registration = $this->getContextValue('registration');
-    $event = $registration->getEvent();
+    /* @var \Drupal\Core\Entity\EntityInterface $event */
+    $event = $this->getContextValue('event');
     return $event->access($operation);
   }
 
