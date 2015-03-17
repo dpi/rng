@@ -183,9 +183,6 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $header = array(t('When'), t('Do'), t('Operations'));
     $rows = array();
 
-    /* @var ActionManager $manager */
-    $manager = \Drupal::service('plugin.manager.action');
-
     // list of communication related action plugin ids
     $communication_actions = array('rng_registrant_email');
 
@@ -196,7 +193,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $row = array();
         $action_id = $action->getPluginId();
         if (in_array($action_id, $communication_actions)) {
-          $definition = $manager->getDefinition($action_id);
+          $definition = $this->actionManager->getDefinition($action_id);
           $row['trigger'] = $rule->getTriggerID();
           $row['action']['data'] = $definition['label'];
 

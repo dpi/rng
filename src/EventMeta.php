@@ -9,6 +9,7 @@ namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -31,15 +32,25 @@ class EventMeta implements EventMetaInterface {
   protected $entityManager;
 
   /**
+   * The selection plugin manager.
+   *
+   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   */
+  protected $selectionPluginManager;
+
+  /**
    * Constructs a new EventMeta object.
    *
    * @param \Drupal\Core\Entity\EntityManager $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_plugin_manager
+   *   The selection plugin manager.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.
    */
-  function __construct(EntityManager $entity_manager, EntityInterface $entity) {
+  function __construct(EntityManager $entity_manager, SelectionPluginManagerInterface $selection_plugin_manager, EntityInterface $entity) {
     $this->entityManager = $entity_manager;
+    $this->selectionPluginManager = $selection_plugin_manager;
     $this->entity = $entity;
   }
 
@@ -49,6 +60,7 @@ class EventMeta implements EventMetaInterface {
   public static function createInstance(ContainerInterface $container, EntityInterface $entity) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('plugin.manager.entity_reference_selection'),
       $entity
     );
   }
@@ -232,13 +244,14 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   function countProxyIdentities() {
-    $options = [
+    return $this
+      ->selectionPluginManager
+      ->getInstance([
       'target_type' => 'user',
       'handler' => 'rng:register',
       'handler_settings' => ['event' => $this->getEvent()],
-    ];
-    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
-    return $handler->countReferenceableEntities();
+      ])
+      ->countReferenceableEntities();
   }
 
   /**
