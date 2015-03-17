@@ -126,7 +126,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::neutral();
     }
 
-    if (!$event_meta->duplicateRegistrantsAllowed() && !$event_meta->countProxyIdentities()) {
+    if (!$event_meta->countProxyIdentities()) {
       return AccessResult::neutral();
     }
 
