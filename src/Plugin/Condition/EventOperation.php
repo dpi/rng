@@ -32,7 +32,7 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  *
  */
-class EventOperation extends ConditionPluginBase implements RNGConditionInterface  {
+class EventOperation extends ConditionPluginBase {
 
   /**
    * {@inheritdoc}
@@ -80,10 +80,5 @@ class EventOperation extends ConditionPluginBase implements RNGConditionInterfac
     $event = $this->getContextValue('event');
     return $event->access($operation);
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  function alterQuery(&$query) {  }
 
 }

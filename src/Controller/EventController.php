@@ -14,6 +14,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\rng\RNGConditionInterface;
 
 /**
  * Controller for events.
@@ -101,9 +102,13 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     foreach($rules as $rule) {
       $row = [];
       $condition_context = []; // Names of all condition contexts
+      $supports_create = 0; // count conditions supporting create (alter query)
 
       foreach ($rule->getConditions() as $condition_storage) {
         $condition = $condition_storage->createInstance();
+        if ($condition instanceof RNGConditionInterface) {
+          $supports_create++;
+        }
 
         $row['condition']['data']['#markup'] = $condition->summary();
 
@@ -128,7 +133,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $ops = ['create' => NULL, 'view' => NULL, 'update' => NULL, 'delete' => NULL];
         foreach (array_keys($ops) as $op) {
           $message = !empty($conf['operations'][$op]) ? $this->t($op) : '-';
-          $row['operation_' . $op] = ($op == 'create' && in_array('registration', $condition_context)) ? $this->t('<em>N/A</em>') : $message;
+          $row['operation_' . $op] = ($op == 'create' && ($supports_create != count($rule->getConditions()))) ? $this->t('<em>N/A</em>') : $message;
         }
 
         $row['action_operations']['data'] = ['#type' => 'operations'];

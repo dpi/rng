@@ -32,7 +32,8 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  *
  */
-class IdentityIsRegistrant extends ConditionPluginBase implements RNGConditionInterface  {
+class IdentityIsRegistrant extends ConditionPluginBase {
+
   /**
    * {@inheritdoc}
    */
@@ -65,8 +66,4 @@ class IdentityIsRegistrant extends ConditionPluginBase implements RNGConditionIn
     return FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  function alterQuery(&$query) {  }
 }

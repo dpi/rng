@@ -15,6 +15,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Condition\ConditionManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\rng\RNGConditionInterface;
 
 /**
  * Provides selection for user entities when registering.
@@ -116,10 +117,12 @@ class RegisterUserSelection extends UserSelection {
       });
 
       if ($action = array_shift($operations_actions)) {
-        foreach ($rule->getConditions() as $condition) {
-          $condition_count++;
-          $condition_instance = $this->conditionManager->createInstance($condition->getPluginId(), $condition->getConfiguration());
-          $condition_instance->alterQuery($query);
+        foreach ($rule->getConditions() as $condition_storage) {
+          // Do not use condition if it cannot alter query.
+          if (($condition = $condition_storage->createInstance()) instanceof RNGConditionInterface) {
+            $condition_count++;
+            $condition->alterQuery($query);
+          }
         }
       }
     }

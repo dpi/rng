@@ -48,7 +48,7 @@ class UserRole extends CoreUserRole implements RNGConditionInterface {
    */
   public function summary() {
     if (!$this->configuration['roles']) {
-      return $this->t('User is logged-in.');
+      return $this->t('Any registered user');
     }
 
     $roles = array_intersect_key(user_role_names(), $this->configuration['roles']);
