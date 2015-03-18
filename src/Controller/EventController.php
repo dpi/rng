@@ -85,32 +85,57 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $event = $route_match->getParameter($event);
     $destination = drupal_get_destination();
     $build = [];
-    $rows = [];
-    $header = [
-      'condition' => ['colspan' => 2, 'data' => $this->t('Condition')],
-      'operations' => ['colspan' => 5, 'data' => $this->t('Operations')],
-      'scope' => $this->t('Scope'),
-    ];
 
     $build['description'] = [
       '#prefix' => '<p>',
-      '#markup' => $this->t('The following rules determine who is eligible to register.'),
+      '#markup' => $this->t('The following rules determine who is eligible to register or perform an operation on a registration.<br />Access is granted if all conditions for a rule evaluate as true.'),
       '#suffix' => '</p>',
     ];
 
+    $rows = [];
+
+    // Header
+    $rows[] = [
+      ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Rule')],
+      ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Component')],
+      ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Scope')],
+      ['header' => TRUE, 'rowspan' => 1, 'data' => $this->t('Operations'), 'colspan' => 4],
+      ['header' => TRUE, 'rowspan' => 2, 'data' => ''],
+    ];
+    $operations = ['create' => $this->t('Create'), 'view' => $this->t('View'), 'update' => $this->t('Update'), 'delete' => $this->t('Delete')];
+    foreach ($operations as $operation) {
+      $rows['operations'][] = [
+        'header' => TRUE,
+        'data' => $operation,
+      ];
+    }
+
+    $i = 0;
     $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register');
     foreach($rules as $rule) {
-      $row = [];
-      $condition_context = []; // Names of all condition contexts
-      $supports_create = 0; // count conditions supporting create (alter query)
+      $i++;
+      $scope_all = FALSE;
+      $supports_create = 0;
+      $condition_context = [];
 
+      // Conditions
+      $k = 0;
+      $row = [];
+      $row['rule'] = ['header' => FALSE, 'data' => $this->t('@row.', ['@row' => $i]), 'rowspan' => count($rule->getConditions()) + 1];
       foreach ($rule->getConditions() as $condition_storage) {
+        $k++;
+        $row[] = ['header' => TRUE, 'data' => $this->t('Condition #@condition', ['@condition' => $k])];
         $condition = $condition_storage->createInstance();
+        $condition_context += array_keys($condition->getContextDefinitions());
+        $scope_all = (!in_array('registration', $condition_context) || in_array('event', $condition_context));
+        if (isset($row['rule']['rowspan']) && $scope_all) {
+          $row['rule']['rowspan']++;
+        }
+
         if ($condition instanceof RNGConditionInterface) {
           $supports_create++;
         }
-
-        $row['condition']['data']['#markup'] = $condition->summary();
+        $row[] = ['colspan' => 5, 'data' => $condition->summary()];
 
         $row['condition_operations']['data'] = ['#type' => 'operations'];
         if ($condition_storage->access('edit')) {
@@ -121,48 +146,49 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           ];
         }
 
-        $condition_context += array_keys($condition->getContextDefinitions());
-
-        // Support one condition for now.
-        break;
+        $rows[] = ['data' => $row, 'no_striping' => TRUE];
+        $row = [];
       }
 
-      foreach ($rule->getActions() as $action) {
-        $conf = $action->getConfiguration();
+      // Actions
+      foreach ($rule->getActions() as $action_storage) {
+        $row = [];
+        $row[] = ['header' => TRUE, 'data' => $this->t('Grants operations'), 'rowspan' => $scope_all ? 2 : 1];
 
-        $ops = ['create' => NULL, 'view' => NULL, 'update' => NULL, 'delete' => NULL];
-        foreach (array_keys($ops) as $op) {
-          $message = !empty($conf['operations'][$op]) ? $this->t($op) : '-';
-          $row['operation_' . $op] = ($op == 'create' && ($supports_create != count($rule->getConditions()))) ? $this->t('<em>N/A</em>') : $message;
+        // Scope: warn user actions apply to all registrations
+        $row[]['data'] = $scope_all ? $this->t('All registrations.') : $this->t('Single registration');
+
+        // Operations granted
+        $config = $action_storage->getConfiguration();
+        foreach ($operations as $op => $t) {
+          $message = !empty($config['operations'][$op]) ? $t : '-';
+          $row['operation_' . $op] = ['data' => ($op == 'create' && ($supports_create != count($rule->getConditions()))) ? $this->t('<em>N/A</em>') : $message];
         }
 
-        $row['action_operations']['data'] = ['#type' => 'operations'];
-        if ($action->access('edit')) {
-          $row['action_operations']['data']['#links']['edit'] = [
+        $links = [];
+        if ($action_storage->access('edit')) {
+          $links['edit'] = [
             'title' => t('Edit'),
-            'url' => $action->urlInfo('edit-form'),
+            'url' => $action_storage->urlInfo('edit-form'),
             'query' => $destination,
           ];
         }
 
-        // Warn user actions apply to all registrations
-        if (!in_array('registration', $condition_context) || in_array('event', $condition_context)) {
-          $row[] = $this->t('<strong>Warning:</strong> selecting view, update, or delete grants operations for any registration on this event.');
-        }
-        else {
-          $row[] = $this->t('For a single registration.');
-        }
+        $row[] = ['data' => ['#type' => 'operations', '#links' => $links], 'rowspan' => $scope_all ? 2 : 1];
+        $rows[] = $row;
 
-        // Support one action for now.
-        break;
+        if ($scope_all) {
+          $rows[] = [[
+            'data' => $this->t('<strong>Warning:</strong> selecting view, update, or delete grants access to any registration on this event.'),
+            'colspan' => 5,
+          ]];
+        }
       }
-      $rows[] = $row;
     }
 
-    $build['access_list'] = [
+    $build[] = [
       '#type' => 'table',
-      '#header' => $header,
-      '#title' => $this->t('Access'),
+      '#header' => [],
       '#rows' => $rows,
       '#empty' => $this->t('No access rules.'),
     ];
