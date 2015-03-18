@@ -8,6 +8,7 @@
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
 use Drupal\user\Plugin\EntityReferenceSelection\UserSelection;
+use Drupal\rng\RuleGrantsOperationTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -29,6 +30,8 @@ use Drupal\rng\RNGConditionInterface;
  * )
 */
 class RegisterUserSelection extends UserSelection {
+
+  use RuleGrantsOperationTrait;
 
   /**
    * The RNG event manager.
@@ -106,17 +109,7 @@ class RegisterUserSelection extends UserSelection {
     $condition_count = 0;
     $rules = $event_meta->getRules('rng_event.register');
     foreach($rules as $rule) {
-      $operation = 'create';
-      $actions = $rule->getActions();
-      $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
-        if ($action->getPluginId() == 'registration_operations') {
-          $config = $action->getConfiguration();
-          return !empty($config['operations'][$operation]);
-        }
-        return FALSE;
-      });
-
-      if ($action = array_shift($operations_actions)) {
+      if ($this->ruleGrantsOperation($rule, 'create')) {
         foreach ($rule->getConditions() as $condition_storage) {
           // Do not use condition if it cannot alter query.
           if (($condition = $condition_storage->createInstance()) instanceof RNGConditionInterface) {

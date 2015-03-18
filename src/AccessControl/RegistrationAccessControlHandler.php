@@ -9,8 +9,8 @@ namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\rng\RuleGrantsOperationTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\rng\RuleInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessException;
@@ -19,6 +19,9 @@ use Drupal\Core\Access\AccessException;
  * Access controller for the registration entity.
  */
 class RegistrationAccessControlHandler extends EntityAccessControlHandler {
+
+  use RuleGrantsOperationTrait;
+
   /**
    * The RNG event manager.
    *
@@ -29,31 +32,6 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   public function __construct(EntityTypeInterface $entity_type) {
     parent::__construct($entity_type);
     $this->eventManager = \Drupal::service('rng.event_manager');
-  }
-
-  /**
-   * Checks if any operation actions on a rule grant $operation access.
-   *
-   * This does not evaluate conditions.
-   *
-   * @param \Drupal\rng\RuleInterface $rule
-   *   A rule entity.
-   * @param string $operation
-   *   A registration operation.
-   *
-   * @return bool
-   *   Whether $operation is granted by the actions.
-   */
-  protected function ruleGrantsOperation(RuleInterface $rule, $operation) {
-    $actions = $rule->getActions();
-    $operations_actions = array_filter($actions, function ($action) use ($actions, $operation) {
-      if ($action->getPluginId() == 'registration_operations') {
-        $config = $action->getConfiguration();
-        return !empty($config['operations'][$operation]);
-      }
-      return FALSE;
-    });
-    return (boolean)count($operations_actions);
   }
 
   /**
