@@ -110,7 +110,7 @@ class RegistrationForm extends ContentEntityForm {
       foreach ($sorted as $entity_type_id) {
         $options = [
           'target_type' => $entity_type_id,
-          'handler' => 'rng:register',
+          'handler' => 'rng_register',
           'handler_settings' => ['event' => $event],
         ];
 
@@ -145,7 +145,7 @@ class RegistrationForm extends ContentEntityForm {
             '#title' => $entity_type->getLabel(),
             '#title_display' => 'invisible',
             '#target_type' => $entity_type_id,
-            '#selection_handler' => 'rng:register',
+            '#selection_handler' => 'rng_register',
             '#selection_settings' => ['event' => $event],
             '#tags' => FALSE,
             '#parents' => array('entity', $entity_type_id),

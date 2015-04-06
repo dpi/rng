@@ -248,7 +248,7 @@ class EventMeta implements EventMetaInterface {
       ->selectionPluginManager
       ->getInstance([
       'target_type' => 'user',
-      'handler' => 'rng:register',
+      'handler' => 'rng_register',
       'handler_settings' => ['event' => $this->getEvent()],
       ])
       ->countReferenceableEntities();

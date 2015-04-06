@@ -41,10 +41,6 @@ function rng_add_event_field_storage($field_name, $entity_type) {
     case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'type' => 'boolean',
-        'settings' => array(
-          'on_label' => t('Accepting new registrations'),
-          'off_label' => t('Not accepting new registrations'),
-        ),
       );
       break;
     case EventManagerInterface::FIELD_CAPACITY:
@@ -60,10 +56,6 @@ function rng_add_event_field_storage($field_name, $entity_type) {
     case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'type' => 'boolean',
-        'settings' => array(
-          'on_label' => t('Allow duplicate registrants for this event'),
-          'off_label' => t('Do not allow duplicate registrants for this event'),
-        ),
       );
       break;
   }
@@ -102,6 +94,10 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'label' => 'Accept new registrations',
+        'settings' => [
+          'on_label' => t('Accepting new registrations'),
+          'off_label' => t('Not accepting new registrations'),
+        ],
       );
       break;
     case EventManagerInterface::FIELD_CAPACITY:
@@ -123,6 +119,10 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
       $definition = array(
         'label' => 'Allow duplicate registrants',
         'description' => t('Allows a registrant to create more than one registration for this event.'),
+        'settings' => [
+          'on_label' => t('Allow duplicate registrants for this event'),
+          'off_label' => t('Do not allow duplicate registrants for this event'),
+        ],
       );
       break;
   }

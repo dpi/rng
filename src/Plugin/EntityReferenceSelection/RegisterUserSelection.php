@@ -25,7 +25,7 @@ use Drupal\rng\RNGConditionInterface;
  *   id = "rng:register:user",
  *   label = @Translation("User selection"),
  *   entity_types = {"user"},
- *   group = "rng:register",
+ *   group = "rng_register",
  *   weight = 10
  * )
 */
