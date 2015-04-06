@@ -30,7 +30,6 @@ use Drupal\Core\Form\FormStateInterface;
  *     )
  *   }
  * )
- *
  */
 class EventOperation extends ConditionPluginBase {
 

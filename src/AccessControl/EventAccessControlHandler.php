@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\AccessControl\EventAccessControlHandler
+ * Contains \Drupal\rng\AccessControl\EventAccessControlHandler.
  */
 
 namespace Drupal\rng\AccessControl;
@@ -28,4 +28,5 @@ class EventAccessControlHandler extends EntityAccessControlHandler {
     }
     return AccessResult::neutral();
   }
+
 }

@@ -121,7 +121,6 @@ class EventSettingsForm extends FormBase {
     $event->save();
 
     // Create base register rules if none exist.
-
     $query = $this->eventManager->getMeta($event)->buildRuleQuery();
     $rule_count = $query->condition('trigger_id', 'rng_event.register', '=')->count()->execute();
     if (!$rule_count) {
@@ -131,4 +130,5 @@ class EventSettingsForm extends FormBase {
     $t_args = array('%event_label' => $event->label());
     drupal_set_message(t('Event settings updated.', $t_args));
   }
+
 }

@@ -78,7 +78,7 @@ class RegistrationForm extends ContentEntityForm {
         array(
           '%event_label' => $event->label(),
           '%event_id' => $event->id(),
-          '%registration_id' => $registration->id()
+          '%registration_id' => $registration->id(),
         )
       );
     }
@@ -99,12 +99,12 @@ class RegistrationForm extends ContentEntityForm {
         '#required' => TRUE,
       ];
 
-      $self = FALSE; // create a register radio option for current user.
-
-      // list of entity reference field types, ordered by radio default priority
+      $self = FALSE;
+      // create a register radio option for current user.
+      // list of entity reference field types, ordered by radio default priority.
       $entity_types = ['user'];
 
-      // Radio order is alphabetical. (ex: self)
+      // Radio order is alphabetical. (ex: self).
       $sorted = $entity_types;
       ksort($sorted);
       foreach ($sorted as $entity_type_id) {
@@ -214,7 +214,7 @@ class RegistrationForm extends ContentEntityForm {
       $trigger_id = 'entity:registration:new';
       drupal_set_message(t('Registration has been created.', $t_args));
 
-      // Add registrant
+      // Add registrant.
       list($entity_type, $entity_id) = explode(':', $form_state->getValue('identity'));
       if ($entity_id == '*') {
         $references = $form_state->getValue('entity');
@@ -246,4 +246,5 @@ class RegistrationForm extends ContentEntityForm {
       }
     }
   }
+
 }

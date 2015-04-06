@@ -60,4 +60,5 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
    * @var string
    */
   public $description;
+
 }

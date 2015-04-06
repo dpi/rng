@@ -105,4 +105,5 @@ interface ActionInterface extends ContentEntityInterface {
    * @return NULL
    */
   public function execute(array $context);
+
 }

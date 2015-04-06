@@ -110,13 +110,13 @@ class EventAccessResetForm extends ConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $event_meta = $this->eventManager->getMeta($this->event);
 
-    // Delete existing rules
+    // Delete existing rules.
     $query = $event_meta->buildRuleQuery();
     $rules_ids = $query->condition('trigger_id', 'rng_event.register', '=')->execute();
     $rules = $this->entityManager->getStorage('rng_rule')->loadMultiple($rules_ids);
     $this->entityManager->getStorage('rng_rule')->delete($rules);
 
-    // Add back defaults
+    // Add back defaults.
     $event_meta->addDefaultAccess();
 
     $form_state->setRedirectUrl($this->getCancelUrl());

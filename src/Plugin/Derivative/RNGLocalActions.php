@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * @fie
  * Contains \Drupal\rng\Plugin\Derivative\RNGLocalActions.
  */
@@ -22,7 +23,7 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
-   * The entity manager
+   * The entity manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
@@ -64,7 +65,6 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
 
     foreach ($entity_type_config as $entity_type => $bundles) {
       // Only need one set of actions per entity type.
-
       $this->derivatives["rng.event.$entity_type.event.access.reset"] = array(
         'title' => $this->t('Reset access to default'),
         'route_name' => "rng.event.$entity_type.access.reset",

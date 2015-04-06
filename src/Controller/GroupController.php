@@ -45,4 +45,5 @@ class GroupController extends ControllerBase implements ContainerInjectionInterf
     $event_entity = $route_match->getParameter($event);
     return $this->entityManager()->getListBuilder('registration_group')->render($event_entity);
   }
+
 }

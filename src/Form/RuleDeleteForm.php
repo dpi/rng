@@ -50,4 +50,5 @@ class RuleDeleteForm extends ContentEntityConfirmFormBase {
       $form_state->setRedirectUrl($urlInfo);
     }
   }
+
 }

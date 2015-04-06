@@ -46,9 +46,12 @@ class RegistrationAccess extends ConfigurableActionBase implements ContainerFact
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    // Always produce CRUD
+    // Always produce CRUD.
     $this->configuration['operations'] += [
-      'create' => NULL, 'view' => NULL, 'update' => NULL, 'delete' => NULL,
+      'create' => NULL,
+      'view' => NULL,
+      'update' => NULL,
+      'delete' => NULL,
     ];
 
     $options = [];
@@ -82,11 +85,11 @@ class RegistrationAccess extends ConfigurableActionBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function execute($context = NULL) {  }
+  public function execute($context = NULL) {}
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {  }
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {}
 
 }

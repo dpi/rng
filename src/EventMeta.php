@@ -113,7 +113,7 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   public function getCapacity() {
-    $capacity = (int)$this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
+    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
     if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {
       return $capacity;
     }
@@ -199,8 +199,8 @@ class EventMeta implements EventMetaInterface {
    */
   public function trigger($trigger, $context = array()) {
     $context['event'] = $this->getEvent();
-    foreach($this->getRules($trigger) as $rule) {
-      foreach($rule->getActions() as $action) {
+    foreach ($this->getRules($trigger) as $rule) {
+      foreach ($rule->getActions() as $action) {
         // @todo: get contexts for $rule; ensure they exist on $context.
         $action->execute($context);
       }
@@ -247,9 +247,9 @@ class EventMeta implements EventMetaInterface {
     return $this
       ->selectionPluginManager
       ->getInstance([
-      'target_type' => 'user',
-      'handler' => 'rng_register',
-      'handler_settings' => ['event' => $this->getEvent()],
+        'target_type' => 'user',
+        'handler' => 'rng_register',
+        'handler_settings' => ['event' => $this->getEvent()],
       ])
       ->countReferenceableEntities();
   }

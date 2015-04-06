@@ -29,6 +29,7 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
+
     case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $definition = array(
         'type' => 'entity_reference',
@@ -38,21 +39,25 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       );
       break;
+
     case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'type' => 'boolean',
       );
       break;
+
     case EventManagerInterface::FIELD_CAPACITY:
       $definition = array(
         'type' => 'integer',
       );
       break;
+
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $definition = array(
         'type' => 'email',
       );
       break;
+
     case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'type' => 'boolean',
@@ -84,6 +89,7 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         'description' => t('Select which registration types are valid for this event.'),
       );
       break;
+
     case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $definition = array(
         'label' => 'Registration groups',
@@ -91,30 +97,34 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         'description' => t('New registrations will be added to these groups.'),
       );
       break;
+
     case EventManagerInterface::FIELD_STATUS:
       $definition = array(
         'label' => 'Accept new registrations',
         'settings' => [
-          'on_label' => t('Accepting new registrations'),
-          'off_label' => t('Not accepting new registrations'),
+        'on_label' => t('Accepting new registrations'),
+        'off_label' => t('Not accepting new registrations'),
         ],
       );
       break;
+
     case EventManagerInterface::FIELD_CAPACITY:
       $definition = array(
         'label' => 'Maximum registrations',
         'description' => t('Maximum amount of registrations for this event. Leave empty for unlimited.'),
         'settings' => array(
-          'min' => -1
-        )
+          'min' => -1,
+        ),
       );
       break;
+
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $definition = array(
         'label' => t('Reply-to e-mail address'),
         'description' => t('E-mail address that appears as reply-to when emails are sent from this event. Leave empty to use site default.'),
       );
       break;
+
     case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $definition = array(
         'label' => 'Allow duplicate registrants',
@@ -156,29 +166,34 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
         'type' => 'options_select',
       ));
       break;
+
     case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
       $form_display->setComponent($field_name, array(
         'type' => 'options_select',
       ));
       break;
+
     case EventManagerInterface::FIELD_STATUS:
       $form_display->setComponent($field_name, array(
         'type' => 'boolean_checkbox',
       ));
       break;
+
     case EventManagerInterface::FIELD_CAPACITY:
       $form_display->setComponent($field_name, array(
         'type' => 'number',
       ));
       break;
+
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $form_display->setComponent($field_name, array(
         'type' => 'email_default',
         'settings' => array(
-        'placeholder' => t('Leave empty to use site default.'),
+          'placeholder' => t('Leave empty to use site default.'),
         ),
       ));
       break;
+
     case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $form_display->setComponent($field_name, array(
         'type' => 'boolean_checkbox',

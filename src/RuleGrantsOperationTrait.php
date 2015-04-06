@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RuleGrantsOperationTrait
+ * Contains \Drupal\rng\RuleGrantsOperationTrait.
  */
 
 namespace Drupal\rng;
@@ -34,7 +34,7 @@ trait RuleGrantsOperationTrait {
       }
       return FALSE;
     });
-    return (boolean)count($operations_actions);
+    return (boolean) count($operations_actions);
   }
 
 }

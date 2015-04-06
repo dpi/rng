@@ -11,9 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Entity\EntityInterface;
 
-  /**
-   * Event manager for RNG.
-   */
+/**
+ * Event manager for RNG.
+ */
 class EventManager implements EventManagerInterface {
 
   use ContainerAwareTrait;

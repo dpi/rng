@@ -165,4 +165,5 @@ class Group extends ContentEntityBase implements GroupInterface {
 
     return $fields;
   }
+
 }

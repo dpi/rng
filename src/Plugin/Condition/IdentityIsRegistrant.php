@@ -30,7 +30,6 @@ use Drupal\Core\Form\FormStateInterface;
  *     )
  *   }
  * )
- *
  */
 class IdentityIsRegistrant extends ConditionPluginBase {
 
@@ -58,7 +57,7 @@ class IdentityIsRegistrant extends ConditionPluginBase {
     /* @var \Drupal\rng\RegistrationInterface $registration */
     $registration = $this->getContextValue('registration');
 
-    // Does not support new registrations ('create' operation)
+    // Does not support new registrations ('create' operation).
     if (!$registration->isNew()) {
       return $registration->hasIdentity($user);
     }

@@ -17,7 +17,7 @@ use Drupal\Core\Routing\RouteProviderInterface;
  */
 class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
   /**
-   * The entity type manager
+   * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
@@ -121,4 +121,5 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
 
     return parent::getDerivativeDefinitions($base_plugin_definition);
   }
+
 }

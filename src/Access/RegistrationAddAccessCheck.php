@@ -45,4 +45,5 @@ class RegistrationAddAccessCheck implements AccessInterface {
     }
     return AccessResult::forbidden();
   }
+
 }

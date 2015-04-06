@@ -98,4 +98,5 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     return $fields;
   }
+
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\AccessControl\RegistrationAccessControlHandler
+ * Contains \Drupal\rng\AccessControl\RegistrationAccessControlHandler.
  */
 
 namespace Drupal\rng\AccessControl;
@@ -58,7 +58,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       ];
 
       $rules = $this->eventManager->getMeta($event)->getRules();
-      foreach($rules as $rule) {
+      foreach ($rules as $rule) {
         if ($this->ruleGrantsOperation($rule, $operation) && $rule->evaluateConditions($context_values)) {
           return AccessResult::allowed();
         }
@@ -92,7 +92,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::neutral();
     }
     // There are no registration types configured.
-    else if (!$event_meta->getRegistrationTypeIds()) {
+    elseif (!$event_meta->getRegistrationTypeIds()) {
       return AccessResult::neutral();
     }
 

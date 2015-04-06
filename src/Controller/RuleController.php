@@ -25,4 +25,5 @@ class RuleController extends ControllerBase implements ContainerInjectionInterfa
     $event_entity = $route_match->getParameter($event);
     return $this->entityManager()->getListBuilder('rng_rule')->render($event_entity);
   }
+
 }

@@ -52,4 +52,5 @@ class RegistrationDeleteForm extends ContentEntityConfirmFormBase {
       $form_state->setRedirect('<front>');
     }
   }
+
 }

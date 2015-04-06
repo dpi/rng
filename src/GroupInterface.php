@@ -75,4 +75,5 @@ interface GroupInterface extends ContentEntityInterface {
    *   Returns group for chaining.
    */
   public function setDescription($description);
+
 }

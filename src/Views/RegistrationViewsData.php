@@ -28,4 +28,5 @@ class RegistrationViewsData extends EntityViewsData {
 
     return $data;
   }
+
 }

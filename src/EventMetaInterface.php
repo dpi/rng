@@ -34,7 +34,7 @@ interface EventMetaInterface {
   public static function createInstance(ContainerInterface $container, EntityInterface $entity);
 
   /**
-   * Get the event entity
+   * Get the event entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    *   The event entity.
@@ -207,7 +207,7 @@ interface EventMetaInterface {
   function buildRegistrantQuery();
 
   /**
-   * Get all registrants for this event
+   * Get all registrants for this event.
    *
    * @return \Drupal\rng\RegistrantInterface[]
    *   An array of registrant entities.
@@ -229,4 +229,5 @@ interface EventMetaInterface {
    * Access rules determine registration operation grants.
    */
   function addDefaultAccess();
+
 }

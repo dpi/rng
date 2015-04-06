@@ -122,4 +122,5 @@ class ActionForm extends ContentEntityForm {
       drupal_set_message(t('Action was updated.', $t_args));
     }
   }
+
 }

@@ -25,7 +25,6 @@ use Drupal\Core\Session\AccountInterface;
  *     )
  *   }
  * )
- *
  */
 class UserRole extends CoreUserRole implements RNGConditionInterface {
 

@@ -16,7 +16,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Link;
 
 /**
- * Provides a breadcrumb builder for RNG
+ * Provides a breadcrumb builder for RNG.
  */
 class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   use StringTranslationTrait;
@@ -84,4 +84,5 @@ class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
     return $links;
   }
+
 }

@@ -99,10 +99,10 @@ class RegistrationTypeForm extends EntityForm {
     $url = $registration_type->urlInfo();
     $t_args = ['%label' => $registration_type->label(), 'link' => $this->l(t('Edit'), $url)];
 
-
     drupal_set_message($this->t($message, $t_args));
     $this->logger('rng')->notice($message, $t_args);
 
     $form_state->setRedirect('rng.registration_type.overview');
   }
+
 }

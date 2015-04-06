@@ -50,4 +50,5 @@ class RegistrationTypeDeleteForm extends EntityConfirmFormBase {
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
+
 }

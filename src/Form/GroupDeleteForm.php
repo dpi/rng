@@ -50,4 +50,5 @@ class GroupDeleteForm extends ContentEntityConfirmFormBase {
       array($event->getEntityTypeId() => $event->id())
     );
   }
+
 }

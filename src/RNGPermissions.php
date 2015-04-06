@@ -41,4 +41,5 @@ class RNGPermissions {
 
     return $permissions;
   }
+
 }

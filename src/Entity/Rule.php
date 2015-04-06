@@ -93,8 +93,10 @@ class Rule extends ContentEntityBase implements RuleInterface {
     // @todo: move evaluation and context to Action/Condition hybrid entity when
     // @todo:   action plugins get better context integration.
     $success = 0;
-    $count = 0; // Counts successfully loaded condition plugins.
     $conditions = $this->getConditions();
+    // Counts successfully loaded condition plugins:
+    $count = 0;
+
     foreach ($conditions as $condition_storage) {
       if (($condition = $condition_storage->createInstance()) !== NULL) {
         $count++;
@@ -111,7 +113,7 @@ class Rule extends ContentEntityBase implements RuleInterface {
         $success++;
       }
       else {
-        // Cancel evaluating remaining conditions
+        // Cancel evaluating remaining conditions.
         return FALSE;
       }
     }

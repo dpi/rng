@@ -29,4 +29,5 @@ class EventTypeConfigListBuilder extends ConfigEntityListBuilder {
     $row['machine_name'] = $entity->id();
     return $row + parent::buildRow($entity);
   }
+
 }

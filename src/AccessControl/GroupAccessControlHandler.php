@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\AccessControl\GroupAccessControlHandler
+ * Contains \Drupal\rng\AccessControl\GroupAccessControlHandler.
  */
 
 namespace Drupal\rng\AccessControl;

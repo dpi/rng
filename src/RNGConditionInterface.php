@@ -7,6 +7,9 @@
 
 namespace Drupal\rng;
 
+/**
+ * Allow a condition to modify an Entity Query.
+ */
 interface RNGConditionInterface {
   /**
    * Modify a query with condition configuration.
@@ -17,4 +20,5 @@ interface RNGConditionInterface {
    *   The query object.
    */
   public function alterQuery(&$query);
+
 }

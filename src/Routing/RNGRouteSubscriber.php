@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 class RNGRouteSubscriber extends RouteSubscriberBase {
 
   /**
-   * The entity type manager
+   * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
@@ -50,7 +50,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         $options = [];
         $options['parameters'][$entity_type]['type'] = 'entity:' . $entity_type;
 
-        // Manage Event
+        // Manage Event.
         $route = new Route(
           $canonical_path . '/event',
           array(
@@ -64,7 +64,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.event", $route);
 
-        // Access
+        // Access.
         $route = new Route(
           $canonical_path . '/event/access',
           array(
@@ -77,7 +77,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.access", $route);
 
-        // Reset access to default
+        // Reset access to default.
         $route = new Route(
           $canonical_path . '/event/access/reset',
           array(
@@ -90,7 +90,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.access.reset", $route);
 
-        // Rules
+        // Rules.
         $route = new Route(
           $canonical_path . '/event/rules',
           array(
@@ -103,7 +103,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.rules", $route);
 
-        // Messages
+        // Messages.
         $route = new Route(
           $canonical_path . '/event/messages',
           array(
@@ -116,7 +116,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.messages", $route);
 
-        // Message send
+        // Message send.
         $route = new Route(
           $canonical_path . '/event/messages/send',
           array(
@@ -129,7 +129,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.messages.send", $route);
 
-        // Group list
+        // Group list.
         $route = new Route(
           $canonical_path . '/event/groups',
           array(
@@ -142,7 +142,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.group.list", $route);
 
-        // Group add
+        // Group add.
         $route = new Route(
           $canonical_path . '/event/groups/add',
           array(
@@ -155,7 +155,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.group.add", $route);
 
-        // Registration list
+        // Registration list.
         $route = new Route(
           $canonical_path . '/registrations',
           array(
@@ -168,7 +168,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.registrations", $route);
 
-        // Register
+        // Register.
         $route = new Route(
           $canonical_path . '/register',
           array(
@@ -183,7 +183,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.register.type_list", $route);
 
-        // Register w/ Registration Type
+        // Register w/ Registration Type.
         $options_register = $options;
         $options_register['parameters']['registration_type']['type'] = 'entity:registration_type';
         $route = new Route(

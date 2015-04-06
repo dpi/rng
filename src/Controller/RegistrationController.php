@@ -63,11 +63,12 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
     $registration_types = $this->eventManager->getMeta($event_entity)->getRegistrationTypes();
     if (count($registration_types) == 1) {
       $registration_type = array_shift($registration_types);
-      return $this->redirect('rng.event.'. $event . '.register', array(
+      return $this->redirect('rng.event.' . $event . '.register', [
         $event => $event_entity->id(),
         'registration_type' => $registration_type->id(),
-      ));
-    } else {
+      ]);
+    }
+    else {
       $render['links'] = array(
         '#title' => $this->t('Select registration type'),
         '#theme' => 'item_list',
@@ -77,7 +78,7 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
 
     foreach ($registration_types as $registration_type) {
       $item = [];
-      $url = new Url('rng.event.'. $event . '.register', [
+      $url = new Url('rng.event.' . $event . '.register', [
         $event => $event_entity->id(),
         'registration_type' => $registration_type->id(),
       ]);
@@ -93,7 +94,6 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
       }
       $render['links']['#items'][] = $item;
     }
-
 
     return $render;
   }
@@ -124,7 +124,7 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
   }
 
   /**
-   * Title callback for registration.event.*.register
+   * Title callback for registration.event.*.register.
    *
    * @param \Drupal\rng\RegistrationTypeInterface
    *   The registration type.
@@ -146,4 +146,5 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
     $event_entity = $route_match->getParameter($event);
     return $this->entityManager()->getListBuilder('registration')->render($event_entity);
   }
+
 }

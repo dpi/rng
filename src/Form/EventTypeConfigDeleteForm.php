@@ -49,4 +49,5 @@ class EventTypeConfigDeleteForm extends EntityConfirmFormBase {
     )));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
+
 }

@@ -156,7 +156,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function removeGroup(GroupInterface $group) {
-    if(($key = array_search($group, $this->getGroups())) !== false) {
+    if (($key = array_search($group, $this->getGroups())) !== FALSE) {
       $this->groups->removeItem($key);
     }
     return $this;
@@ -200,7 +200,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setSetting('exclude_entity_types', 'true')
       ->setSetting('entity_type_ids', array('registrant', 'registration'))
       ->setDescription(t('The relationship between this registration and an event.'))
-      ->setRevisionable(TRUE) // change to false when https://www.drupal.org/node/2300101 gets in
+      ->setRevisionable(TRUE) // @todo: change to false when https://www.drupal.org/node/2300101 gets in.
       ->setReadOnly(TRUE);
 
     $fields['groups'] = BaseFieldDefinition::create('entity_reference')
@@ -220,8 +220,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setLabel(t('Authored on'))
       ->setDescription(t('Time the Registration was created.'))
       ->setTranslatable(FALSE)
-      ->setRevisionable(TRUE); // change to false when https://www.drupal.org/node/2300101 gets in
-
+      ->setRevisionable(TRUE); // @todo: change to false when https://www.drupal.org/node/2300101 gets in.
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Updated on'))
       ->setDescription(t('The time Registration was last updated.'))
@@ -265,4 +264,5 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
 
     parent::delete();
   }
+
 }

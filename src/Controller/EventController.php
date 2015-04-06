@@ -94,7 +94,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
 
     $rows = [];
 
-    // Header
+    // Header.
     $rows[] = [
       ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Rule')],
       ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Component')],
@@ -112,13 +112,13 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
 
     $i = 0;
     $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register');
-    foreach($rules as $rule) {
+    foreach ($rules as $rule) {
       $i++;
       $scope_all = FALSE;
       $supports_create = 0;
       $condition_context = [];
 
-      // Conditions
+      // Conditions.
       $k = 0;
       $row = [];
       $row['rule'] = ['header' => FALSE, 'data' => $this->t('@row.', ['@row' => $i]), 'rowspan' => count($rule->getConditions()) + 1];
@@ -150,15 +150,15 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $row = [];
       }
 
-      // Actions
+      // Actions.
       foreach ($rule->getActions() as $action_storage) {
         $row = [];
         $row[] = ['header' => TRUE, 'data' => $this->t('Grants operations'), 'rowspan' => $scope_all ? 2 : 1];
 
-        // Scope: warn user actions apply to all registrations
+        // Scope: warn user actions apply to all registrations.
         $row[]['data'] = $scope_all ? $this->t('All registrations.') : $this->t('Single registration');
 
-        // Operations granted
+        // Operations granted.
         $config = $action_storage->getConfiguration();
         foreach ($operations as $op => $t) {
           $message = !empty($config['operations'][$op]) ? $t : '-';
@@ -214,11 +214,11 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $header = array(t('When'), t('Do'), t('Operations'));
     $rows = array();
 
-    // list of communication related action plugin ids
+    // list of communication related action plugin ids.
     $communication_actions = array('rng_registrant_email');
 
     $rules = $this->eventManager->getMeta($event)->getRules();
-    foreach($rules as $rule) {
+    foreach ($rules as $rule) {
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
         $row = array();
@@ -268,4 +268,5 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
 
     return $build;
   }
+
 }

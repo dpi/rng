@@ -65,4 +65,5 @@ class RegistrationRegistrantEditForm extends ContentEntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
   }
+
 }

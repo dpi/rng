@@ -48,4 +48,5 @@ interface RegistrantInterface extends ContentEntityInterface {
    *   Whether the identity is the registrant.
    */
   public function hasIdentity(EntityInterface $entity);
+
 }

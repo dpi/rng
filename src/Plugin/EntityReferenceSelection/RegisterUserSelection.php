@@ -28,7 +28,7 @@ use Drupal\rng\RNGConditionInterface;
  *   group = "rng_register",
  *   weight = 10
  * )
-*/
+ */
 class RegisterUserSelection extends UserSelection {
 
   use RuleGrantsOperationTrait;
@@ -101,14 +101,15 @@ class RegisterUserSelection extends UserSelection {
         $entity_ids[] = $registrant->getIdentityId()['entity_id'];
       }
 
-      $entity_ids[] = 0; // Remove anonymous user.
+      // Remove anonymous user:
+      $entity_ids[] = 0;
       $query->condition($entity_type->getKey('id'), $entity_ids, 'NOT IN');
     }
 
     // Event access rules.
     $condition_count = 0;
     $rules = $event_meta->getRules('rng_event.register');
-    foreach($rules as $rule) {
+    foreach ($rules as $rule) {
       if ($this->ruleGrantsOperation($rule, 'create')) {
         foreach ($rule->getConditions() as $condition_storage) {
           // Do not use condition if it cannot alter query.
@@ -122,16 +123,17 @@ class RegisterUserSelection extends UserSelection {
 
     // Cancel the query if there are no conditions.
     if (!$condition_count) {
-      $query->condition($entity_type->getKey('id') , NULL, 'IS NULL');
+      $query->condition($entity_type->getKey('id'), NULL, 'IS NULL');
       return $query;
     }
 
     // Apply proxy registration permissions for the current user.
     $proxy_count = 0;
-    $all_users = FALSE; // if user can register `authenticated` users.
+    // if user can register `authenticated` users:
+    $all_users = FALSE;
     $group = $query->orConditionGroup();
 
-    // Self
+    // Self.
     if ($this->currentUser->hasPermission('rng register self')) {
       $proxy_count++;
       $group->condition($entity_type->getKey('id'), $this->currentUser->id(), '=');
@@ -152,14 +154,14 @@ class RegisterUserSelection extends UserSelection {
     }
 
     if ($all_users) {
-      // Do not add any conditions
+      // Do not add any conditions.
     }
-    else if ($proxy_count) {
+    elseif ($proxy_count) {
       $query->condition($group);
     }
     else {
-      // cancel the query
-      $query->condition($entity_type->getKey('id') , NULL, 'IS NULL');
+      // cancel the query:
+      $query->condition($entity_type->getKey('id'), NULL, 'IS NULL');
     }
 
     return $query;
