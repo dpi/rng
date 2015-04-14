@@ -102,7 +102,7 @@ class RegistrationForm extends ContentEntityForm {
       $self = FALSE;
       // create a register radio option for current user.
       // list of entity reference field types, ordered by radio default priority.
-      $entity_types = ['user'];
+      $entity_types = $this->eventManager->getMeta($event)->getIdentityTypes();
 
       // Radio order is alphabetical. (ex: self).
       $sorted = $entity_types;
@@ -180,6 +180,8 @@ class RegistrationForm extends ContentEntityForm {
         '#type' => 'checkbox',
         '#title' => $this->t('Add additional identities after saving.'),
         '#default_value' => FALSE,
+        // @todo: Hide option until user has ability to add more identities.
+        '#access' => FALSE,
       ];
     }
     else {
@@ -234,7 +236,7 @@ class RegistrationForm extends ContentEntityForm {
     }
 
     $this->eventManager->getMeta($event)
-      ->trigger($trigger_id, ['registration' => $registration]);
+      ->trigger($trigger_id, ['registrations' => [$registration]]);
 
     if ($registration->id()) {
       if ($registration->access('view')) {

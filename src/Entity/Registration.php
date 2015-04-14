@@ -220,7 +220,8 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setLabel(t('Authored on'))
       ->setDescription(t('Time the Registration was created.'))
       ->setTranslatable(FALSE)
-      ->setRevisionable(TRUE); // @todo: change to false when https://www.drupal.org/node/2300101 gets in.
+      ->setRevisionable(FALSE);
+
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Updated on'))
       ->setDescription(t('The time Registration was last updated.'))

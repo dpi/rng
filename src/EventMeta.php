@@ -9,7 +9,9 @@ namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\courier\IdentityChannelManager;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -32,6 +34,13 @@ class EventMeta implements EventMetaInterface {
   protected $entityManager;
 
   /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The selection plugin manager.
    *
    * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
@@ -39,18 +48,31 @@ class EventMeta implements EventMetaInterface {
   protected $selectionPluginManager;
 
   /**
+   * The identity channel manager.
+   *
+   * @var \Drupal\courier\IdentityChannelManager
+   */
+  protected $identityChannelManager;
+
+  /**
    * Constructs a new EventMeta object.
    *
    * @param \Drupal\Core\Entity\EntityManager $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_plugin_manager
    *   The selection plugin manager.
+   * @param \Drupal\courier\IdentityChannelManager $identity_channel_manager
+   *   The identity channel manager.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.
    */
-  function __construct(EntityManager $entity_manager, SelectionPluginManagerInterface $selection_plugin_manager, EntityInterface $entity) {
+  public function __construct(EntityManager $entity_manager, ConfigFactoryInterface $config_factory, SelectionPluginManagerInterface $selection_plugin_manager, IdentityChannelManager $identity_channel_manager, EntityInterface $entity) {
     $this->entityManager = $entity_manager;
+    $this->configFactory = $config_factory;
     $this->selectionPluginManager = $selection_plugin_manager;
+    $this->identityChannelManager = $identity_channel_manager;
     $this->entity = $entity;
   }
 
@@ -60,7 +82,9 @@ class EventMeta implements EventMetaInterface {
   public static function createInstance(ContainerInterface $container, EntityInterface $entity) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('config.factory'),
       $container->get('plugin.manager.entity_reference_selection'),
+      $container->get('plugin.manager.identity_channel'),
       $entity
     );
   }
@@ -225,33 +249,58 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  function buildRegistrantQuery() {
-    return $this->entityManager->getStorage('registrant')->getQuery('AND')
-      ->condition('identity__target_type', 'user', '=')
+  public function buildRegistrantQuery($entity_type_id = NULL) {
+    $query = $this->entityManager->getStorage('registrant')->getQuery('AND')
       ->condition('registration.entity.event__target_type', $this->getEvent()->getEntityTypeId(), '=')
       ->condition('registration.entity.event__target_id', $this->getEvent()->id(), '=');
+
+    if ($entity_type_id) {
+      $query->condition('identity__target_type', $entity_type_id, '=');
+    }
+
+    return $query;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getRegistrants() {
-    $query = $this->buildRegistrantQuery();
+  public function getRegistrants($entity_type_id = NULL) {
+    $query = $this->buildRegistrantQuery($entity_type_id);
     return $this->entityManager->getStorage('registrant')->loadMultiple($query->execute());
   }
 
   /**
    * {@inheritdoc}
    */
-  function countProxyIdentities() {
-    return $this
-      ->selectionPluginManager
-      ->getInstance([
-        'target_type' => 'user',
-        'handler' => 'rng_register',
-        'handler_settings' => ['event' => $this->getEvent()],
-      ])
-      ->countReferenceableEntities();
+  public function countProxyIdentities() {
+    $total = 0;
+
+    foreach ($this->getIdentityTypes() as $entity_type_id) {
+      $count = $this
+        ->selectionPluginManager
+        ->getInstance([
+          'target_type' => $entity_type_id,
+          'handler' => 'rng_register',
+          'handler_settings' => ['event' => $this->getEvent()],
+        ])
+        ->countReferenceableEntities();
+      if (is_numeric($count)) {
+        $total += $count;
+      }
+    }
+
+    return $total;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIdentityTypes() {
+    $config = $this->configFactory->get('rng.settings');
+    $identity_types = $config->get('identity_types');
+    $allowed_identity_types = is_array($identity_types) ? $identity_types : [];
+    $available_identity_types = array_keys($this->identityChannelManager->getChannels());
+    return array_intersect($allowed_identity_types, $available_identity_types);
   }
 
   /**

@@ -1,3 +1,13 @@
+rng.settings:
+  type: mapping
+  label: 'RNG settings'
+  mapping:
+    identity_types:
+      type: sequence
+      label: 'Identity types'
+      sequence:
+        type: string
+
 rng.registration_type.*:
   type: config_entity
   label: 'Registration type'

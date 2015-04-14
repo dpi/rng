@@ -201,18 +201,24 @@ interface EventMetaInterface {
    * Builds a entity query for registrants associated to registrations
    * referencing this event.
    *
+   * @param string $entity_type_id
+   *   The registrant entity type, or NULL to get all.
+   *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   An entity query.
    */
-  function buildRegistrantQuery();
+  public function buildRegistrantQuery($entity_type_id = NULL);
 
   /**
    * Get all registrants for this event.
    *
+   * @param string $entity_type_id
+   *   The registrant entity type, or NULL to get all.
+   *
    * @return \Drupal\rng\RegistrantInterface[]
    *   An array of registrant entities.
    */
-  function getRegistrants();
+  public function getRegistrants($entity_type_id = NULL);
 
   /**
    * Count number of identities the current  has proxy register access
@@ -222,6 +228,14 @@ interface EventMetaInterface {
    *   Number of identities.
    */
   function countProxyIdentities();
+
+  /**
+   * Get identity entity types valid for this event.
+   *
+   * @return array
+   *   Array of entity types IDs.
+   */
+  public function getIdentityTypes();
 
   /**
    * Adds default access rules to the event.

@@ -116,6 +116,9 @@ class MessageActionForm extends FormBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->actionPlugin->submitConfigurationForm($form, $form_state);
 
@@ -128,15 +131,12 @@ class MessageActionForm extends FormBase {
     $event = $form_state->get('event');
     $trigger = $form_state->getValue('trigger');
     if ($trigger == 'now') {
-      $registrations = $this->eventManager->getMeta($event)->getRegistrations();
-      foreach ($registrations as $registration) {
-        $context = array(
-          'event' => $event,
-          'registration' => $registration,
-        );
-        $action->execute($context);
-        drupal_set_message(t('Message sent to all registrants.'));
-      }
+      $context = [
+        'event' => $event,
+        'registrations' => $this->eventManager->getMeta($event)->getRegistrations(),
+      ];
+      $action->execute($context);
+      drupal_set_message(t('Message sent to all registrants.'));
     }
     else {
       $rule = $this->entityManager->getStorage('rng_rule')->create(array(

@@ -10,9 +10,7 @@ namespace Drupal\rng\Plugin\Action;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Mail\MailManagerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\user\UserInterface;
+use Drupal\courier\IdentityChannelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -28,6 +26,13 @@ use Drupal\Core\Session\AccountInterface;
 class RegistrantBasicEmail extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The identity channel manager.
+   *
+   * @var \Drupal\courier\IdentityChannelManager
+   */
+  protected $identityChannelManager;
+
+  /**
    * Constructs a RegistrantBasicEmail object.
    *
    * @param array $configuration
@@ -36,14 +41,12 @@ class RegistrantBasicEmail extends ConfigurableActionBase implements ContainerFa
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Mail\MailManagerInterface
-   *   The mail manager.
+   * @param \Drupal\courier\IdentityChannelManager $identity_channel_manager
+   *   The identity channel manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MailManagerInterface $mail_manager, EntityManagerInterface $entity_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, IdentityChannelManager $identity_channel_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->entityManager = $entity_manager;
-    $this->mailManager = $mail_manager;
+    $this->identityChannelManager = $identity_channel_manager;
   }
 
   /**
@@ -51,8 +54,7 @@ class RegistrantBasicEmail extends ConfigurableActionBase implements ContainerFa
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
-      $container->get('plugin.manager.mail'),
-      $container->get('entity.manager')
+      $container->get('plugin.manager.identity_channel')
     );
   }
 
@@ -98,35 +100,28 @@ class RegistrantBasicEmail extends ConfigurableActionBase implements ContainerFa
    * {@inheritdoc}
    */
   public function execute($context = NULL) {
+    /* @var \Drupal\Core\Entity\EntityInterface $event */
     $event = $context['event'];
-    /* @var \Drupal\rng\RegistrationInterface $registration */
-    $registration = $context['registration'];
 
-    foreach ($registration->getRegistrants() as $registrant) {
-      $identity = $registrant->getIdentity();
+    /** @var \Drupal\courier\MessageInterface $message_original */
+    $message_original = entity_create('courier_email', [
+      'subject' => $this->configuration['subject'],
+      'body' => $this->configuration['body'],
+    ]);
 
-      // @todo: do not assume user entity.
-      if ($identity->getEntityTypeId() == 'user') {
-        /* @var UserInterface $user */
-        $user = $identity;
-
-        // @todo preload storages in constructor
-        $storage_user = $this->entityManager->getStorage('user');
-
-        // @todo tokens
-        $result = $this->mailManager->mail(
-          'system',
-          'rng_registrant_email',
-          $user->getUsername() . ' <' . $user->getEmail() . '>',
-          $user->getPreferredLangcode(),
-          array(
-            'context' => array(
-              'subject' => $this->configuration['subject'],
-              'message' => $this->configuration['body'],
-            ),
-          ),
-          NULL // @todo: replyto: get from event wrapper
-        );
+    // @todo: Send meta: reply-to address
+    // @todo: $event as token.
+    foreach ($context['registrations'] as $registration) {
+      /* @var \Drupal\rng\RegistrationInterface $registration */
+      foreach ($registration->getRegistrants() as $registrant) {
+        $identity = $registrant->getIdentity();
+        $message = clone $message_original;
+        if ($plugin_id = $this->identityChannelManager->getCourierIdentity('courier_email', $identity->getEntityTypeId())) {
+          /** @var \Drupal\courier\Plugin\IdentityChannel\IdentityChannelPluginInterface $plugin */
+          $plugin = $this->identityChannelManager->createInstance($plugin_id);
+          $plugin->applyIdentity($message, $identity);
+          $message->send();
+        }
       }
     }
   }
