@@ -107,6 +107,7 @@ class EventSettingsForm extends FormBase {
     $form['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Save'),
+      '#button_type' => 'primary',
     );
 
     return $form;

@@ -26,6 +26,13 @@ original project, and unexpected extension of development timeline for Drupal 8.
 
 See MAINTAINERS.txt for a list of official developers.
 
+# Dependencies
+
+ *  Dynamic Entity Reference
+    https://drupal.org/project/dynamic_entity_reference
+ *  Courier
+    https://github.com/dpi/courier
+
 # Terms
 
  * Event: any content (fieldable) entity.

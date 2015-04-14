@@ -120,7 +120,7 @@ class RegistrantBasicEmail extends ConfigurableActionBase implements ContainerFa
           /** @var \Drupal\courier\Plugin\IdentityChannel\IdentityChannelPluginInterface $plugin */
           $plugin = $this->identityChannelManager->createInstance($plugin_id);
           $plugin->applyIdentity($message, $identity);
-          $message->send();
+          $message->sendMessage();
         }
       }
     }
