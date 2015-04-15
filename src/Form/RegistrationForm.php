@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
 use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Form controller for registrations.
@@ -150,6 +151,19 @@ class RegistrationForm extends ContentEntityForm {
             '#tags' => FALSE,
             '#parents' => array('entity', $entity_type_id),
           ];
+
+          // Add link: The 'add' link is something invented by RNG, it is not a
+          // standard link.
+          // @todo: replace with add and reference ajax popup + form
+          if ($add_link = $entity_type->getLinkTemplate('add-form')) {
+            $form['identity_information']['identity'][$entity_type_id]['add'] = [
+              '#type' => 'link',
+              '#title' => $this->t('Add @entity_type', ['@entity_type' => $entity_type->getLabel()]),
+              '#url' => Url::fromUserInput($entity_type->getLinkTemplate('add-form')),
+              '#prefix' => '[',
+              '#suffix' => ']',
+            ];
+          }
         }
       }
 
