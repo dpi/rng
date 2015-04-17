@@ -326,7 +326,7 @@ class EventMeta implements EventMetaInterface {
       ));
       $rng_rule->save();
       foreach ($rule['conditions'] as $plugin_id => $configuration) {
-        $this->entityManager->getStorage('rng_action')->create([])
+        $this->entityManager->getStorage('rng_rule_component')->create([])
           ->setRule($rng_rule)
           ->setType('condition')
           ->setPluginId($plugin_id)
@@ -334,7 +334,7 @@ class EventMeta implements EventMetaInterface {
           ->save();
       }
       foreach ($rule['actions'] as $plugin_id => $configuration) {
-        $this->entityManager->getStorage('rng_action')->create([])
+        $this->entityManager->getStorage('rng_rule_component')->create([])
           ->setRule($rng_rule)
           ->setType('action')
           ->setPluginId($plugin_id)

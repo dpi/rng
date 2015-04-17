@@ -123,7 +123,7 @@ class MessageActionForm extends FormBase {
     $this->actionPlugin->submitConfigurationForm($form, $form_state);
 
     /* @var $action \Drupal\rng\ActionInterface */
-    $action = $this->entityManager->getStorage('rng_action')->create();
+    $action = $this->entityManager->getStorage('rng_rule_component')->create();
     $action->setPluginId($this->actionPlugin->getPluginId());
     $action->setConfiguration($this->actionPlugin->getConfiguration());
     $action->setType('action');

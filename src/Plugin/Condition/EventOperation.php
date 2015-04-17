@@ -8,7 +8,6 @@
 namespace Drupal\rng\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;
-use Drupal\rng\RNGConditionInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**

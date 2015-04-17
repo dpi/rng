@@ -14,12 +14,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\RuleInterface;
 
 /**
- * Defines the event action entity.
+ * Defines a event rule plugin instance entity: a condition or action.
  *
  * @ContentEntityType(
- *   id = "rng_action",
- *   label = @Translation("Event Action"),
- *   base_table = "rng_action",
+ *   id = "rng_rule_component",
+ *   label = @Translation("Event rule plugin configuration"),
+ *   base_table = "rng_rule_component",
  *   entity_keys = {
  *     "id" = "id",
  *   },
@@ -33,8 +33,8 @@ use Drupal\rng\RuleInterface;
  *     },
  *   },
  *   links = {
- *     "canonical" = "/rng/action/{rng_action}/edit",
- *     "edit-form" = "/rng/action/{rng_action}/edit",
+ *     "canonical" = "/rng/action/{rng_rule_component}/edit",
+ *     "edit-form" = "/rng/action/{rng_rule_component}/edit",
  *   }
  * )
  */

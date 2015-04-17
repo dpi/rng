@@ -22,7 +22,7 @@ class EventAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     $account = $this->prepareUser($account);
-    $child = $entity->getEntityTypeId() != 'rng_action' ? $entity : $entity->getRule();
+    $child = $entity->getEntityTypeId() != 'rng_rule_component' ? $entity : $entity->getRule();
     if ($child instanceof EntityInterface) {
       return $child->getEvent()->access('manage event', $account, TRUE);
     }

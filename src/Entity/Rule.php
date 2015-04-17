@@ -10,8 +10,6 @@ namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\rng\RuleInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
-use Drupal\Component\Utility\String;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -57,10 +55,10 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * {@inheritdoc}
    */
   public function delete() {
-    $action_ids = \Drupal::entityQuery('rng_action')
+    $action_ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
       ->execute();
-    entity_delete_multiple('rng_action', $action_ids);
+    entity_delete_multiple('rng_rule_component', $action_ids);
     parent::delete();
   }
 
@@ -68,22 +66,22 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * {@inheritdoc}
    */
   public function getConditions() {
-    $action_ids = \Drupal::entityQuery('rng_action')
+    $action_ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'condition', '=')
       ->execute();
-    return entity_load_multiple('rng_action', $action_ids);
+    return entity_load_multiple('rng_rule_component', $action_ids);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getActions() {
-    $action_ids = \Drupal::entityQuery('rng_action')
+    $action_ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'action', '=')
       ->execute();
-    return entity_load_multiple('rng_action', $action_ids);
+    return entity_load_multiple('rng_rule_component', $action_ids);
   }
 
   /**

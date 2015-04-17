@@ -28,9 +28,9 @@ entity.registration.registrants:
   weight: 15
 
 # Actions
-entity.rng_action.edit:
-  route_name: entity.rng_action.edit_form
-  base_route: entity.rng_action.edit_form
+entity.rng_rule_component.edit:
+  route_name: entity.rng_rule_component.edit_form
+  base_route: entity.rng_rule_component.edit_form
   title: 'Edit'
   weight: 10
 
