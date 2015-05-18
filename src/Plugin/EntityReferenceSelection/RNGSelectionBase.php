@@ -42,13 +42,16 @@ class RNGSelectionBase extends SelectionBase {
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, Connection $connection, EventManagerInterface $event_manager, ConditionManager $condition_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $module_handler, $current_user, $connection);
 
-    if (!isset($this->configuration['handler_settings']['event'])) {
+    if (isset($this->configuration['handler_settings']['event_entity_type'], $this->configuration['handler_settings']['event_entity_id'])) {
+      $event = $this->entityManager->getStorage($this->configuration['handler_settings']['event_entity_type'])->load($this->configuration['handler_settings']['event_entity_id']);
+      $this->eventMeta = $event_manager->getMeta($event);
+    }
+    else {
       throw new \Exception('RNG selection handler requires event context.');
     }
 
     $this->conditionManager = $condition_manager;
     $this->entityType = $this->entityManager->getDefinition($this->configuration['target_type']);
-    $this->eventMeta = $event_manager->getMeta($this->configuration['handler_settings']['event']);
   }
 
   /**

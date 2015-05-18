@@ -112,7 +112,7 @@ class RegistrationForm extends ContentEntityForm {
         $options = [
           'target_type' => $entity_type_id,
           'handler' => 'rng_register',
-          'handler_settings' => ['event' => $event],
+          'handler_settings' => ['event_entity_type' => $event->getEntityTypeId(), 'event_entity_id' => $event->id()],
         ];
 
         /* @var $selection \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
@@ -147,7 +147,10 @@ class RegistrationForm extends ContentEntityForm {
             '#title_display' => 'invisible',
             '#target_type' => $entity_type_id,
             '#selection_handler' => 'rng_register',
-            '#selection_settings' => ['event' => $event],
+            '#selection_settings' => [
+              'event_entity_type' => $event->getEntityTypeId(),
+              'event_entity_id' => $event->id(),
+            ],
             '#tags' => FALSE,
             '#parents' => array('entity', $entity_type_id),
           ];

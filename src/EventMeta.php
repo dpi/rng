@@ -281,7 +281,7 @@ class EventMeta implements EventMetaInterface {
         ->getInstance([
           'target_type' => $entity_type_id,
           'handler' => 'rng_register',
-          'handler_settings' => ['event' => $this->getEvent()],
+          'handler_settings' => ['event_entity_type' => $this->getEvent()->getEntityTypeId(), 'event_entity_id' => $this->getEvent()->id()],
         ])
         ->countReferenceableEntities();
       if (is_numeric($count)) {

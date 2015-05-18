@@ -45,7 +45,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
 
     if (!$account->isAnonymous() && in_array($operation, array('view', 'update', 'delete'))) {
       if ($account->hasPermission('administer rng')) {
-        return AccessResult::allowed()->cachePerRole();
+        return AccessResult::allowed()->cachePerPermissions();
       }
       $event = $entity->getEvent();
 
