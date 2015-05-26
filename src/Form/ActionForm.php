@@ -85,6 +85,7 @@ class ActionForm extends ContentEntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $action = $this->entity;
+
     if (!$action->isNew()) {
       $form['#title'] = $this->t('Edit @type',
         array(
@@ -92,8 +93,7 @@ class ActionForm extends ContentEntityForm {
         )
       );
     }
-
-    $form += $this->plugin->buildConfigurationForm($form, $form_state);
+    $form = $this->plugin->buildConfigurationForm($form, $form_state);
     return parent::form($form, $form_state, $action);
   }
 
@@ -116,10 +116,10 @@ class ActionForm extends ContentEntityForm {
     $t_args = array('@type' => $action->bundle(), '%label' => $action->label(), '%id' => $action->id());
 
     if ($is_new) {
-      drupal_set_message(t('Action has been created.', $t_args));
+      drupal_set_message(t('Action created.', $t_args));
     }
     else {
-      drupal_set_message(t('Action was updated.', $t_args));
+      drupal_set_message(t('Action updated.', $t_args));
     }
   }
 

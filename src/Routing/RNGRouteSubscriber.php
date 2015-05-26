@@ -116,18 +116,18 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.messages", $route);
 
-        // Message send.
+        // Message add.
         $route = new Route(
-          $canonical_path . '/event/messages/send',
+          $canonical_path . '/event/messages/add',
           array(
             '_form' => '\Drupal\rng\Form\MessageActionForm',
-            '_title' => 'Send message',
+            '_title' => 'Add message',
             'event' => $entity_type,
           ),
           $manage_requirements,
           $options
         );
-        $collection->add("rng.event.$entity_type.messages.send", $route);
+        $collection->add("rng.event.$entity_type.messages.add", $route);
 
         // Group list.
         $route = new Route(

@@ -35,7 +35,7 @@ class UserRole extends CoreUserRole implements RNGConditionInterface {
     $form = parent::buildConfigurationForm($form, $form_state);
     $roles = user_role_names(TRUE);
     unset($roles[AccountInterface::AUTHENTICATED_ROLE]);
-    $form['roles']['#title'] = $this->t('When the user has any all of the following roles');
+    $form['roles']['#title'] = $this->t('When the user has all of the following roles');
     $form['roles']['#options'] = array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', $roles);
     $form['roles']['#description'] = $this->t('If you select no roles, the condition will evaluate to TRUE for all logged-in users.');
     $form['negate']['#access'] = FALSE;

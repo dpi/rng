@@ -17,12 +17,12 @@ use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Builds a rule with pre-made message action.
+ * Creates a rule with a rng_courier_message action.
  */
 class MessageActionForm extends FormBase {
 
   /**
-   * @var \Drupal\Core\Action\ConfigurableActionBase $actionPlugin
+   * @var \Drupal\rng\Plugin\Action\CourierTemplateCollection $actionPlugin
    */
   protected $actionPlugin;
 
@@ -51,7 +51,7 @@ class MessageActionForm extends FormBase {
    *   The RNG event manager.
    */
   public function __construct(ActionManager $action_manager, EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {
-    $this->actionPlugin = $action_manager->createInstance('rng_registrant_email');
+    $this->actionPlugin = $action_manager->createInstance('rng_courier_message');
     $this->entityManager = $entity_manager;
     $this->eventManager = $event_manager;
   }
@@ -71,7 +71,7 @@ class MessageActionForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'rng_event_message_send';
+    return 'rng_event_message_create';
   }
 
   /**
@@ -79,10 +79,10 @@ class MessageActionForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
     $event = clone $route_match->getParameter($event);
+    $this->actionPlugin->setConfiguration(['active' => FALSE]);
     $form_state->set('event', $event);
 
     $triggers = array(
-      'now' => $this->t('Immediately, to all registrants'),
       $this->t('Registrations') => array(
         'entity:registration:new' => $this->t('When registrations are created.'),
         'entity:registration:update' => $this->t('When registrations are updated.'),
@@ -97,12 +97,10 @@ class MessageActionForm extends FormBase {
       '#default_value' => 'now',
     );
 
-    $form += $this->actionPlugin->buildConfigurationForm($form, $form_state);
-
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Send'),
+      '#value' => t('Add message and edit templates'),
     );
     $form['actions']['cancel'] = array(
       '#type' => 'link',
@@ -122,36 +120,33 @@ class MessageActionForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->actionPlugin->submitConfigurationForm($form, $form_state);
 
-    /* @var $action \Drupal\rng\ActionInterface */
+    if (!$template_collection = $this->actionPlugin->getTemplateCollection()) {
+      drupal_set_message(t('Unable to create templates.', 'error'));
+      return;
+    }
+
+    $event = $form_state->get('event');
+    $template_collection->setOwner($event);
+    $template_collection->save();
+    drupal_set_message(t('Templates created.'));
+
+    /* @var $action \Drupal\rng\ActionInterface*/
     $action = $this->entityManager->getStorage('rng_rule_component')->create();
     $action->setPluginId($this->actionPlugin->getPluginId());
     $action->setConfiguration($this->actionPlugin->getConfiguration());
     $action->setType('action');
 
-    $event = $form_state->get('event');
-    $trigger = $form_state->getValue('trigger');
-    if ($trigger == 'now') {
-      $context = [
-        'event' => $event,
-        'registrations' => $this->eventManager->getMeta($event)->getRegistrations(),
-      ];
-      $action->execute($context);
-      drupal_set_message(t('Message sent to all registrants.'));
-    }
-    else {
-      $rule = $this->entityManager->getStorage('rng_rule')->create(array(
-        'event' => array('entity' => $event),
-        'trigger_id' => $trigger,
-      ));
-      $rule->save();
-      $action->setRule($rule)->save();
-      drupal_set_message(t('Message saved.'));
-    }
+    $trigger_id = $form_state->getValue('trigger');
 
-    $form_state->setRedirect(
-      'rng.event.' . $event->getEntityTypeId() . '.messages',
-      array($event->getEntityTypeId() => $event->id())
-    );
+    /** @var \Drupal\rng\RuleInterface $rule */
+    $rule = $this->entityManager->getStorage('rng_rule')->create(array(
+      'event' => array('entity' => $event),
+      'trigger_id' => $trigger_id,
+    ));
+    $rule->save();
+    $action->setRule($rule)->save();
+
+    $form_state->setRedirectUrl($action->urlInfo('edit-form'));
   }
 
 }

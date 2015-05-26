@@ -10,6 +10,7 @@ namespace Drupal\rng\Controller;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Condition\ConditionManager;
 use Drupal\rng\EventManagerInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -43,6 +44,13 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
   protected $eventManager;
 
   /**
+   * The redirect destination service.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * Constructs a new action form.
    *
    * @param \Drupal\Core\Action\ActionManager $actionManager
@@ -51,11 +59,14 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
    *   The condition manager.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination service.
    */
-  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager, EventManagerInterface $event_manager) {
+  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager, EventManagerInterface $event_manager, RedirectDestinationInterface $redirect_destination) {
     $this->actionManager = $actionManager;
     $this->conditionManager = $conditionManager;
     $this->eventManager = $event_manager;
+    $this->redirectDestination = $redirect_destination;
   }
 
   /**
@@ -65,7 +76,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     return new static(
       $container->get('plugin.manager.action'),
       $container->get('plugin.manager.condition'),
-      $container->get('rng.event_manager')
+      $container->get('rng.event_manager'),
+      $container->get('redirect.destination')
     );
   }
 
@@ -83,7 +95,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
    */
   public function listing_access(RouteMatchInterface $route_match, $event) {
     $event = $route_match->getParameter($event);
-    $destination = drupal_get_destination();
+    $destination = $this->redirectDestination->getAsArray();
     $build = [];
 
     $build['description'] = [
@@ -209,13 +221,13 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
    */
   public function listing_messages(RouteMatchInterface $route_match, $event) {
     $event = $route_match->getParameter($event);
-    $destination = drupal_get_destination();
+    $destination = $this->redirectDestination->getAsArray();
     $build = array();
-    $header = array(t('When'), t('Do'), t('Operations'));
+    $header = array(t('Trigger'), t('Status'), t('Operations'));
     $rows = array();
 
     // list of communication related action plugin ids.
-    $communication_actions = array('rng_registrant_email');
+    $communication_actions = array('rng_courier_message');
 
     $rules = $this->eventManager->getMeta($event)->getRules();
     foreach ($rules as $rule) {
@@ -224,10 +236,16 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $row = array();
         $action_id = $action->getPluginId();
         if (in_array($action_id, $communication_actions)) {
-          $definition = $this->actionManager->getDefinition($action_id);
-          $row['trigger'] = $rule->getTriggerID();
-          $row['action']['data'] = $definition['label'];
+          // @todo: move trigger definitions to a discovery service.
+          $rng_triggers = [
+            'entity:registration:new' => $this->t('When registrations are created.'),
+            'entity:registration:update' => $this->t('When registrations are updated.'),
+          ];
+          $trigger_id = $rule->getTriggerID();
+          $row['trigger'] = isset($rng_triggers[$trigger_id]) ? $rng_triggers[$trigger_id] : $trigger_id;
 
+          $configuration = $action->getConfiguration();
+          $row['status'] = !empty($configuration['active']) ? $this->t('Active') : $this->t('Draft');
           $row['operations']['data'] = ['#type' => 'operations'];
           if ($action->access('edit')) {
             $row['operations']['data']['#links']['edit'] = [
@@ -251,12 +269,6 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $rows[] = $row;
       }
     }
-
-    $build['description'] = [
-      '#prefix' => '<p>',
-      '#markup' => $this->t('These messages will be sent when a trigger occurs.'),
-      '#suffix' => '</p>',
-    ];
 
     $build['action_list'] = array(
       '#type' => 'table',
