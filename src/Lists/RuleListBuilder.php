@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\rng\EventManagerInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,18 +28,18 @@ class RuleListBuilder extends EntityListBuilder {
   protected $eventManager;
 
   /**
+   * The redirect destination service.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * The event entity.
    *
    * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $event;
-
-  /**
-   * Route to redirect after performing operations linked from this list.
-   *
-   * @var array
-   */
-  protected $destination;
 
   /**
    * Constructs a new RegistrationListBuilder object.
@@ -47,10 +48,13 @@ class RuleListBuilder extends EntityListBuilder {
    *
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EventManagerInterface $event_manager) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EventManagerInterface $event_manager, RedirectDestinationInterface $redirect_destination) {
     parent::__construct($entity_type, $storage);
     $this->eventManager = $event_manager;
+    $this->redirectDestination = $redirect_destination;
   }
 
   /**
@@ -60,7 +64,8 @@ class RuleListBuilder extends EntityListBuilder {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('rng.event_manager')
+      $container->get('rng.event_manager'),
+      $container->get('redirect.destination')
     );
   }
 
@@ -74,7 +79,6 @@ class RuleListBuilder extends EntityListBuilder {
     if (isset($event)) {
       $this->event = $event;
     }
-    $this->destination = drupal_get_destination();
     $render['description'] = [
       '#prefix' => '<p>',
       '#markup' => $this->t('This rule list is for debugging purposes. There are better lists found in the <strong>Access</strong> and <strong>Messages</strong> tabs.'),
@@ -101,7 +105,7 @@ class RuleListBuilder extends EntityListBuilder {
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
     foreach ($operations as &$operation) {
-      $operation['query'] = $this->destination;
+      $operation['query'] = $this->redirectDestination->getAsArray();
     }
     return $operations;
   }
@@ -136,7 +140,7 @@ class RuleListBuilder extends EntityListBuilder {
       $row['conditions']['data']['#links'][] = array(
         'title' => $this->t('Edit', ['@condition_id' => $condition->id(), '@condition' => $condition->getPluginId()]),
         'url' => $condition->urlInfo('edit-form'),
-        'query' => $this->destination,
+        'query' => $this->redirectDestination->getAsArray(),
       );
     }
 
@@ -149,7 +153,7 @@ class RuleListBuilder extends EntityListBuilder {
       $row['actions']['data']['#links'][] = array(
         'title' => $this->t('Edit', ['@action_id' => $action->id(), '@action' => $action->getPluginId()]),
         'url' => $action->urlInfo('edit-form'),
-        'query' => $this->destination,
+        'query' => $this->redirectDestination->getAsArray(),
       );
     }
 
