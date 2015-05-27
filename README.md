@@ -1,4 +1,4 @@
-RNG is a Drupal module allowing people to register for events.
+RNG is a Drupal module enabling people to register for events.
 
 Copyright (C) 2015 Daniel Phin (@dpi)
 
@@ -28,25 +28,24 @@ See MAINTAINERS.txt for a list of official developers.
 
 # Dependencies
 
- *  Dynamic Entity Reference
-    https://drupal.org/project/dynamic_entity_reference
- *  Courier
-    https://github.com/dpi/courier
+ *  [Dynamic Entity Reference](https://www.drupal.org/project/dynamic_entity_reference)
+ *  [Courier](https://www.drupal.org/project/courier)
 
 # Terms
 
- * Event: any content (fieldable) entity.
- * Registration type: bundle entity for Registrations.
- * Registration: an entity that associates with one Event, and has at least
-   one child Registrant. Each Registration has at least one owner Registrant.
- * Registrant: an entity that maintains a relationship between a Registration
-   and an Identity.
- * Identity: an entity that has implemented a method for contact. Cores' user
-   module provides the User entity. Identity module provides the Contact entity,
-   allowing users to create registrations by providing an email address.
- * EventTypeConfig: and entity maintaining configuration, and default values
-   for EventConfig. Each EventTypeConfig is associated with an event bundle.
-   This type exists pending [#2361775].
+ *  __Event__: any content (fieldable) entity.
+ *  __Registration type__: bundle entity for Registrations.
+ *  __Registration__: an entity that associates with one Event, and has at least
+    one child Registrant. Each Registration has at least one owner Registrant.
+ *  __Registrant__: an entity that maintains a relationship between a
+    Registration and an Identity.
+ *  __Identity__: an entity that has implemented a method for contact. Cores'
+    user module provides the User entity. Identity module provides the Contact
+    entity, allowing users to create registrations by providing an email
+    address.
+ *  __EventTypeConfig__: and entity maintaining configuration, and default
+    values for EventConfig. Each EventTypeConfig is associated with an event
+    bundle. This type exists pending bug #2361775.
 
 # Model
 
@@ -65,6 +64,6 @@ about how an Identity relates to a Registration.
 
 Please see the project websites for instructions:
 
- *  https://drupal.org/project/rng
+ *  https://www.drupal.org/project/rng
  *  https://github.com/dpi/rng
  *  http://dpi.id.au/rng-quick-start/
