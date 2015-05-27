@@ -1,0 +1,3 @@
+rng_debug.local_tasks:
+  class: \Drupal\Core\Menu\LocalTaskDefault
+  deriver: \Drupal\rng_debug\Plugin\Derivative\LocalTasks

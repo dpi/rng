@@ -2,19 +2,20 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Controller\RuleController.
+ * Contains \Drupal\rng_debug\Controller\DebugController.
  */
 
-namespace Drupal\rng\Controller;
+namespace Drupal\rng_debug\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Controller for RNG rules.
+ * Controller for rng_debug.
  */
-class RuleController extends ControllerBase implements ContainerInjectionInterface {
+class DebugController extends ControllerBase implements ContainerInjectionInterface {
+
   /**
    * Provides a list of rng rules for an event.
    *

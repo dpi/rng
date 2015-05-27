@@ -1,0 +1,7 @@
+name: RNG Debug
+type: module
+description: 'Debug event settings.'
+package: RNG
+core: 8.x
+dependencies:
+  - rng

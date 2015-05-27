@@ -1,0 +1,6 @@
+services:
+  rng_debug.route_subscriber:
+    class: Drupal\rng_debug\Routing\RouteSubscriber
+    arguments: ['@entity.manager']
+    tags:
+      - { name: event_subscriber }
