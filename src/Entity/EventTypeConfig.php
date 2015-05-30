@@ -111,7 +111,10 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
         rng_add_event_field_config($field, $this->entity_type, $this->bundle);
       }
     }
+    // Rebuild routes and local tasks
     \Drupal::service('router.builder')->setRebuildNeeded();
+    // Rebuild local actions https://github.com/dpi/rng/issues/18
+    \Drupal::service('plugin.manager.menu.local_action')->clearCachedDefinitions();
   }
 
   /**
@@ -129,7 +132,10 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
 
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
+    // Rebuild routes and local tasks
     \Drupal::service('router.builder')->setRebuildNeeded();
+    // Rebuild local actions https://github.com/dpi/rng/issues/18
+    \Drupal::service('plugin.manager.menu.local_action')->clearCachedDefinitions();
   }
 
 }

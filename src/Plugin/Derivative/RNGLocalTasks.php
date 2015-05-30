@@ -11,26 +11,31 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 
 /**
  * Provides dynamic tasks for RNG.
  */
 class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
+
   /**
-   * The entity type manager.
+   * The storage manager for event_type_config entities.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $eventTypeConfigStorage;
 
   /**
    * Constructs a RNGLocalTasks object.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
+   *   The route provider to load routes by name.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    */
-  public function __construct(RouteProviderInterface $route_provider) {
+  public function __construct(RouteProviderInterface $route_provider, EntityManagerInterface $entity_manager) {
     $this->routeProvider = $route_provider;
+    $this->eventTypeConfigStorage = $entity_manager->getStorage('event_type_config');
   }
 
   /**
@@ -38,7 +43,8 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
-      $container->get('router.route_provider')
+      $container->get('router.route_provider'),
+      $container->get('entity.manager')
     );
   }
 
@@ -49,7 +55,7 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
     $this->derivatives = array();
 
     $entity_type_config = array();
-    foreach (entity_load_multiple('event_type_config') as $entity) {
+    foreach ($this->eventTypeConfigStorage->loadMultiple() as $entity) {
       $entity_type_config[$entity->entity_type][$entity->bundle] = $entity;
     }
 

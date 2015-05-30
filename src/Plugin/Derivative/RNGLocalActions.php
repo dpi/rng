@@ -23,11 +23,11 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
-   * The entity manager.
+   * The storage manager for event_type_config entities.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $eventTypeConfigStorage;
 
   /**
    * Constructs a FieldUiLocalAction object.
@@ -39,7 +39,7 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
    */
   public function __construct(RouteProviderInterface $route_provider, EntityManagerInterface $entity_manager) {
     $this->routeProvider = $route_provider;
-    $this->entityManager = $entity_manager;
+    $this->eventTypeConfigStorage = $entity_manager->getStorage('event_type_config');
   }
 
   /**
@@ -58,8 +58,8 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     $this->derivatives = array();
 
-    $entity_type_config = array();
-    foreach (entity_load_multiple('event_type_config') as $entity) {
+    $entity_type_config = [];
+    foreach ($this->eventTypeConfigStorage->loadMultiple() as $entity) {
       $entity_type_config[$entity->entity_type][$entity->bundle] = $entity;
     }
 
