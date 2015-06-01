@@ -133,6 +133,8 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $config = $this->config('rng.settings');
     $config->set('identity_types', $identity_types);
     $config->save();
+
+    drupal_set_message(t('Registrant settings updated.'));
   }
 
 }

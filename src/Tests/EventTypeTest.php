@@ -34,7 +34,7 @@ class EventTypeTest extends WebTestBase {
 
     // Event types button on admin
     $this->drupalGet('admin/config');
-    $this->assertRaw('Manage which entity bundles are designated as events.', 'Event type button shows in administration.');
+    $this->assertRaw('Manage which entity bundles are designated as events.', 'Button shows in administration.');
 
     // No events
     $event_types = EventTypeConfig::loadMultiple();
@@ -45,7 +45,7 @@ class EventTypeTest extends WebTestBase {
     // Add
     $t_args = ['%label' => 'node.event'];
     $edit = [];
-    $this->drupalPostForm('admin/config/rng/event_types/add', [], t('Save'));
+    $this->drupalPostForm('admin/config/rng/event_types/add', $edit, t('Save'));
     $node_type = NodeType::load('event');
 
     $event_types = EventTypeConfig::loadMultiple();
@@ -62,7 +62,7 @@ class EventTypeTest extends WebTestBase {
     $this->assertRaw(t('Edit event type %label configuration', $t_args), 'Event Type edit form rendered.');
 
     $edit = [];
-    $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/edit', [], t('Save'));
+    $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/edit', $edit, t('Save'));
     $this->assertRaw(t('%label event type updated.', $t_args), 'Event Type edit form saved');
 
     // Delete form
