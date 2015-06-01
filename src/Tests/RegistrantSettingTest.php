@@ -7,16 +7,14 @@
 
 namespace Drupal\rng\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\Core\Url;
 
 /**
  * Tests registrant settings.
  *
  * @group RNG
  */
-class RegistrantSettingTest extends WebTestBase {
-
-  public static $modules = array('rng');
+class RegistrantSettingTest extends RNGTestBase {
 
   public static function getInfo() {
     return array(
@@ -31,7 +29,7 @@ class RegistrantSettingTest extends WebTestBase {
     $this->drupalLogin($web_user);
 
     $this->drupalGet('admin/config');
-    $this->assertRaw('Manage registrant settings.', 'Button shows in administration.');
+    $this->assertLinkByHref(Url::fromRoute('rng.config.registrant')->toString());
 
     $this->drupalGet('admin/config/rng/registrant');
     $this->assertRaw('Enable identity types who can register for events.', 'Registration settings form is rendered.');
