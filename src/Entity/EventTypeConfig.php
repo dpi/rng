@@ -74,7 +74,11 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
   /**
    * Mirror update permissions.
    *
-   * @var boolean
+   * The operation to mirror from the parent entity. For example, if the user
+   * has 'update' permission on the event entity and you want to mirror it. You
+   * should set this to 'update'.
+   *
+   * @var string
    */
   public $mirror_update_permission;
 

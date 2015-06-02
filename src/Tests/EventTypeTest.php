@@ -32,6 +32,13 @@ class EventTypeTest extends RNGTestBase {
     $web_user = $this->drupalCreateUser(['administer event types', 'access administration pages']);
     $this->drupalLogin($web_user);
 
+    // Create and delete the testing event type
+    $event_bundle = $this->drupalCreateContentType();
+    $event_type = $this->createEventType($event_bundle);
+    $this->drupalGet('admin/config/rng/event_types/manage/' . $event_type->id() . '/edit');
+    $event_type->delete();
+    $event_bundle->delete();
+
     // Event types button on admin
     $this->drupalGet('admin/config');
     $this->assertLinkByHref(Url::fromRoute('rng.event_type_config.overview')->toString());
@@ -46,7 +53,6 @@ class EventTypeTest extends RNGTestBase {
     $this->assertLinkByHref(Url::fromRoute('entity.event_type_config.add')->toString());
 
     // Add
-    // @todo local action shows
     $t_args = ['%label' => 'node.event'];
     $edit = [];
     $this->drupalPostForm('admin/config/rng/event_types/add', $edit, t('Save'));

@@ -39,7 +39,7 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     $entity_type_config = array();
-    foreach (entity_load_multiple('event_type_config') as $entity) {
+    foreach ($this->entityManager->getStorage('event_type_config')->loadMultiple() as $entity) {
       $entity_type_config[$entity->entity_type] = $entity->entity_type;
     }
 
