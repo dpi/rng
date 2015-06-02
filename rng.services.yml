@@ -13,6 +13,11 @@ services:
     arguments: ['@entity.manager']
     tags:
       - { name: event_subscriber }
+  access_check.rng.entity_is_event:
+    class: Drupal\rng\Access\EntityIsEventCheck
+    arguments: ['@rng.event_manager']
+    tags:
+      - { name: access_check, applies_to: _entity_is_event }
   access_check.rng.event_registrations_allowed:
     class: Drupal\rng\Access\RegistrationAddAccessCheck
     arguments: ['@entity.manager']

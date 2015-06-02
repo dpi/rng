@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessException;
+use Drupal\rng\Exception\InvalidEventException;
 
 /**
  * Access controller for the registration entity.
@@ -84,31 +85,36 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::neutral();
     }
 
-    $event_meta = $this->eventManager->getMeta($context['event']);
+    try {
+      $event_meta = $this->eventManager->getMeta($context['event']);
 
-    // $entity_bundle is omitted for registration type list at
-    // $event_path/register
-    if ($entity_bundle && !$event_meta->registrationTypeIsValid($entity_bundle)) {
+      // $entity_bundle is omitted for registration type list at
+      // $event_path/register
+      if ($entity_bundle && !$event_meta->registrationTypeIsValid($entity_bundle)) {
+        return AccessResult::neutral();
+      }
+      // There are no registration types configured.
+      elseif (!$event_meta->getRegistrationTypeIds()) {
+        return AccessResult::neutral();
+      }
+
+      if (!$event_meta->isAcceptingRegistrations()) {
+        return AccessResult::neutral();
+      }
+
+      if ($event_meta->remainingCapacity() == 0) {
+        return AccessResult::neutral();
+      }
+
+      if (!$event_meta->countProxyIdentities()) {
+        return AccessResult::neutral();
+      }
+
+      return AccessResult::allowed();
+    }
+    catch (InvalidEventException $e) {
       return AccessResult::neutral();
     }
-    // There are no registration types configured.
-    elseif (!$event_meta->getRegistrationTypeIds()) {
-      return AccessResult::neutral();
-    }
-
-    if (!$event_meta->isAcceptingRegistrations()) {
-      return AccessResult::neutral();
-    }
-
-    if ($event_meta->remainingCapacity() == 0) {
-      return AccessResult::neutral();
-    }
-
-    if (!$event_meta->countProxyIdentities()) {
-      return AccessResult::neutral();
-    }
-
-    return AccessResult::allowed();
   }
 
 }

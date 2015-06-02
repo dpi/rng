@@ -46,7 +46,10 @@ class RNGRouteSubscriber extends RouteSubscriberBase {
     foreach ($entity_type_config as $entity_type) {
       $definition = $this->entityManager->getDefinition($entity_type);
       if ($canonical_path = $definition->getLinkTemplate('canonical')) {
-        $manage_requirements = array('_entity_access' => $entity_type . '.manage event');
+        $manage_requirements = [
+          '_entity_access' => $entity_type . '.manage event',
+          '_entity_is_event' => 'TRUE',
+        ];
         $options = [];
         $options['parameters'][$entity_type]['type'] = 'entity:' . $entity_type;
 

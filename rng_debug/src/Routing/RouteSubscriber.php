@@ -48,6 +48,7 @@ class RouteSubscriber extends RouteSubscriberBase {
       if ($canonical_path = $definition->getLinkTemplate('canonical')) {
         $manage_requirements = [
           '_entity_access' => $entity_type . '.manage event',
+          '_entity_is_event' => 'TRUE',
           '_permission' => 'debug rng',
         ];
         $options = [];

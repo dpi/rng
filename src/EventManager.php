@@ -10,6 +10,7 @@ namespace Drupal\rng;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\rng\Exception\InvalidEventException;
 
 /**
  * Event manager for RNG.
@@ -48,6 +49,10 @@ class EventManager implements EventManagerInterface {
   public function getMeta(EntityInterface $entity) {
     $entity_type = $entity->getEntityTypeId();
     $id = $entity->id();
+
+    if (!$this->event_type($entity->getEntityTypeId(), $entity->bundle())) {
+      throw new InvalidEventException(sprintf('%s: %s is not an event bundle.', $entity->getEntityTypeId(), $entity->bundle()));
+    }
 
     if (!isset($this->event_meta[$entity_type][$id])) {
       $this->event_meta[$entity_type][$id] = EventMeta::createInstance($this->container, $entity);

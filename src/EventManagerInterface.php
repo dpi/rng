@@ -66,8 +66,11 @@ interface EventManagerInterface {
    * @param EntityInterface $entity
    *   An event entity.
    *
-   * @return \Drupal\rng\EventMeta
+   * @return \Drupal\rng\EventMeta|NULL
    *   An event meta object.
+   *
+   * @throws \Drupal\rng\Exception\InvalidEventException
+   *   If the $entity is not an event.
    */
   public function getMeta(EntityInterface $entity);
 
