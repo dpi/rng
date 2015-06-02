@@ -47,10 +47,10 @@ abstract class RNGTestBase extends WebTestBase {
    * @param array $settings
    *   Additional settings for the new entity.
    *
-   * @return \Drupal\rng\Entity\EventTypeConfig
+   * @return \Drupal\Core\Entity\EntityInterface
    *   An event.
    */
-  function createEvent(ConfigEntityInterface $entity_type, $settings = []) {
+  function createEntity(ConfigEntityInterface $entity_type, $settings = []) {
     // @todo change to custom entity
     /*
     $entity_type_id = $entity_type->getEntityType()->getBundleOf();
