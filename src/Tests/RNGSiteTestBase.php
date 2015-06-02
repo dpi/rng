@@ -2,17 +2,15 @@
 
 /**
  * @file
- * Definition of Drupal\rng\Tests\RNGTestBase.
+ * Definition of Drupal\rng\Tests\RNGSiteTestBase.
  */
 
 namespace Drupal\rng\Tests;
 
-use Drupal\simpletest\WebTestBase;
-
 /**
  * Sets up page and article content types.
  */
-abstract class RNGSitePreConfigured extends RNGTestBase {
+abstract class RNGSiteTestBase extends RNGTestBase {
 
   public static $modules = array('rng', 'node');
 

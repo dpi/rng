@@ -12,21 +12,13 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
 
 /**
- * Tests EventTypeConfig
+ * Tests event types
  *
- * @group RNG
+ * @group rng
  */
 class EventTypeTest extends RNGTestBase {
 
   public static $modules = array('node');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Event Types',
-      'description' => 'Event Types',
-      'group' => 'RNG',
-    );
-  }
 
   function testEventType() {
     $web_user = $this->drupalCreateUser(['administer event types', 'access administration pages']);

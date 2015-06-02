@@ -10,19 +10,11 @@ namespace Drupal\rng\Tests;
 use Drupal\Core\Url;
 
 /**
- * Tests event settings.
+ * Tests event settings page.
  *
- * @group RNG
+ * @group rng
  */
-class EventSettingsTest extends RNGSitePreConfigured {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Event settings',
-      'description' => 'Event settings',
-      'group' => 'RNG',
-    );
-  }
+class EventSettingsTest extends RNGSiteTestBase {
 
   /**
    * {@inheritdoc}
@@ -39,6 +31,9 @@ class EventSettingsTest extends RNGSitePreConfigured {
     ]);
   }
 
+  /**
+   * Tests canonical event page, and the Event default local task.
+   */
   function testEventSettings() {
     // local task appears on canonical route
     $this->drupalGet('node/' . $this->event->id());

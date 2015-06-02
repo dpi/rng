@@ -13,17 +13,9 @@ use Drupal\rng\Entity\RegistrationType;
 /**
  * Tests registration types.
  *
- * @group RNG
+ * @group rng
  */
 class RegistrationTypeTest extends RNGTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Registration types',
-      'description' => 'Registration types',
-      'group' => 'RNG',
-    );
-  }
 
   function testRegistrationTypes() {
     $web_user = $this->drupalCreateUser(['administer registration types', 'access administration pages']);

@@ -12,17 +12,9 @@ use Drupal\Core\Url;
 /**
  * Tests registrant settings.
  *
- * @group RNG
+ * @group rng
  */
 class RegistrantSettingTest extends RNGTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'RNG registrant settings',
-      'description' => 'RNG registrant settings',
-      'group' => 'RNG',
-    );
-  }
 
   function testRegistrantSettings() {
     $web_user = $this->drupalCreateUser(['administer rng', 'access administration pages']);
