@@ -85,7 +85,7 @@ class EventAccessResetForm extends ConfirmFormBase {
    */
   public function getQuestion() {
     if (!$this->eventMeta->isDefaultRules('rng_event.register')) {
-      return $this->t('Are you sure you want to access rules to site defaults?');
+      return $this->t('Are you sure you want to reset access rules to site defaults?');
     }
     else {
       return $this->t('Are you sure you want to customize access rules?');

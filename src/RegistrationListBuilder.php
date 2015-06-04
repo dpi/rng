@@ -117,12 +117,13 @@ class RegistrationListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    *
-   * @param RegistrationInterface $entity
+   * @param \Drupal\rng\RegistrationInterface $entity
    *   A registration entity.
    */
   public function buildRow(EntityInterface $entity) {
     $row['counter'] = ++$this->row_counter;
-    $row['type'] = $entity->type->entity->label();
+    $bundle = entity_load($this->entityType->getBundleEntityType(), $entity->bundle());
+    $row['type'] = $bundle ? $bundle->label() : '';
 
     $row['groups']['data'] = array(
       '#theme' => 'item_list',

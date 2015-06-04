@@ -74,7 +74,7 @@ class GroupListBuilder extends EntityListBuilder {
       '#suffix' => '</p>',
     ];
 
-    $render['table'] = parent::render();
+    $render = parent::render();
     $render['table']['#empty'] = t('No groups found for this event.');
     return $render;
   }
