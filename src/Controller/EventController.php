@@ -288,7 +288,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       '#header' => $header,
       '#title' => t('Messages'),
       '#rows' => $rows,
-      '#empty' => $this->t('No messages found.'),
+      '#empty' => $this->t('No messages found for this event.'),
     );
 
     return $build;

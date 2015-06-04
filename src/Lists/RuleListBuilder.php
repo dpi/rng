@@ -79,12 +79,8 @@ class RuleListBuilder extends EntityListBuilder {
     if (isset($event)) {
       $this->event = $event;
     }
-    $render['description'] = [
-      '#prefix' => '<p>',
-      '#markup' => $this->t('This rule list is for debugging purposes. There are better lists found in the <strong>Access</strong> and <strong>Messages</strong> tabs.'),
-      '#suffix' => '</p>',
-    ];
-    $render['table'] = parent::render();
+    drupal_set_message($this->t('This rule list is for advanced users. Take care when committing any actions from this page.'), 'warning');
+    $render = parent::render();
     $render['table']['#empty'] = t('No rules found for this event.');
     return $render;
   }
