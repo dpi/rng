@@ -66,8 +66,9 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
     foreach ($entity_type_config as $entity_type => $bundles) {
       // Only need one set of actions per entity type.
       $this->derivatives["rng.event.$entity_type.event.access.reset"] = array(
-        'title' => $this->t('Reset access to default'),
+        'title' => $this->t('Reset/customize access rules'),
         'route_name' => "rng.event.$entity_type.access.reset",
+        'class' => '\Drupal\rng\Plugin\Menu\LocalAction\ResetAccessRules',
         'appears_on' => array("rng.event.$entity_type.access"),
       );
 

@@ -9,7 +9,9 @@ namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\rng\RuleInterface;
+use Drupal\rng\ActionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -36,6 +38,18 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Rule extends ContentEntityBase implements RuleInterface {
+
+  /**
+   * Internal cache of components to associate with this rule when it is saved.
+   * 
+   * @see \Drupal\rng\RuleInterface->addComponent()
+   * 
+   * @var array
+   */
+  protected $components_unsaved = [
+    'action' => [],
+    'condition' => [],
+  ];
 
   /**
    * {@inheritdoc}
@@ -70,7 +84,7 @@ class Rule extends ContentEntityBase implements RuleInterface {
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'condition', '=')
       ->execute();
-    return entity_load_multiple('rng_rule_component', $action_ids);
+    return entity_load_multiple('rng_rule_component', $action_ids) + $this->components_unsaved['condition'];
   }
 
   /**
@@ -81,7 +95,20 @@ class Rule extends ContentEntityBase implements RuleInterface {
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'action', '=')
       ->execute();
-    return entity_load_multiple('rng_rule_component', $action_ids);
+    return entity_load_multiple('rng_rule_component', $action_ids) + $this->components_unsaved['action'];
+  }
+
+  /**
+   * Add components to the rule.
+   *
+   * Components are not saved until the rule is saved.
+   *
+   * @param string $type
+   *   action or component @todo
+   * @param \Drupal\rng\ActionInterface $component
+   */
+  public function addComponent($type, ActionInterface $component) {
+    $this->components_unsaved[$type][] = $component;
   }
 
   /**
@@ -118,6 +145,20 @@ class Rule extends ContentEntityBase implements RuleInterface {
 
     // Will fail if there are no conditions.
     return $count && ($success == count($conditions)) && ($count == count($conditions));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    foreach ($this->components_unsaved as $components) {
+      foreach ($components as $component) {
+        /** @var \Drupal\rng\ActionInterface $component */
+        $component->setRule($this);
+        $component->save();
+      }
+    }
   }
 
   /**

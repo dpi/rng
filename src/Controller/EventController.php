@@ -96,6 +96,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
   public function listing_access(RouteMatchInterface $route_match, $event) {
     $event = $route_match->getParameter($event);
     $destination = $this->redirectDestination->getAsArray();
+    $event_meta = $this->eventManager->getMeta($event);
+    $trigger = 'rng_event.register';
     $build = [];
 
     $build['description'] = [
@@ -107,13 +109,17 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $rows = [];
 
     // Header.
-    $rows[] = [
+    $rows[0] = [
       ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Rule')],
       ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Component')],
       ['header' => TRUE, 'rowspan' => 2, 'data' => $this->t('Scope')],
       ['header' => TRUE, 'rowspan' => 1, 'data' => $this->t('Operations'), 'colspan' => 4],
-      ['header' => TRUE, 'rowspan' => 2, 'data' => ''],
     ];
+
+    if (!$event_meta->isDefaultRules($trigger)) {
+      $rows[0][] = ['header' => TRUE, 'rowspan' => 2, 'data' => ''];
+    }
+
     $operations = ['create' => $this->t('Create'), 'view' => $this->t('View'), 'update' => $this->t('Update'), 'delete' => $this->t('Delete')];
     foreach ($operations as $operation) {
       $rows['operations'][] = [
@@ -123,7 +129,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     }
 
     $i = 0;
-    $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register');
+    $rules = $event_meta->getRules($trigger, TRUE);
     foreach ($rules as $rule) {
       $i++;
       $scope_all = FALSE;
@@ -149,13 +155,15 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         }
         $row[] = ['colspan' => 5, 'data' => $condition->summary()];
 
-        $row['condition_operations']['data'] = ['#type' => 'operations'];
-        if ($condition_storage->access('edit')) {
-          $row['condition_operations']['data']['#links']['edit'] = [
-            'title' => t('Edit'),
-            'url' => $condition_storage->urlInfo('edit-form'),
-            'query' => $destination,
-          ];
+        if (!$event_meta->isDefaultRules($trigger)) {
+          $row['condition_operations']['data'] = ['#type' => 'operations'];
+          if ($condition_storage->access('edit')) {
+            $row['condition_operations']['data']['#links']['edit'] = [
+              'title' => t('Edit'),
+              'url' => $condition_storage->urlInfo('edit-form'),
+              'query' => $destination,
+            ];
+          }
         }
 
         $rows[] = ['data' => $row, 'no_striping' => TRUE];
@@ -177,16 +185,21 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
           $row['operation_' . $op] = ['data' => ($op == 'create' && ($supports_create != count($rule->getConditions()))) ? $this->t('<em>N/A</em>') : $message];
         }
 
-        $links = [];
-        if ($action_storage->access('edit')) {
-          $links['edit'] = [
-            'title' => t('Edit'),
-            'url' => $action_storage->urlInfo('edit-form'),
-            'query' => $destination,
+        if (!$event_meta->isDefaultRules($trigger)) {
+          $links = [];
+          if ($action_storage->access('edit')) {
+            $links['edit'] = [
+              'title' => t('Edit'),
+              'url' => $action_storage->urlInfo('edit-form'),
+              'query' => $destination,
+            ];
+          }
+
+          $row[] = [
+            'data' => ['#type' => 'operations', '#links' => $links],
+            'rowspan' => $scope_all ? 2 : 1
           ];
         }
-
-        $row[] = ['data' => ['#type' => 'operations', '#links' => $links], 'rowspan' => $scope_all ? 2 : 1];
         $rows[] = $row;
 
         if ($scope_all) {

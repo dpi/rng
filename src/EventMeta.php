@@ -208,14 +208,82 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  function getRules($trigger = NULL) {
+  function getRules($trigger = NULL, $defaults = FALSE) {
     $query = $this->buildRuleQuery();
 
     if ($trigger) {
       $query->condition('trigger_id', $trigger, '=');
     }
 
-    return $this->entityManager->getStorage('rng_rule')->loadMultiple($query->execute());
+    $rules = $this->entityManager->getStorage('rng_rule')->loadMultiple($query->execute());
+    if ($defaults && !$rules) {
+      return $this->getDefaultRules($trigger);
+    }
+
+    return $rules;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultRules($trigger = NULL) {
+    $definitions = [];
+    if ($trigger == 'rng_event.register') {
+      // Allow any user to create a registration on the event.
+      $definitions['user_role']['condition']['rng_user_role'] = ['roles' => []];
+      $definitions['user_role']['action']['registration_operations'] = ['operations' => ['create' => TRUE]];
+
+      // Allow registrants to edit their registrations.
+      $definitions['registrant']['condition']['rng_registration_identity'] = [];
+      $definitions['registrant']['action']['registration_operations'] = [
+        'operations' => [
+          'view' => TRUE,
+          'update' => TRUE
+        ]
+      ];
+
+      // Give event managers all rights.
+      $definitions['event_operation']['condition']['rng_event_operation'] = ['operations' => ['manage event' => TRUE]];
+      $definitions['event_operation']['action']['registration_operations'] = [
+        'operations' => [
+          'create' => TRUE,
+          'view' => TRUE,
+          'update' => TRUE,
+          'delete' => TRUE
+        ]
+      ];
+    }
+
+    $rules = [];
+    foreach ($definitions as $definition) {
+      $rule = $this->entityManager->getStorage('rng_rule')->create(array(
+        'event' => array('entity' => $this->getEvent()),
+        'trigger_id' => 'rng_event.register',
+      ));
+      foreach (['condition', 'action'] as $component_type) {
+        if (isset($definition[$component_type])) {
+          foreach ($definition[$component_type] as $plugin_id => $configuration) {;
+            $component = $this->entityManager->getStorage('rng_rule_component')
+              ->create([])
+              ->setType($component_type)
+              ->setPluginId($plugin_id)
+              ->setConfiguration($configuration);
+            $rule->addComponent($component_type, $component);
+          }
+        }
+      }
+
+      $rules[] = $rule;
+    }
+
+    return $rules;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function isDefaultRules($trigger) {
+    return (boolean)!$this->getRules($trigger);
   }
 
   /**
@@ -307,40 +375,9 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   function addDefaultAccess() {
-    // Allow any user to create a registration on the event.
-    $rules['user_role']['conditions']['rng_user_role'] = ['roles' => []];
-    $rules['user_role']['actions']['registration_operations'] = ['operations' => ['create' => TRUE]];
-
-    // Allow registrants to edit their registrations.
-    $rules['registrant']['conditions']['rng_registration_identity'] = [];
-    $rules['registrant']['actions']['registration_operations'] = ['operations' => ['view' => TRUE, 'update' => TRUE]];
-
-    // Give event managers all rights.
-    $rules['event_operation']['conditions']['rng_event_operation'] = ['operations' => ['manage event' => TRUE]];
-    $rules['event_operation']['actions']['registration_operations'] = ['operations' => ['create' => TRUE, 'view' => TRUE, 'update' => TRUE, 'delete' => TRUE]];
-
+    $rules = $this->getDefaultRules('rng_event.register');
     foreach ($rules as $rule) {
-      $rng_rule = $this->entityManager->getStorage('rng_rule')->create(array(
-        'event' => array('entity' => $this->getEvent()),
-        'trigger_id' => 'rng_event.register',
-      ));
-      $rng_rule->save();
-      foreach ($rule['conditions'] as $plugin_id => $configuration) {
-        $this->entityManager->getStorage('rng_rule_component')->create([])
-          ->setRule($rng_rule)
-          ->setType('condition')
-          ->setPluginId($plugin_id)
-          ->setConfiguration($configuration)
-          ->save();
-      }
-      foreach ($rule['actions'] as $plugin_id => $configuration) {
-        $this->entityManager->getStorage('rng_rule_component')->create([])
-          ->setRule($rng_rule)
-          ->setType('action')
-          ->setPluginId($plugin_id)
-          ->setConfiguration($configuration)
-          ->save();
-      }
+      $rule->save();
     }
   }
 

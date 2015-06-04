@@ -88,7 +88,7 @@ class Action extends ContentEntityBase implements ActionInterface {
    * {@inheritdoc}
    */
   public function getConfiguration() {
-    return $this->get('configuration')->first()->getValue();
+    return $this->get('configuration')->first() ? $this->get('configuration')->first()->getValue() : [];
   }
 
   /**

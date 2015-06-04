@@ -165,11 +165,38 @@ interface EventMetaInterface {
    *
    * @param string|NULL $trigger
    *   The trigger ID for the rule.
+   * @param boolean $defaults
+   *   If there are no rules in the database, generate some unsaved rules.
    *
    * @return \Drupal\rng\RuleInterface[]
    *   An array of rng_rule entities.
    */
-  function getRules($trigger = NULL);
+  function getRules($trigger = NULL, $defaults = FALSE);
+
+  /**
+   * Gets site default access rules and associated conditions and actions.
+   *
+   * @param string $trigger
+   *   The trigger ID for the rules.
+   *
+   * @return \Drupal\rng\RuleInterface[]
+   *   An array of rng_rule entities.
+   */
+  public function getDefaultRules($trigger = NULL);
+
+  /**
+   * Determines if this event should use site default rules.
+   *
+   * If the event has no rules defined, this will determine if site default
+   * rules should be used.
+   *
+   * @param string $trigger
+   *   The trigger ID for the rules.
+   *
+   * @return boolean
+   *   Whether site default rules should be used.
+   */
+  function isDefaultRules($trigger);
 
   /**
    * Manually triggers rules for this event.
@@ -238,7 +265,10 @@ interface EventMetaInterface {
   public function getIdentityTypes();
 
   /**
-   * Adds default access rules to the event.
+   * Clones the site default access rules onto the event.
+   *
+   * If the site default rules change in the future, the access rules for this
+   * event will not get automatically updated.
    *
    * Access rules determine registration operation grants.
    */

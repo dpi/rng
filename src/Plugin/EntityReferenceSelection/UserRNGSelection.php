@@ -7,15 +7,7 @@
 
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
-use Drupal\rng\Plugin\EntityReferenceSelection\RNGSelectionBase;
 use Drupal\rng\RuleGrantsOperationTrait;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Database\Connection;
-use Drupal\rng\EventManagerInterface;
-use Drupal\Core\Condition\ConditionManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rng\RNGConditionInterface;
 
 /**
@@ -52,7 +44,7 @@ class UserRNGSelection extends RNGSelectionBase {
 
     // Event access rules.
     $condition_count = 0;
-    $rules = $this->eventMeta->getRules('rng_event.register');
+    $rules = $this->eventMeta->getRules('rng_event.register', TRUE);
     foreach ($rules as $rule) {
       if ($this->ruleGrantsOperation($rule, 'create')) {
         foreach ($rule->getConditions() as $condition_storage) {

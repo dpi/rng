@@ -25,9 +25,16 @@ class EventAccessResetForm extends ConfirmFormBase {
   /**
    * The event entity.
    *
-   * @var \Drupal\Core\Entity\EntityInterface $event
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $event;
+
+  /**
+   * The event meta wrapper.
+   *
+   * @var \Drupal\rng\EventMetaInterface
+   */
+  protected $eventMeta;
 
   /**
    * The entity manager.
@@ -77,14 +84,36 @@ class EventAccessResetForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete all access rules and reset access to default settings?');
+    if (!$this->eventMeta->isDefaultRules('rng_event.register')) {
+      return $this->t('Are you sure you want to access rules to site defaults?');
+    }
+    else {
+      return $this->t('Are you sure you want to customize access rules?');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    if (!$this->eventMeta->isDefaultRules('rng_event.register')) {
+      return $this->t('Custom access rules will be deleted.');
+    }
+    else {
+      return $this->t('Rules for this event will no longer match site defaults.');
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return $this->t('Reset access rules');
+    if (!$this->eventMeta->isDefaultRules('rng_event.register')) {
+      return $this->t('Delete existing access rules');
+    }
+    else {
+      return $this->t('Customize');
+    }
   }
 
   /**
@@ -101,6 +130,7 @@ class EventAccessResetForm extends ConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
     $this->event = clone $route_match->getParameter($event);
+    $this->eventMeta = $this->eventManager->getMeta($this->event);
     return parent::buildForm($form, $form_state);
   }
 
@@ -108,19 +138,17 @@ class EventAccessResetForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $event_meta = $this->eventManager->getMeta($this->event);
-
-    // Delete existing rules.
-    $query = $event_meta->buildRuleQuery();
-    $rules_ids = $query->condition('trigger_id', 'rng_event.register', '=')->execute();
-    $rules = $this->entityManager->getStorage('rng_rule')->loadMultiple($rules_ids);
-    $this->entityManager->getStorage('rng_rule')->delete($rules);
-
-    // Add back defaults.
-    $event_meta->addDefaultAccess();
-
+    if ($rules = $this->eventMeta->getRules('rng_event.register')) {
+      foreach ($rules as $rule) {
+        $rule->delete();
+      }
+      drupal_set_message(t('Access rules reset to site defaults.'));
+    }
+    else {
+      $this->eventMeta->addDefaultAccess();
+      drupal_set_message(t('Access rules can now be customized using edit operations.'));
+    }
     $form_state->setRedirectUrl($this->getCancelUrl());
-    drupal_set_message(t('Access rules reset.'));
   }
 
 }
