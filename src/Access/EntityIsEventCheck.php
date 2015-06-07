@@ -39,7 +39,7 @@ class EntityIsEventCheck implements AccessInterface {
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
     if ($event = $route->getDefault('event')) {
       $event = $route_match->getParameter($event);
-      if ($this->eventManager->event_type($event->getEntityTypeId(), $event->bundle())) {
+      if ($this->eventManager->eventType($event->getEntityTypeId(), $event->bundle())) {
         return AccessResult::allowed();
       }
     }

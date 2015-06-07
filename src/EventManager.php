@@ -50,7 +50,7 @@ class EventManager implements EventManagerInterface {
     $entity_type = $entity->getEntityTypeId();
     $id = $entity->id();
 
-    if (!$this->event_type($entity->getEntityTypeId(), $entity->bundle())) {
+    if (!$this->eventType($entity->getEntityTypeId(), $entity->bundle())) {
       throw new InvalidEventException(sprintf('%s: %s is not an event bundle.', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
@@ -64,7 +64,7 @@ class EventManager implements EventManagerInterface {
   /**
    * {@inheritdoc}
    */
-  function event_type($entity_type, $bundle) {
+  function eventType($entity_type, $bundle) {
     $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
       ->condition('entity_type', $entity_type, '=')
       ->condition('bundle', $bundle, '=')
@@ -78,6 +78,9 @@ class EventManager implements EventManagerInterface {
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function eventTypeWithEntityType($entity_type) {
     $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
       ->condition('entity_type', $entity_type, '=')

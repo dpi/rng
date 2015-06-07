@@ -23,7 +23,7 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
 function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account, $langcode) {
   if ($operation == 'manage event') {
     $event_config = \Drupal::service('rng.event_manager')
-      ->event_type($entity->getEntityTypeId(), $entity->bundle());
+      ->eventType($entity->getEntityTypeId(), $entity->bundle());
     // Check if we are mirroring another operation, and prevent recursion
     if ($event_config && !empty($event_config->mirror_update_permission) && $event_config->mirror_update_permission != 'manage event') {
       if ($entity->access($event_config->mirror_update_permission, $account)) {
