@@ -7,12 +7,13 @@
 
 namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\rng\RegistrationInterface;
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\GroupInterface;
-use Drupal\rng\RegistrationInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 
@@ -60,6 +61,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * )
  */
 class Registration extends ContentEntityBase implements RegistrationInterface {
+
+  use EntityChangedTrait;
 
   /**
    * A cache of registrants.
