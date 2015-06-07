@@ -126,6 +126,12 @@ class MessageActionForm extends FormBase {
     }
 
     $event = $form_state->get('event');
+    $context = $this->entityManager->getStorage('courier_context')
+      ->load('rng_registration_' . $event->getEntityTypeId());
+    if (!$context) {
+      throw new \Exception(sprintf('No context available for %s', $event->getEntityTypeId()));
+    }
+    $template_collection->setContext($context);
     $template_collection->setOwner($event);
     $template_collection->save();
     drupal_set_message(t('Templates created.'));

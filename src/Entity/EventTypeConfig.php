@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\rng\EventTypeConfigInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\courier\Entity\CourierContext;
 use Drupal\field\Entity\FieldConfig;
 
 /**
@@ -106,6 +107,45 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
   /**
    * {@inheritdoc}
    */
+  static function courierContextCC($entity_type, $operation) {
+    $event_types = \Drupal::service('rng.event_manager')
+      ->eventTypeWithEntityType($entity_type);
+
+    if (!count($event_types)) {
+      $courier_context = CourierContext::load('rng_registration_' . $entity_type);
+      if ($courier_context) {
+        if ($operation == 'delete') {
+          $courier_context->delete();
+        }
+      }
+      else {
+        if ($operation == 'create') {
+          $entity_type_info = \Drupal::entityManager()
+            ->getDefinition($entity_type);
+          $courier_context = CourierContext::create([
+            'label' => t('Event (@entity_type): Registration', ['@entity_type' => $entity_type_info->getLabel()]),
+            'id' => 'rng_registration_' . $entity_type,
+            'tokens' => [$entity_type, 'registration']
+          ]);
+          $courier_context->save();
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    if ($this->isNew()) {
+      $this->courierContextCC($this->entity_type, 'create');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
     if (!$update) {
@@ -134,8 +174,16 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
     parent::delete();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
+
+    if ($event_type = reset($entities)) {
+      EventTypeConfig::courierContextCC($event_type->entity_type, 'delete');
+    }
+
     // Rebuild routes and local tasks
     \Drupal::service('router.builder')->setRebuildNeeded();
     // Rebuild local actions https://github.com/dpi/rng/issues/18

@@ -164,12 +164,19 @@ Each template requires content suitable to the channel.');
    *     registrations to send the message.
    */
   public function execute($context = NULL) {
-    if ($this->isActive() && ($template_collection = $this->getTemplateCollection())) {
-      /* @var \Drupal\rng\RegistrationInterface $registration */
+    if ($this->isActive() && ($collection_original = $this->getTemplateCollection())) {
+      $event = NULL;
       foreach ($context['registrations'] as $registration) {
+        /** @var \Drupal\rng\RegistrationInterface $registration */
+        if (!$event) {
+          $event = $registration->getEvent();
+          $collection_original->addTokenValue($event->getEntityTypeId(), $event);
+        }
+        $collection = clone $collection_original;
+        $collection->addTokenValue('registration', $registration);
         foreach ($registration->getRegistrants() as $registrant) {
           $identity = $registrant->getIdentity();
-          $this->identityChannelManager->sendMessage($template_collection, $identity);
+          $this->identityChannelManager->sendMessage($collection, $identity);
         }
       }
     }

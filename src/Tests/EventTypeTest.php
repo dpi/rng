@@ -8,6 +8,7 @@
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Entity\EventTypeConfig;
+use Drupal\courier\Entity\CourierContext;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
 
@@ -41,6 +42,9 @@ class EventTypeTest extends RNGTestBase {
     $this->drupalGet('admin/config/rng/event_types');
     $this->assertRaw('There is no Event configuration type yet.', 'Event Type list is empty');
 
+    // There are no courier contexts.
+    $this->assertEqual(0, count(CourierContext::loadMultiple()), 'There are no courier context entities.');
+
     // Local action
     $this->assertLinkByHref(Url::fromRoute('entity.event_type_config.add')->toString());
 
@@ -53,6 +57,9 @@ class EventTypeTest extends RNGTestBase {
     $this->assertEqual(1, count(EventTypeConfig::loadMultiple()), 'Event type exists in database.');
     $this->assertRaw(t('The content type !link has been added.', ['!link' => $node_type->link()]), 'Node was created for Event Type');
     $this->assertRaw(t('%label event type added.', $t_args), 'Event Type created');
+
+    // Courier context created?
+    $this->assertTrue(CourierContext::load('rng_registration_node'), 'Courier context entity created for this event type\' entity type.');
 
     // Event type list
     $this->assertUrl('admin/config/rng/event_types', [], 'Browser was redirected to event type list.');

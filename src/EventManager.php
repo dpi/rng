@@ -65,7 +65,30 @@ class EventManager implements EventManagerInterface {
    * {@inheritdoc}
    */
   function event_type($entity_type, $bundle) {
-    return $this->entityManager->getStorage('event_type_config')->load("$entity_type.$bundle");
+    $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
+      ->condition('entity_type', $entity_type, '=')
+      ->condition('bundle', $bundle, '=')
+      ->execute();
+
+    if ($ids) {
+      return $this->entityManager->getStorage('event_type_config')
+        ->load(reset($ids));
+    }
+
+    return NULL;
+  }
+
+  function eventTypeWithEntityType($entity_type) {
+    $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
+      ->condition('entity_type', $entity_type, '=')
+      ->execute();
+
+    if ($ids) {
+      return $this->entityManager->getStorage('event_type_config')
+        ->loadMultiple($ids);
+    }
+
+    return [];
   }
 
 }

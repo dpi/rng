@@ -7,12 +7,14 @@
 
 namespace Drupal\rng;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides an interface defining a Registration entity.
  */
-interface RegistrationInterface extends ContentEntityInterface {
+interface RegistrationInterface extends ContentEntityInterface, EntityChangedInterface {
+
   /**
    * Get associated event.
    *
@@ -20,6 +22,25 @@ interface RegistrationInterface extends ContentEntityInterface {
    *   An entity, or NULL if the event does not exist.
    */
   public function getEvent();
+
+  /**
+   * Returns the registration creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the registration.
+   */
+  public function getCreatedTime();
+
+  /**
+   * Sets the registration creation timestamp.
+   *
+   * @param int $timestamp
+   *   The registration creation timestamp.
+   *
+   * @return \Drupal\rng\RegistrationInterface
+   *   Returns registration for chaining.
+   */
+  public function setCreatedTime($timestamp);
 
   /**
    * Set associated event.

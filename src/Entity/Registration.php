@@ -90,6 +90,28 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getChangedTime() {
+    return $this->get('changed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRegistrantIds() {
     if (!isset($this->registrant_ids)) {
       $this->registrant_ids = \Drupal::entityQuery('registrant')
