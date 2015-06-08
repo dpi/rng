@@ -20,7 +20,7 @@ class ActionForm extends ContentEntityForm {
   /**
    * The action entity.
    *
-   * @var \Drupal\rng\ActionInterface
+   * @var \Drupal\rng\RuleComponentInterface
    */
   protected $entity;
 

@@ -33,7 +33,7 @@ interface RuleInterface extends ContentEntityInterface {
   /**
    * Get actions for the rule.
    *
-   * @return \Drupal\rng\ActionInterface[]
+   * @return \Drupal\rng\RuleComponentInterface[]
    *   An array of action entities.
    */
   public function getActions();
@@ -41,7 +41,7 @@ interface RuleInterface extends ContentEntityInterface {
   /**
    * Get conditions for the rule.
    *
-   * @return \Drupal\rng\ActionInterface[]
+   * @return \Drupal\rng\RuleComponentInterface[]
    *   An array of action entities.
    */
   public function getConditions();

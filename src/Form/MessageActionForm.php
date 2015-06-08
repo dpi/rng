@@ -136,7 +136,7 @@ class MessageActionForm extends FormBase {
     $template_collection->save();
     drupal_set_message(t('Templates created.'));
 
-    /* @var $action \Drupal\rng\ActionInterface*/
+    /* @var $action \Drupal\rng\RuleComponentInterface*/
     $action = $this->entityManager->getStorage('rng_rule_component')->create();
     $action->setPluginId($this->actionPlugin->getPluginId());
     $action->setConfiguration($this->actionPlugin->getConfiguration());

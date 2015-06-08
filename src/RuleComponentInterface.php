@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\ActionInterface.
+ * Contains \Drupal\rng\RuleComponentInterface.
  */
 
 namespace Drupal\rng;
@@ -11,7 +11,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 /**
  * Provides an interface for event action entities.
  */
-interface ActionInterface extends ContentEntityInterface {
+interface RuleComponentInterface extends ContentEntityInterface {
   /**
    * Gets the rule entity.
    *
@@ -23,7 +23,7 @@ interface ActionInterface extends ContentEntityInterface {
   /**
    * Sets the rule for the action.
    *
-   * @return ActionInterface
+   * @return RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setRule(RuleInterface $rule);
@@ -42,7 +42,7 @@ interface ActionInterface extends ContentEntityInterface {
    * @param string $type
    *   The type of action: 'action' or 'condition'.
    *
-   * @return ActionInterface
+   * @return RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setType($type);
@@ -61,7 +61,7 @@ interface ActionInterface extends ContentEntityInterface {
    * @param string $plugin_id
    *   The plugin ID.
    *
-   * @return ActionInterface
+   * @return RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setPluginId($plugin_id);
@@ -77,7 +77,7 @@ interface ActionInterface extends ContentEntityInterface {
   /**
    * Sets the plugin configuration.
    *
-   * @return ActionInterface
+   * @return RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setConfiguration(array $configuration);

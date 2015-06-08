@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Entity\Action.
+ * Contains \Drupal\rng\Entity\RuleComponent.
  */
 
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\rng\ActionInterface;
+use Drupal\rng\RuleComponentInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\RuleInterface;
@@ -38,7 +38,7 @@ use Drupal\rng\RuleInterface;
  *   }
  * )
  */
-class Action extends ContentEntityBase implements ActionInterface {
+class RuleComponent extends ContentEntityBase implements RuleComponentInterface {
   /**
    * {@inheritdoc}
    */

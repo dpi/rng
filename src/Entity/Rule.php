@@ -9,7 +9,7 @@ namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\rng\RuleInterface;
-use Drupal\rng\ActionInterface;
+use Drupal\rng\RuleComponentInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -105,9 +105,9 @@ class Rule extends ContentEntityBase implements RuleInterface {
    *
    * @param string $type
    *   action or component @todo
-   * @param \Drupal\rng\ActionInterface $component
+   * @param \Drupal\rng\RuleComponentInterface $component
    */
-  public function addComponent($type, ActionInterface $component) {
+  public function addComponent($type, RuleComponentInterface $component) {
     $this->components_unsaved[$type][] = $component;
   }
 
@@ -154,7 +154,7 @@ class Rule extends ContentEntityBase implements RuleInterface {
     parent::postSave($storage, $update);
     foreach ($this->components_unsaved as $components) {
       foreach ($components as $component) {
-        /** @var \Drupal\rng\ActionInterface $component */
+        /** @var \Drupal\rng\RuleComponentInterface $component */
         $component->setRule($this);
         $component->save();
       }
