@@ -9,6 +9,8 @@ namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\rng\RegistrationTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\rng\EventManagerInterface;
 
 /**
  * Defines the Registration type configuration entity.
@@ -60,5 +62,52 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
    * @var string
    */
   public $description;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    $registration_storage = \Drupal::entityManager()->getStorage('registration');
+    $event_type_storage = \Drupal::entityManager()->getStorage('event_type_config');
+
+    /** @var \Drupal\rng\Entity\RegistrationType $entity */
+    foreach ($entities as $entity) {
+      // Remove entity field references in
+      // $event->{EventManagerInterface::FIELD_REGISTRATION_TYPE}
+
+      foreach ($event_type_storage->loadMultiple() as $event_config) {
+        $bundle_key = \Drupal::entityManager()
+          ->getDefinition($event_config->entity_type)->getKey('bundle');
+        $event_storage = \Drupal::entityManager()
+          ->getStorage($event_config->entity_type);
+
+        $ids = $event_storage->getQuery()
+          ->condition($bundle_key, $event_config->bundle)
+          ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $entity->id())
+          ->execute();
+
+        foreach ($ids as $id) {
+          $event = $event_storage->load($id);
+          $registration_types = &$event->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
+          foreach ($registration_types->getValue() as $key => $value) {
+            if ($value['target_id'] == $entity->id()) {
+              $registration_types->removeItem($key);
+            }
+          }
+          $event->save();
+        }
+      }
+
+      // Remove registrations.
+      $ids = $registration_storage->getQuery()
+        ->condition('type', $entity->id())
+        ->execute();
+
+      $registrations = $registration_storage->loadMultiple($ids);
+      $registration_storage->delete($registrations);
+    }
+
+    parent::preDelete($storage, $entities);
+  }
 
 }

@@ -10,6 +10,8 @@ namespace Drupal\rng\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\node\NodeInterface;
+use \Drupal\Core\Entity\EntityInterface;
+use \Drupal\rng\RegistrationTypeInterface;
 
 /**
  * Sets up page and article content types.
@@ -78,6 +80,29 @@ abstract class RNGTestBase extends WebTestBase {
     ]);
     $registration_type->save();
     return $registration_type;
+  }
+
+  /**
+   * Creates and saves a registration entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $event
+   *   An event entity.
+   * @param string $registration_type_id
+   *   A registration type ID.
+   *
+   * @return \Drupal\rng\Entity\Registration
+   *   A saved registration entity.
+   *
+   */
+  function createRegistration(EntityInterface $event, $registration_type_id) {
+    $registration = \Drupal::entityManager()
+      ->getStorage('registration')
+      ->create(array(
+        'type' => $registration_type_id,
+      ));
+    $registration->setEvent($event);
+    $registration->save();
+    return $registration;
   }
 
 }
