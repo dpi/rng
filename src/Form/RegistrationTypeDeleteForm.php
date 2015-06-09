@@ -41,10 +41,35 @@ class RegistrationTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $count = $this->entityManager->getStorage('registration')->getQuery()
+      ->condition('type', $this->entity->id())
+      ->count()
+      ->execute();
+
+    if ($count == 0) {
+      return parent::buildForm($form, $form_state);
+    }
+
+    drupal_set_message($this->t('Cannot delete registration type.'), 'warning');
+
+    $form['#title'] = $this->getQuestion();
+    $form['description'] = array('#markup' => $this->formatPlural(
+      $count,
+      'Unable to delete registration type. It is used by @count registration.',
+      'Unable to delete registration type. It is used by @count registrations.'
+    ));
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message(t('Registration type %label was deleted.', array(
+    drupal_set_message($this->t('Registration type %label was deleted.', array(
       '%label' => $this->entity->label(),
     )));
 

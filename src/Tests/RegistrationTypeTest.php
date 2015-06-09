@@ -52,6 +52,10 @@ class RegistrationTypeTest extends RNGTestBase {
     $this->drupalPostForm('admin/structure/rng/registration_types/manage/foobar', $edit, t('Save'));
     $this->assertRaw(t('%label registration type was updated.', ['%label' => 'Foobar2']));
 
+    // No registrations; delete is allowed.
+    $this->drupalGet('admin/structure/rng/registration_types/manage/foobar/delete');
+    $this->assertRaw(t('This action cannot be undone.'));
+
     // Delete
     $this->drupalPostForm('admin/structure/rng/registration_types/manage/foobar/delete', [], t('Delete'));
     $this->assertRaw(t('Registration type %label was deleted.', ['%label' => 'Foobar2']));
