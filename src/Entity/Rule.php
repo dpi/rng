@@ -68,17 +68,6 @@ class Rule extends ContentEntityBase implements RuleInterface {
   /**
    * {@inheritdoc}
    */
-  public function delete() {
-    $action_ids = \Drupal::entityQuery('rng_rule_component')
-      ->condition('rule', $this->id(), '=')
-      ->execute();
-    entity_delete_multiple('rng_rule_component', $action_ids);
-    parent::delete();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getConditions() {
     $action_ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
@@ -104,8 +93,9 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * Components are not saved until the rule is saved.
    *
    * @param string $type
-   *   action or component @todo
+   *   The type of component. Possible values: 'action' or 'condition'.
    * @param \Drupal\rng\RuleComponentInterface $component
+   *   The rule component entity.
    */
   public function addComponent($type, RuleComponentInterface $component) {
     $this->components_unsaved[$type][] = $component;
@@ -115,8 +105,6 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * {@inheritdoc}
    */
   public function evaluateConditions($context_values = []) {
-    // @todo: move evaluation and context to Action/Condition hybrid entity when
-    // @todo:   action plugins get better context integration.
     $success = 0;
     $conditions = $this->getConditions();
     // Counts successfully loaded condition plugins:
@@ -159,6 +147,25 @@ class Rule extends ContentEntityBase implements RuleInterface {
         $component->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    $component_storage = \Drupal::entityManager()->getStorage('rng_rule_component');
+
+    /** @var \Drupal\rng\RuleInterface $rule */
+    foreach ($entities as $rule) {
+      // Delete associated rule components.
+      $ids = $component_storage->getQuery()
+        ->condition('rule', $rule->id())
+        ->execute();
+      $components = $component_storage->loadMultiple($ids);
+      $component_storage->delete($components);
+    }
+
+    parent::preDelete($storage, $entities);
   }
 
   /**
