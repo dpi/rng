@@ -74,7 +74,7 @@ class RegistrationListBuilder extends EntityListBuilder {
       $this->event = $event;
     }
     $render = parent::render();
-    $render['#empty'] = t('No registrations found for this event.');
+    $render['table']['#empty'] = t('No registrations found for this event.');
     return $render;
   }
 

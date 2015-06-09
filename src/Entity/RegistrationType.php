@@ -70,8 +70,8 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
     $registration_storage = \Drupal::entityManager()->getStorage('registration');
     $event_type_storage = \Drupal::entityManager()->getStorage('event_type_config');
 
-    /** @var \Drupal\rng\Entity\RegistrationType $entity */
-    foreach ($entities as $entity) {
+    /** @var \Drupal\rng\RegistrationTypeInterface $registration_type */
+    foreach ($entities as $registration_type) {
       // Remove entity field references in
       // $event->{EventManagerInterface::FIELD_REGISTRATION_TYPE}
 
@@ -83,14 +83,14 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
 
         $ids = $event_storage->getQuery()
           ->condition($bundle_key, $event_config->bundle)
-          ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $entity->id())
+          ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $registration_type->id())
           ->execute();
 
         foreach ($ids as $id) {
           $event = $event_storage->load($id);
           $registration_types = &$event->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
           foreach ($registration_types->getValue() as $key => $value) {
-            if ($value['target_id'] == $entity->id()) {
+            if ($value['target_id'] == $registration_type->id()) {
               $registration_types->removeItem($key);
             }
           }
@@ -100,7 +100,7 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
 
       // Remove registrations.
       $ids = $registration_storage->getQuery()
-        ->condition('type', $entity->id())
+        ->condition('type', $registration_type->id())
         ->execute();
 
       $registrations = $registration_storage->loadMultiple($ids);

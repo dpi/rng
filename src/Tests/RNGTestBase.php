@@ -9,9 +9,7 @@ namespace Drupal\rng\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\node\NodeInterface;
-use \Drupal\Core\Entity\EntityInterface;
-use \Drupal\rng\RegistrationTypeInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Sets up page and article content types.

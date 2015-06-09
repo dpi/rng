@@ -128,7 +128,9 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function getRegistrants() {
-    return entity_load_multiple('registrant', $this->getRegistrantIds());
+    return \Drupal::entityManager()->getStorage('registrant')->loadMultiple(
+      $this->getRegistrantIds()
+    );
   }
 
   /**
@@ -278,17 +280,20 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function delete() {
-    // Delete associated registrants.
-    $registrant_ids = \Drupal::entityQuery('registrant')
-      ->condition('registration', $this->id(), '=')
-      ->execute();
-    $registrants = entity_load_multiple('registrant', $registrant_ids);
-    foreach ($registrants as $registrant) {
-      $registrant->delete();
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    $registrant_storage = \Drupal::entityManager()->getStorage('registrant');
+
+    /** @var \Drupal\rng\RegistrationInterface $registration */
+    foreach ($entities as $registration) {
+      // Delete associated registrants.
+      $ids = $registrant_storage->getQuery()
+        ->condition('registration', $registration->id(), '=')
+        ->execute();
+      $registrants = $registrant_storage->loadMultiple($ids);dpm($registrants);
+      $registrant_storage->delete($registrants);
     }
 
-    parent::delete();
+    parent::preDelete($storage, $entities);
   }
 
 }

@@ -45,7 +45,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Set associated event.
    *
-   * @param ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *
    * @return \Drupal\rng\RegistrationInterface
    *   Returns registration for chaining.
@@ -63,7 +63,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Get registrants for the registration.
    *
-   * @return RegistrantInterface[]
+   * @return \Drupal\rng\RegistrantInterface[]
    *   An array of registrant entities.
    */
   public function getRegistrants();
@@ -71,7 +71,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Searches registrants on this registration for an identity.
    *
-   * @param $identity
+   * @param \Drupal\Core\Entity\EntityInterface $identity
    *   The identity to search.
    *
    * @return boolean
@@ -84,10 +84,10 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
    *
    * Take care to ensure the identity is not already on the registration.
    *
-   * @param $identity
+   * @param \Drupal\Core\Entity\EntityInterface $identity
    *   The identity to add.
    *
-   * @return RegistrantInterface
+   * @return \Drupal\rng\RegistrantInterface
    *   The newly created registrant.
    */
   public function addIdentity(EntityInterface $identity);
@@ -95,7 +95,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Get groups for the registration.
    *
-   * @return GroupInterface[]
+   * @return \Drupal\rng\GroupInterface[]
    *   An array of registration_group entities.
    */
   public function getGroups();
@@ -103,7 +103,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Add a group to the registration.
    *
-   * @param GroupInterface $group
+   * @param \Drupal\rng\GroupInterface $group
    *   The group to add.
    *
    * @return \Drupal\rng\RegistrationInterface
@@ -114,7 +114,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Remove a group from the registration.
    *
-   * @param GroupInterface $group
+   * @param \Drupal\rng\GroupInterface $group
    *   The group to remove.
    *
    * @return \Drupal\rng\RegistrationInterface
