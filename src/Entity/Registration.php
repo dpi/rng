@@ -289,7 +289,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       $ids = $registrant_storage->getQuery()
         ->condition('registration', $registration->id(), '=')
         ->execute();
-      $registrants = $registrant_storage->loadMultiple($ids);dpm($registrants);
+      $registrants = $registrant_storage->loadMultiple($ids);
       $registrant_storage->delete($registrants);
     }
 
