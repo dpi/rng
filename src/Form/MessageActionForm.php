@@ -15,6 +15,7 @@ use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\rng\Entity\RuleComponent;
 
 /**
  * Creates a rule with a rng_courier_message action.
@@ -83,9 +84,10 @@ class MessageActionForm extends FormBase {
     $form_state->set('event', $event);
 
     $triggers = array(
+      'rng:custom:date' => $this->t('To all registrations, on a date.'),
       $this->t('Registrations') => array(
-        'entity:registration:new' => $this->t('When registrations are created.'),
-        'entity:registration:update' => $this->t('When registrations are updated.'),
+        'entity:registration:new' => $this->t('To a single registration, when it is created.'),
+        'entity:registration:update' => $this->t('To a single registration, when it is updated.'),
       ),
     );
 
@@ -151,6 +153,20 @@ class MessageActionForm extends FormBase {
     ));
     $rule->save();
     $action->setRule($rule)->save();
+
+    if ($trigger_id == 'rng:custom:date') {
+      $rule_component = RuleComponent::create()
+        ->setRule($rule)
+        ->setType('condition')
+        ->setPluginId('rng_rule_scheduler');
+      $rule_component->save();
+
+      // Save the ID into config
+      $rule_component->setConfiguration([
+        'rng_rule_component' => $rule_component->id(),
+      ]);
+      $rule_component->save();
+    }
 
     $form_state->setRedirectUrl($action->urlInfo('edit-form'));
   }

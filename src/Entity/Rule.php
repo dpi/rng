@@ -110,8 +110,8 @@ class Rule extends ContentEntityBase implements RuleInterface {
     // Counts successfully loaded condition plugins:
     $count = 0;
 
-    foreach ($conditions as $condition_storage) {
-      if (($condition = $condition_storage->createInstance()) !== NULL) {
+    foreach ($conditions as $component) {
+      if (($condition = $component->createInstance()) !== NULL) {
         $count++;
       }
 
@@ -131,8 +131,7 @@ class Rule extends ContentEntityBase implements RuleInterface {
       }
     }
 
-    // Will fail if there are no conditions.
-    return $count && ($success == count($conditions)) && ($count == count($conditions));
+    return ($success == count($conditions)) && ($count == count($conditions));
   }
 
   /**
@@ -196,6 +195,10 @@ class Rule extends ContentEntityBase implements RuleInterface {
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The last time the rule was edited.'));
+
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Status'))
+      ->setDescription(t('Whether this rule should run if the trigger is used. 0=disabled, 1=active.'));
 
     return $fields;
   }

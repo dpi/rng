@@ -5,6 +5,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\rng\Entity\RuleSchedule;
 
 /**
  * Implements hook_help().
@@ -46,4 +47,32 @@ function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function rng_cron() {
+  // Add scheduled rules to be executed.
+  $queue = \Drupal::queue('rng_rule_scheduler');
+  $rule_scheduler_storage = \Drupal::entityManager()->getStorage('rng_rule_scheduler');
+  $ids = $rule_scheduler_storage->getQuery()
+    ->condition('trigger_date', time(), '<=')
+    ->condition('in_queue', 0, '=')
+    ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '<=')
+    ->execute();
+
+  foreach ($rule_scheduler_storage->loadMultiple($ids) as $rule_schedule) {
+    $data = ['rule_component_id' => $rule_schedule->id()];
+    if ($queue->createItem($data)) {
+      $rule_schedule->setInQueue(TRUE);
+      $rule_schedule->save();
+    }
+  }
+
+  // Delete scheduled rules which have had too many attempts.
+  $ids = $rule_scheduler_storage->getQuery()
+    ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '>')
+    ->execute();
+  $rule_scheduler_storage->delete($rule_scheduler_storage->loadMultiple($ids));
 }

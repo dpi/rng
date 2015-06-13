@@ -230,7 +230,6 @@ class RegistrationForm extends ContentEntityForm {
     $t_args = array('@type' => $registration->bundle(), '%label' => $registration->label(), '%id' => $registration->id());
 
     if ($is_new) {
-      $trigger_id = 'entity:registration:new';
       drupal_set_message(t('Registration has been created.', $t_args));
 
       // Add registrant.
@@ -247,13 +246,9 @@ class RegistrationForm extends ContentEntityForm {
       }
     }
     else {
-      $trigger_id = 'entity:registration:update';
       drupal_set_message(t('Registration was updated.', $t_args));
       $registration->setNewRevision(!$form_state->isValueEmpty('revision'));
     }
-
-    $this->eventManager->getMeta($event)
-      ->trigger($trigger_id, ['registrations' => [$registration]]);
 
     if ($registration->id()) {
       if ($registration->access('view')) {

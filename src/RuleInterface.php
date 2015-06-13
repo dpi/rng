@@ -53,8 +53,7 @@ interface RuleInterface extends ContentEntityInterface {
    *   Context to pass to conditions. Keyed by context name.
    *
    * @return bool
-   *   Whether all conditions evaluate true. Evaluation will fail if there are
-   *   no conditions associated with the rule.
+   *   Whether all conditions evaluate true.
    *
    * @throws \Drupal\Component\Plugin\Exception\ContextException
    *   If a context value is missing for any condition.

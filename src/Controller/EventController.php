@@ -16,6 +16,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rng\RNGConditionInterface;
+use Drupal\rng\Plugin\Condition\CurrentTime;
 
 /**
  * Controller for events.
@@ -236,8 +237,14 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $event = $route_match->getParameter($event);
     $destination = $this->redirectDestination->getAsArray();
     $build = array();
-    $header = array(t('Trigger'), t('Status'), t('Operations'));
+    $header = [$this->t('Trigger'), $this->t('Date'), $this->t('Status'), $this->t('Operations')];
     $rows = array();
+
+    $rng_triggers = [
+      'entity:registration:new' => $this->t('When registrations are created.'),
+      'entity:registration:update' => $this->t('When registrations are updated.'),
+      'rng:custom:date' => $this->t('Current date is after a date.'),
+    ];
 
     // list of communication related action plugin ids.
     $communication_actions = array('rng_courier_message');
@@ -247,33 +254,50 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
         $row = array();
+        $links = [];
         $action_id = $action->getPluginId();
         if (in_array($action_id, $communication_actions)) {
           // @todo: move trigger definitions to a discovery service.
-          $rng_triggers = [
-            'entity:registration:new' => $this->t('When registrations are created.'),
-            'entity:registration:update' => $this->t('When registrations are updated.'),
-          ];
           $trigger_id = $rule->getTriggerID();
           $row['trigger'] = isset($rng_triggers[$trigger_id]) ? $rng_triggers[$trigger_id] : $trigger_id;
 
+          $row['date'] = $this->t('N/A');
+          foreach ($rule->getConditions() as $component) {
+            $condition = $component->createInstance();
+            if ($condition instanceof CurrentTime) {
+              $row['date'] = $condition->getDateFormatted();
+              if ($component->access('edit')) {
+                $links['edit-date'] = [
+                  'title' => $this->t('Edit date'),
+                  'url' => $component->urlInfo('edit-form'),
+                  'query' => $destination,
+                ];
+              }
+            }
+          }
+
           $configuration = $action->getConfiguration();
           $row['status'] = !empty($configuration['active']) ? $this->t('Active') : $this->t('Draft');
-          $row['operations']['data'] = ['#type' => 'operations'];
+
           if ($action->access('edit')) {
-            $row['operations']['data']['#links']['edit'] = [
-              'title' => t('Edit'),
+            $links['edit-templates'] = [
+              'title' => $this->t('Edit templates'),
               'url' => $action->urlInfo('edit-form'),
               'query' => $destination,
             ];
           }
           if ($rule->access('delete')) {
-            $row['operations']['data']['#links']['delete'] = [
-              'title' => t('Delete'),
+            $links['delete'] = [
+              'title' => $this->t('Delete'),
               'url' => $rule->urlInfo('delete-form'),
               'query' => $destination,
             ];
           }
+
+          $row['operations']['data'] = [
+            '#type' => 'operations',
+            '#links' => $links,
+          ];
         }
         else {
           continue;
@@ -286,7 +310,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     $build['action_list'] = array(
       '#type' => 'table',
       '#header' => $header,
-      '#title' => t('Messages'),
+      '#title' => $this->t('Messages'),
       '#rows' => $rows,
       '#empty' => $this->t('No messages found for this event.'),
     );

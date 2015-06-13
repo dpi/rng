@@ -292,9 +292,10 @@ class EventMeta implements EventMetaInterface {
   public function trigger($trigger, $context = array()) {
     $context['event'] = $this->getEvent();
     foreach ($this->getRules($trigger) as $rule) {
-      foreach ($rule->getActions() as $action) {
-        // @todo: get contexts for $rule; ensure they exist on $context.
-        $action->execute($context);
+      if ($rule->evaluateConditions()) {
+        foreach ($rule->getActions() as $action) {
+          $action->execute($context);
+        }
       }
     }
   }

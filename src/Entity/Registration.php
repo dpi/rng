@@ -280,6 +280,16 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    $trigger_id = $update ? 'entity:registration:update' : 'entity:registration:new';
+    \Drupal::service('rng.event_manager')->getMeta($this->getEvent())
+      ->trigger($trigger_id, ['registrations' => [$this]]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     $registrant_storage = \Drupal::entityManager()->getStorage('registrant');
 
