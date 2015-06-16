@@ -7,7 +7,7 @@
 
 namespace Drupal\rng\Tests;
 
-use Drupal\rng\Entity\EventTypeConfig;
+use Drupal\rng\Entity\EventType;
 use Drupal\courier\Entity\CourierContext;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
@@ -34,19 +34,19 @@ class EventTypeTest extends RNGTestBase {
 
     // Event types button on admin
     $this->drupalGet('admin/config');
-    $this->assertLinkByHref(Url::fromRoute('rng.event_type_config.overview')->toString());
+    $this->assertLinkByHref(Url::fromRoute('rng.event_type.overview')->toString());
     $this->assertRaw('Manage which entity bundles are designated as events.', 'Button shows in administration.');
 
     // No events
-    $this->assertEqual(0, count(EventTypeConfig::loadMultiple()), 'There are no event type entities.');
+    $this->assertEqual(0, count(EventType::loadMultiple()), 'There are no event type entities.');
     $this->drupalGet('admin/config/rng/event_types');
-    $this->assertRaw('There is no Event configuration type yet.', 'Event Type list is empty');
+    $this->assertRaw('There is no Event type yet.', 'Event Type list is empty');
 
     // There are no courier contexts.
     $this->assertEqual(0, count(CourierContext::loadMultiple()), 'There are no courier context entities.');
 
     // Local action
-    $this->assertLinkByHref(Url::fromRoute('entity.event_type_config.add')->toString());
+    $this->assertLinkByHref(Url::fromRoute('entity.event_type.add')->toString());
 
     // Add
     $t_args = ['%label' => 'node.event'];
@@ -54,7 +54,7 @@ class EventTypeTest extends RNGTestBase {
     $this->drupalPostForm('admin/config/rng/event_types/add', $edit, t('Save'));
     $node_type = NodeType::load('event');
 
-    $this->assertEqual(1, count(EventTypeConfig::loadMultiple()), 'Event type exists in database.');
+    $this->assertEqual(1, count(EventType::loadMultiple()), 'Event type exists in database.');
     $this->assertRaw(t('The content type !link has been added.', ['!link' => $node_type->link()]), 'Node was created for Event Type');
     $this->assertRaw(t('%label event type added.', $t_args), 'Event Type created');
 
@@ -77,7 +77,7 @@ class EventTypeTest extends RNGTestBase {
     $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/delete', [], t('Delete'));
     $this->assertRaw(t('Event type %label was deleted.', $t_args), 'Event Type delete form saved');
 
-    $this->assertEqual(0, count(EventTypeConfig::loadMultiple()), 'Event type deleted from database.');
+    $this->assertEqual(0, count(EventType::loadMultiple()), 'Event type deleted from database.');
 
     // @todo: ensure conditional on form omits node/existing radios
     // @todo create event type with custom entity

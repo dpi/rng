@@ -27,11 +27,11 @@ class EventManager implements EventManagerInterface {
   protected $event_meta = [];
 
   /**
-   * The entity manager.
+   * Event type storage.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $eventTypeStorage;
 
   /**
    * Constructs a new EventManager object.
@@ -40,7 +40,7 @@ class EventManager implements EventManagerInterface {
    *   The entity manager.
    */
   function __construct(EntityManager $entity_manager) {
-    $this->entityManager = $entity_manager;
+    $this->eventTypeStorage = $entity_manager->getStorage('event_type');
   }
 
   /**
@@ -65,13 +65,13 @@ class EventManager implements EventManagerInterface {
    * {@inheritdoc}
    */
   function eventType($entity_type, $bundle) {
-    $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
+    $ids = $this->eventTypeStorage->getQuery()
       ->condition('entity_type', $entity_type, '=')
       ->condition('bundle', $bundle, '=')
       ->execute();
 
     if ($ids) {
-      return $this->entityManager->getStorage('event_type_config')
+      return $this->eventTypeStorage
         ->load(reset($ids));
     }
 
@@ -82,16 +82,27 @@ class EventManager implements EventManagerInterface {
    * {@inheritdoc}
    */
   function eventTypeWithEntityType($entity_type) {
-    $ids = $this->entityManager->getStorage('event_type_config')->getQuery()
+    $ids = $this->eventTypeStorage->getQuery()
       ->condition('entity_type', $entity_type, '=')
       ->execute();
 
     if ($ids) {
-      return $this->entityManager->getStorage('event_type_config')
-        ->loadMultiple($ids);
+      return $this->eventTypeStorage->loadMultiple($ids);
     }
 
     return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getEventTypes() {
+    /** @var \Drupal\rng\EventTypeInterface[] $event_types */
+    $entity_type_bundles = [];
+    foreach ($this->eventTypeStorage->loadMultiple() as $entity) {
+      $entity_type_bundles[$entity->getEventEntityTypeId()][$entity->getEventBundle()] = $entity;
+    }
+    return $entity_type_bundles;
   }
 
 }

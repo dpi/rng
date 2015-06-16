@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\rng\EventTypeConfigListBuilder.
+ * Contains \Drupal\rng\Lists\EventTypeListBuilder.
  */
 
-namespace Drupal\rng;
+namespace Drupal\rng\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
@@ -13,7 +13,8 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Builds a list of event config entities.
  */
-class EventTypeConfigListBuilder extends ConfigEntityListBuilder {
+class EventTypeListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */

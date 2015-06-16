@@ -11,7 +11,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\rng\EventManagerInterface;
 
 /**
  * Provides dynamic tasks for RNG.
@@ -19,23 +19,23 @@ use Drupal\Core\Entity\EntityManagerInterface;
 class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The storage manager for event_type_config entities.
+   * The RNG event manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\rng\EventManagerInterface
    */
-  protected $eventTypeConfigStorage;
+  protected $eventManager;
 
   /**
    * Constructs a RNGLocalTasks object.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   *   The route provider.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(RouteProviderInterface $route_provider, EntityManagerInterface $entity_manager) {
+  public function __construct(RouteProviderInterface $route_provider, EventManagerInterface $event_manager) {
     $this->routeProvider = $route_provider;
-    $this->eventTypeConfigStorage = $entity_manager->getStorage('event_type_config');
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -44,7 +44,7 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
       $container->get('router.route_provider'),
-      $container->get('entity.manager')
+      $container->get('rng.event_manager')
     );
   }
 
@@ -52,14 +52,10 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    $this->derivatives = array();
+    $this->derivatives = [];
 
-    $entity_type_config = array();
-    foreach ($this->eventTypeConfigStorage->loadMultiple() as $entity) {
-      $entity_type_config[$entity->entity_type][$entity->bundle] = $entity;
-    }
-
-    foreach ($entity_type_config as $entity_type => $bundles) {
+    $event_types = $this->eventManager->getEventTypes();
+    foreach (array_keys($event_types) as $entity_type) {
       // Only need one set of tasks task per entity type.
       if ($this->routeProvider->getRouteByName("entity.$entity_type.canonical")) {
         $event_default = "rng.event.$entity_type.event.default";

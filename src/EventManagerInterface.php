@@ -84,7 +84,7 @@ interface EventManagerInterface {
    * @param string $bundle
    *   A bundle ID.
    *
-   * @return \Drupal\rng\EventTypeConfigInterface|null
+   * @return \Drupal\rng\EventTypeInterface|null
    */
   function eventType($entity_type, $bundle);
 
@@ -94,9 +94,17 @@ interface EventManagerInterface {
    * @param string $entity_type
    *   An entity type ID.
    *
-   * @return \Drupal\rng\EventTypeConfigInterface[]
+   * @return \Drupal\rng\EventTypeInterface[]
    *   An array of event type config entities
    */
   function eventTypeWithEntityType($entity_type);
+
+  /**
+   * Get all event types configuration entities.
+   *
+   * @return array
+   *   A multidimensional array: [event_entity_type][event_bundle] = $event_type
+   */
+  function getEventTypes();
 
 }

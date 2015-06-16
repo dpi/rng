@@ -10,6 +10,7 @@ namespace Drupal\rng\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\rng\Entity\EventType;
 
 /**
  * Sets up page and article content types.
@@ -24,11 +25,11 @@ abstract class RNGTestBase extends WebTestBase {
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
    *   An entity type.
    *
-   * @return \Drupal\rng\Entity\EventTypeConfig
+   * @return \Drupal\rng\EventTypeInterface
    *   An event type config.
    */
   function createEventType(ConfigEntityInterface $entity_type) {
-    $event_type = \Drupal::entityManager()->getStorage('event_type_config')->create([
+    $event_type = EventType::create([
       'label' => 'Event Type A',
       'entity_type' => $entity_type->getEntityType()->getBundleOf(),
       'bundle' => $entity_type->id(),

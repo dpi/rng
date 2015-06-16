@@ -68,33 +68,35 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     $registration_storage = \Drupal::entityManager()->getStorage('registration');
-    $event_type_storage = \Drupal::entityManager()->getStorage('event_type_config');
+    /** @var \Drupal\rng\EventManagerInterface $event_manager */
+    $event_manager = \Drupal::service('rng.event_manager');
 
     /** @var \Drupal\rng\RegistrationTypeInterface $registration_type */
     foreach ($entities as $registration_type) {
       // Remove entity field references in
       // $event->{EventManagerInterface::FIELD_REGISTRATION_TYPE}
+      $event_types = $event_manager->getEventTypes();
+      foreach ($event_types as $entity_type => $bundles) {
+        $event_storage = \Drupal::entityManager()->getStorage($entity_type);
+        foreach ($bundles as $bundle => $event_type) {
+          $bundle_key = \Drupal::entityManager()
+            ->getDefinition($entity_type)->getKey('bundle');
 
-      foreach ($event_type_storage->loadMultiple() as $event_config) {
-        $bundle_key = \Drupal::entityManager()
-          ->getDefinition($event_config->entity_type)->getKey('bundle');
-        $event_storage = \Drupal::entityManager()
-          ->getStorage($event_config->entity_type);
+          $ids = $event_storage->getQuery()
+            ->condition($bundle_key, $bundle)
+            ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $registration_type->id())
+            ->execute();
 
-        $ids = $event_storage->getQuery()
-          ->condition($bundle_key, $event_config->bundle)
-          ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $registration_type->id())
-          ->execute();
-
-        foreach ($ids as $id) {
-          $event = $event_storage->load($id);
-          $registration_types = &$event->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
-          foreach ($registration_types->getValue() as $key => $value) {
-            if ($value['target_id'] == $registration_type->id()) {
-              $registration_types->removeItem($key);
+          foreach ($ids as $id) {
+            $event = $event_storage->load($id);
+            $registration_types = &$event->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
+            foreach ($registration_types->getValue() as $key => $value) {
+              if ($value['target_id'] == $registration_type->id()) {
+                $registration_types->removeItem($key);
+              }
             }
+            $event->save();
           }
-          $event->save();
         }
       }
 

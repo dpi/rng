@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Form\EventTypeConfigForm.
+ * Contains \Drupal\rng\Form\EventTypeForm.
  */
 
 namespace Drupal\rng\Form;
@@ -17,7 +17,7 @@ use Drupal\rng\EventManagerInterface;
 /**
  * Form controller for event config entities.
  */
-class EventTypeConfigForm extends EntityForm {
+class EventTypeForm extends EntityForm {
 
   /**
    * The entity manager.
@@ -41,7 +41,7 @@ class EventTypeConfigForm extends EntityForm {
   protected $eventManager;
 
   /**
-   * Constructs a EventTypeConfigForm object.
+   * Constructs a EventTypeForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
@@ -72,15 +72,15 @@ class EventTypeConfigForm extends EntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $event_type_config = $this->entity;
+    $event_type = $this->entity;
 
-    if (!$event_type_config->isNew()) {
+    if (!$event_type->isNew()) {
       $form['#title'] = $this->t('Edit event type %label configuration', array(
-        '%label' => $event_type_config->label(),
+        '%label' => $event_type->label(),
       ));
     }
 
-    if ($event_type_config->isNew()) {
+    if ($event_type->isNew()) {
       $bundle_options = array();
       // Generate a list of fieldable bundles which are not events.
       foreach ($this->entityManager->getDefinitions() as $entity_type) {
@@ -131,9 +131,9 @@ class EventTypeConfigForm extends EntityForm {
         '#type' => 'select',
         '#title' => $this->t('Bundle'),
         '#options' => $bundle_options,
-        '#default_value' => $event_type_config->id(),
+        '#default_value' => $event_type->id(),
         '#required' => TRUE,
-        '#disabled' => !$event_type_config->isNew(),
+        '#disabled' => !$event_type->isNew(),
         '#empty_option' => $bundle_options ?: t('No Bundles Available'),
       );
     }
@@ -150,7 +150,7 @@ class EventTypeConfigForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => t('Mirror manage registrations with update permission'),
       '#description' => t('Allow users to <strong>manage registrations</strong> if they have <strong>update</strong> permission on an event entity.'),
-      '#default_value' => ((boolean) (isset($event_type_config->mirror_update_permission) ? $event_type_config->mirror_update_permission : TRUE)),
+      '#default_value' => ((boolean) (isset($event_type->mirror_update_permission) ? $event_type->mirror_update_permission : TRUE)),
     );
 
     return $form;
@@ -168,9 +168,9 @@ class EventTypeConfigForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $event_type_config = $this->getEntity();
+    $event_type = $this->getEntity();
 
-    if ($event_type_config->isNew()) {
+    if ($event_type->isNew()) {
       if ($this->moduleHandler->moduleExists('node') && ($form_state->getValue('entity_type') == 'node')) {
         $node_type = $this->createContentType('event');
         $t_args = [
@@ -178,28 +178,29 @@ class EventTypeConfigForm extends EntityForm {
           '!link' => $node_type->link(),
         ];
         drupal_set_message(t('The content type !link has been added.', $t_args));
-        $event_type_config->entity_type = $node_type->getEntityType()->getBundleOf();
-        $event_type_config->bundle = $node_type->id();
+        $event_type->setEventEntityTypeId($node_type->getEntityType()->getBundleOf());
+        $event_type->setEventBundle($node_type->id());
       }
       else {
-        $bundle = $form_state->getValue('bundle');
-        list($event_type_config->entity_type, $event_type_config->bundle) = explode('.', $bundle);
+        $bundle = explode('.', $form_state->getValue('bundle'));
+        $event_type->setEventEntityTypeId($bundle[0]);
+        $event_type->setEventBundle($bundle[1]);
       }
     }
 
     // Set to the access operation for event.
-    $event_type_config->mirror_update_permission = $form_state->getValue('mirror_update') ? 'update' : '';
+    $event_type->mirror_update_permission = $form_state->getValue('mirror_update') ? 'update' : '';
 
-    $status = $event_type_config->save();
+    $status = $event_type->save();
 
     $message = ($status == SAVED_UPDATED) ? '%label event type updated.' : '%label event type added.';
-    $url = $event_type_config->urlInfo();
-    $t_args = ['%label' => $event_type_config->id(), 'link' => $this->l(t('Edit'), $url)];
+    $url = $event_type->urlInfo();
+    $t_args = ['%label' => $event_type->id(), 'link' => $this->l(t('Edit'), $url)];
 
     drupal_set_message($this->t($message, $t_args));
     $this->logger('rng')->notice($message, $t_args);
 
-    $form_state->setRedirect('rng.event_type_config.overview');
+    $form_state->setRedirect('rng.event_type.overview');
   }
 
   /**

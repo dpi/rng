@@ -43,8 +43,8 @@ See MAINTAINERS.txt for a list of official developers.
     user module provides the User entity. Identity module provides the Contact
     entity, allowing users to create registrations by providing an email
     address.
- *  __EventTypeConfig__: and entity maintaining configuration, and default
-    values for EventConfig. Each EventTypeConfig is associated with an event
+ *  __EventType__: and entity maintaining configuration, and default
+    values for EventConfig. Each EventType is associated with an event
     bundle. This type exists pending bug #2361775.
 
 # Model

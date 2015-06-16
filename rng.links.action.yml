@@ -8,8 +8,8 @@ rng.registration_type.add:
   appears_on:
     - rng.registration_type.overview
 
-rng.event_type_config.add:
-  route_name: entity.event_type_config.add
+rng.event_type.add:
+  route_name: entity.event_type.add
   title: 'Add event type'
   appears_on:
-    - rng.event_type_config.overview
+    - rng.event_type.overview

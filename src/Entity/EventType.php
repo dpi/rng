@@ -2,33 +2,30 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Entity\EventTypeConfig.
+ * Contains \Drupal\rng\Entity\EventType.
  */
 
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\rng\EventTypeConfigInterface;
+use Drupal\rng\EventTypeInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\courier\Entity\CourierContext;
 use Drupal\field\Entity\FieldConfig;
 
 /**
- * Defines the event configuration entity.
- *
- * Event configs hold settings for other fieldable bundles, and store default
- * event setting values for new events.
+ * Defines the event type entity.
  *
  * @ConfigEntityType(
- *   id = "event_type_config",
- *   label = @Translation("Event configuration type"),
+ *   id = "event_type",
+ *   label = @Translation("Event type"),
  *   handlers = {
- *     "list_builder" = "\Drupal\rng\EventTypeConfigListBuilder",
+ *     "list_builder" = "\Drupal\rng\Lists\EventTypeListBuilder",
  *     "form" = {
- *       "add" = "Drupal\rng\Form\EventTypeConfigForm",
- *       "edit" = "Drupal\rng\Form\EventTypeConfigForm",
- *       "delete" = "Drupal\rng\Form\EventTypeConfigDeleteForm"
+ *       "add" = "Drupal\rng\Form\EventTypeForm",
+ *       "edit" = "Drupal\rng\Form\EventTypeForm",
+ *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm"
  *     }
  *   },
  *   admin_permission = "administer event types",
@@ -38,12 +35,12 @@ use Drupal\field\Entity\FieldConfig;
  *     "label" = "id"
  *   },
  *   links = {
- *     "edit-form" = "/admin/config/rng/event_types/manage/{event_type_config}/edit",
- *     "delete-form" = "/admin/config/rng/event_types/manage/{event_type_config}/delete"
+ *     "edit-form" = "/admin/config/rng/event_types/manage/{event_type}/edit",
+ *     "delete-form" = "/admin/config/rng/event_types/manage/{event_type}/delete"
  *   }
  * )
  */
-class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterface {
+class EventType extends ConfigEntityBase implements EventTypeInterface {
 
   /**
    * The machine name of this event config.
@@ -56,21 +53,21 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The ID of the event entity type.
    *
    * @var string
    */
-  public $entity_type;
+  protected $entity_type;
 
   /**
    * The ID of the event bundle type.
    *
    * @var string
    */
-  public $bundle;
+  protected $bundle;
 
   /**
    * Mirror update permissions.
@@ -100,8 +97,38 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
   /**
    * {@inheritdoc}
    */
+  function getEventEntityTypeId() {
+    return $this->entity_type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setEventEntityTypeId($entity_type) {
+    $this->entity_type = $entity_type;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getEventBundle() {
+    return $this->bundle;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setEventBundle($bundle) {
+    $this->bundle = $bundle;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function id() {
-    return $this->entity_type . '.' . $this->bundle;
+    return $this->getEventEntityTypeId() . '.' . $this->getEventBundle();
   }
 
   /**
@@ -152,7 +179,7 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
       module_load_include('inc', 'rng', 'rng.field.defaults');
       foreach ($this->fields as $field) {
         rng_add_event_field_storage($field, $this->entity_type);
-        rng_add_event_field_config($field, $this->entity_type, $this->bundle);
+        rng_add_event_field_config($field, $this->getEventEntityTypeId(), $this->getEventBundle());
       }
     }
     // Rebuild routes and local tasks
@@ -166,7 +193,9 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
    */
   public function delete() {
     foreach ($this->fields as $field) {
-      $field = FieldConfig::loadByName($this->entity_type, $this->bundle, $field);
+      $field = FieldConfig::loadByName(
+        $this->getEventEntityTypeId(), $this->getEventBundle(), $field
+      );
       if ($field) {
         $field->delete();
       }
@@ -181,13 +210,37 @@ class EventTypeConfig extends ConfigEntityBase implements EventTypeConfigInterfa
     parent::postDelete($storage, $entities);
 
     if ($event_type = reset($entities)) {
-      EventTypeConfig::courierContextCC($event_type->entity_type, 'delete');
+      EventType::courierContextCC($event_type->entity_type, 'delete');
     }
 
     // Rebuild routes and local tasks
     \Drupal::service('router.builder')->setRebuildNeeded();
     // Rebuild local actions https://github.com/dpi/rng/issues/18
     \Drupal::service('plugin.manager.menu.local_action')->clearCachedDefinitions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    parent::calculateDependencies();
+    $entity_type = \Drupal::entityManager()
+      ->getDefinition($this->entity_type);
+    if ($entity_type) {
+      if ($entity_type->getBundleEntityType()) {
+        $bundle = \Drupal::entityManager()
+          ->getStorage($entity_type->getBundleEntityType())
+          ->load($this->getEventBundle());
+        if ($bundle) {
+          $this->addDependency('config', $bundle->getConfigDependencyName());
+        }
+      }
+      // Entity type does not use bundles (bundle=entity_type_id)
+      else {
+        $this->addDependency('module', $entity_type->getProvider());
+      }
+    }
+    return $this->dependencies;
   }
 
 }

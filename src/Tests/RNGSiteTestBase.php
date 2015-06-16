@@ -20,12 +20,12 @@ abstract class RNGSiteTestBase extends RNGTestBase {
   var $registration_type;
 
   /**
-   * @var \Drupal\rng\Entity\EventTypeConfig
+   * @var \Drupal\rng\EventTypeInterface
    */
   var $event_bundle;
 
   /**
-   * @var \Drupal\rng\Entity\EventTypeConfig
+   * @var \Drupal\rng\EventTypeInterface
    */
   var $event_type;
 

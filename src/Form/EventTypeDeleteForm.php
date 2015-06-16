@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Form\EventTypeConfigDeleteForm.
+ * Contains \Drupal\rng\Form\EventTypeDeleteForm.
  */
 
 namespace Drupal\rng\Form;
@@ -15,7 +15,7 @@ use Drupal\field\Entity\FieldConfig;
 /**
  * Form controller to delete event configs.
  */
-class EventTypeConfigDeleteForm extends EntityConfirmFormBase {
+class EventTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
@@ -36,7 +36,7 @@ class EventTypeConfigDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('rng.event_type_config.overview');
+    return new Url('rng.event_type.overview');
   }
 
   /**
