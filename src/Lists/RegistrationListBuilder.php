@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RegistrationListBuilder.
+ * Contains \Drupal\rng\Lists\RegistrationListBuilder.
  */
 
-namespace Drupal\rng;
+namespace Drupal\rng\Lists;
 
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;

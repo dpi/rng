@@ -40,7 +40,7 @@ class EventTypeTest extends RNGTestBase {
     // No events
     $this->assertEqual(0, count(EventType::loadMultiple()), 'There are no event type entities.');
     $this->drupalGet('admin/config/rng/event_types');
-    $this->assertRaw('There is no Event type yet.', 'Event Type list is empty');
+    $this->assertRaw('No event types found.', 'Event Type list is empty');
 
     // There are no courier contexts.
     $this->assertEqual(0, count(CourierContext::loadMultiple()), 'There are no courier context entities.');

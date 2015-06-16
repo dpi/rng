@@ -19,7 +19,7 @@ use Drupal\rng\EventManagerInterface;
  *   id = "registration_type",
  *   label = @Translation("Registration type"),
  *   handlers = {
- *     "list_builder" = "\Drupal\rng\RegistrationTypeListBuilder",
+ *     "list_builder" = "\Drupal\rng\Lists\RegistrationTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\rng\Form\RegistrationTypeForm",
  *       "edit" = "Drupal\rng\Form\RegistrationTypeForm",

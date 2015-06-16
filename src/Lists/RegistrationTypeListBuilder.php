@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RegistrationTypeListBuilder.
+ * Contains \Drupal\rng\Lists\RegistrationTypeListBuilder.
  */
 
-namespace Drupal\rng;
+namespace Drupal\rng\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
@@ -30,6 +30,15 @@ class RegistrationTypeListBuilder extends ConfigEntityListBuilder {
     $row['label'] = $this->getLabel($entity);
     $row['machine_name'] = $entity->id();
     return $row + parent::buildRow($entity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $render = parent::render();
+    $render['table']['#empty'] = t('No registration types found.');
+    return $render;
   }
 
 }

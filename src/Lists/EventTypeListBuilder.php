@@ -31,4 +31,13 @@ class EventTypeListBuilder extends ConfigEntityListBuilder {
     return $row + parent::buildRow($entity);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $render = parent::render();
+    $render['table']['#empty'] = t('No event types found.');
+    return $render;
+  }
+
 }

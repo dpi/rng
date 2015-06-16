@@ -52,7 +52,7 @@ class RegistrationTypeTest extends RNGSiteTestBase {
     $this->assertLinkByHref(Url::fromRoute('rng.registration_type.overview')->toString());
 
     $this->drupalGet('admin/structure/rng/registration_types');
-    $this->assertRaw('There is no Registration type yet.');
+    $this->assertRaw('No registration types found.', 'Registration type list is empty');
     $this->assertEqual(0, count(RegistrationType::loadMultiple()));
 
     // Local action
