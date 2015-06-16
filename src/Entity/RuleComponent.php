@@ -27,18 +27,19 @@ use Drupal\rng\RuleInterface;
  *   handlers = {
  *     "access" = "Drupal\rng\AccessControl\EventAccessControlHandler",
  *     "form" = {
- *       "default" = "Drupal\rng\Form\ActionForm",
- *       "add" = "Drupal\rng\Form\ActionForm",
- *       "edit" = "Drupal\rng\Form\ActionForm",
+ *       "default" = "Drupal\rng\Form\RuleComponentForm",
+ *       "add" = "Drupal\rng\Form\RuleComponentForm",
+ *       "edit" = "Drupal\rng\Form\RuleComponentForm",
  *     },
  *   },
  *   links = {
- *     "canonical" = "/rng/action/{rng_rule_component}/edit",
- *     "edit-form" = "/rng/action/{rng_rule_component}/edit",
+ *     "canonical" = "/rng/component/{rng_rule_component}/edit",
+ *     "edit-form" = "/rng/component/{rng_rule_component}/edit",
  *   }
  * )
  */
 class RuleComponent extends ContentEntityBase implements RuleComponentInterface {
+
   /**
    * {@inheritdoc}
    */

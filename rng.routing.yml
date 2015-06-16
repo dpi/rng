@@ -93,12 +93,12 @@ entity.rng_rule.delete_form:
   requirements:
     _entity_access: 'rng_rule.delete'
 
-# action entities
+# rule component entities
 entity.rng_rule_component.edit_form:
-  path: '/rng/action/{rng_rule_component}/edit'
+  path: '/rng/component/{rng_rule_component}/edit'
   defaults:
     _entity_form: 'rng_rule_component.edit'
-    _title: 'Edit action'
+    _title: 'Edit component'
   requirements:
     _entity_access: 'rng_rule_component.update'
 

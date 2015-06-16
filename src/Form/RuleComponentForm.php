@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Form\ActionForm.
+ * Contains \Drupal\rng\Form\RuleComponentForm.
  */
 
 namespace Drupal\rng\Form;
@@ -14,9 +14,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form controller for rng actions.
+ * Form controller for rng rule components.
  */
-class ActionForm extends ContentEntityForm {
+class RuleComponentForm extends ContentEntityForm {
+
   /**
    * The action entity.
    *
@@ -106,20 +107,23 @@ class ActionForm extends ContentEntityForm {
   }
 
   public function save(array $form, FormStateInterface $form_state) {
-    $action = $this->getEntity();
-    $is_new = $action->isNew();
+    /** @var \Drupal\rng\RuleComponentInterface $component */
+    $component = $this->getEntity();
+    $is_new = $component->isNew();
     $plugin_configuration = $this->plugin->getConfiguration();
 
-    $action->setConfiguration($plugin_configuration);
-    $action->save();
+    $component->setConfiguration($plugin_configuration);
+    $component->save();
 
-    $t_args = array('@type' => $action->bundle(), '%label' => $action->label(), '%id' => $action->id());
+    $type = $this->entity->getType();
+    $types = ['action' => $this->t('Action'), 'condition' => $this->t('Condition')];
+    $t_args = ['@type' => isset($types[$type]) ? $types[$type] : $this->t('Component')];
 
     if ($is_new) {
-      drupal_set_message(t('Action created.', $t_args));
+      drupal_set_message(t('@type created.', $t_args));
     }
     else {
-      drupal_set_message(t('Action updated.', $t_args));
+      drupal_set_message(t('@type updated.', $t_args));
     }
   }
 
