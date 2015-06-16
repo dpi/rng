@@ -3,7 +3,7 @@
 /**
  * @file
  * @fie
- * Contains \Drupal\rng\Plugin\Derivative\RNGLocalActions.
+ * Contains \Drupal\rng\Plugin\Derivative\LocalActions.
  */
 
 namespace Drupal\rng\Plugin\Derivative;
@@ -16,9 +16,9 @@ use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides local action for RNG.
+ * Provides dynamic local actions for RNG.
  */
-class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
+class LocalActions extends DeriverBase implements ContainerDeriverInterface {
 
   use StringTranslationTrait;
 
@@ -30,7 +30,7 @@ class RNGLocalActions extends DeriverBase implements ContainerDeriverInterface {
   protected $eventManager;
 
   /**
-   * Constructs a RNGLocalTasks object.
+   * Constructs a LocalTasks object.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.

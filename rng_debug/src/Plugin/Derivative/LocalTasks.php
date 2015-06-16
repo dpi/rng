@@ -26,7 +26,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
   protected $eventManager;
 
   /**
-   * Constructs a RNGLocalTasks object.
+   * Constructs a LocalTasks object.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Routing\RNGRouteSubscriber.
+ * Contains \Drupal\rng\Routing\RouteSubscriber.
  */
 
 namespace Drupal\rng\Routing;
@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Dynamic RNG routes.
  */
-class RNGRouteSubscriber extends RouteSubscriberBase {
+class RouteSubscriber extends RouteSubscriberBase {
 
   /**
    * The entity type manager.

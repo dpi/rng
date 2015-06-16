@@ -1,6 +1,6 @@
 # registration entities
 # Registration add: rng.event.{entity_type_of_event}.register
-# See \Drupal\rng\Routing\RNGRouteSubscriber for more info.
+# See \Drupal\rng\Routing\RouteSubscriber for more info.
 entity.registration.canonical:
   path: '/registration/{registration}'
   defaults:
