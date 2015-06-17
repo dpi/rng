@@ -6,12 +6,14 @@
  */
 
 namespace Drupal\rng;
+
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Provides an interface defining a registration group entity.
  */
 interface GroupInterface extends ContentEntityInterface {
+
   /**
    * Get associated event.
    *

@@ -3,8 +3,13 @@ services:
     class: Drupal\rng\EventManager
     arguments: ['@entity.manager']
     parent: container.trait
-  rng.breadcrumb:
+  rng.breadcrumb.registration:
     class: Drupal\rng\Breadcrumb\RegistrationBreadcrumbBuilder
+    arguments: ['@entity.manager', '@access_manager', '@current_user']
+    tags:
+      - { name: breadcrumb_builder, priority: 100 }
+  rng.breadcrumb.registration_group:
+    class: Drupal\rng\Breadcrumb\GroupBreadcrumbBuilder
     arguments: ['@entity.manager', '@access_manager', '@current_user']
     tags:
       - { name: breadcrumb_builder, priority: 100 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Breadcrumb\RegistrationBreadcrumbBuilder.
+ * Contains \Drupal\rng\Breadcrumb\GroupBreadcrumbBuilder.
  */
 
 namespace Drupal\rng\Breadcrumb;
@@ -13,13 +13,13 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\rng\RegistrationInterface;
+use Drupal\rng\GroupInterface;
 use Drupal\Core\Link;
 
 /**
- * Provides a breadcrumb builder for registrations.
+ * Provides a breadcrumb builder for groups.
  */
-class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
+class GroupBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
   use StringTranslationTrait;
 
@@ -64,8 +64,8 @@ class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    $registration = $route_match->getParameter('registration');
-    return $registration instanceof RegistrationInterface;
+    $group = $route_match->getParameter('registration_group');
+    return $group instanceof GroupInterface;
   }
 
   /**
@@ -73,14 +73,11 @@ class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    */
   public function build(RouteMatchInterface $route_match) {
     $links = array(Link::createFromRoute($this->t('Home'), '<front>'));
-    $registration = $route_match->getParameter('registration');
+    /** @var \Drupal\rng\GroupInterface $group */
+    $group = $route_match->getParameter('registration_group');
 
-    if ($event = $registration->getEvent()) {
+    if ($event = $group->getEvent()) {
       $links[] = new Link($event->label(), $event->urlInfo());
-    }
-
-    if ('entity.registration.canonical' != $route_match->getRouteName()) {
-      $links[] = new Link($registration->label(), $registration->urlInfo());
     }
 
     return $links;
