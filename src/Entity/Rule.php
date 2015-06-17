@@ -139,11 +139,12 @@ class Rule extends ContentEntityBase implements RuleInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-    foreach ($this->components_unsaved as $components) {
-      foreach ($components as $component) {
+    foreach ($this->components_unsaved as $type => $components) {
+      foreach ($components as $k => $component) {
         /** @var \Drupal\rng\RuleComponentInterface $component */
         $component->setRule($this);
         $component->save();
+        unset($this->components_unsaved[$type][$k]);
       }
     }
   }

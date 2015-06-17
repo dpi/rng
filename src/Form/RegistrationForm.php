@@ -223,15 +223,14 @@ class RegistrationForm extends ContentEntityForm {
 
   public function save(array $form, FormStateInterface $form_state) {
     $registration = $this->entity;
-    $event = $registration->getEvent();
-    $is_new = $registration->isNew();
-    $registration->save();
 
-    $t_args = array('@type' => $registration->bundle(), '%label' => $registration->label(), '%id' => $registration->id());
+    $t_args = [
+      '@type' => $registration->bundle(),
+      '%label' => $registration->label(),
+      '%id' => $registration->id(),
+    ];
 
-    if ($is_new) {
-      drupal_set_message(t('Registration has been created.', $t_args));
-
+    if ($registration->isNew()) {
       // Add registrant.
       list($entity_type, $entity_id) = explode(':', $form_state->getValue('identity'));
       if ($entity_id == '*') {
@@ -242,13 +241,20 @@ class RegistrationForm extends ContentEntityForm {
       }
 
       if ($identity = entity_load($entity_type, $entity_id)) {
-        $registrant = $registration->addIdentity($identity);
+        $registration->addIdentity($identity);
       }
     }
     else {
-      drupal_set_message(t('Registration was updated.', $t_args));
       $registration->setNewRevision(!$form_state->isValueEmpty('revision'));
     }
+
+    if ($registration->save() == SAVED_NEW) {
+      drupal_set_message(t('Registration has been created.', $t_args));
+    }
+    else {
+      drupal_set_message(t('Registration was updated.', $t_args));
+    }
+
 
     if ($registration->id()) {
       if ($registration->access('view')) {

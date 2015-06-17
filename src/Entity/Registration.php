@@ -16,6 +16,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\GroupInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\rng\Entity\Registrant;
 
 /**
  * Defines the registration entity class.
@@ -65,11 +66,11 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   use EntityChangedTrait;
 
   /**
-   * A cache of registrants.
+   * Internal cache of identities to associate with this rule when it is saved.
    *
-   * @var integer[]
+   * @var \Drupal\Core\Entity\EntityInterface
    */
-  protected $registrant_ids;
+  protected $identities_unsaved = [];
 
   /**
    * {@inheritdoc}
@@ -116,12 +117,9 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function getRegistrantIds() {
-    if (!isset($this->registrant_ids)) {
-      $this->registrant_ids = \Drupal::entityQuery('registrant')
-        ->condition('registration', $this->id(), '=')
-        ->execute();
-    }
-    return $this->registrant_ids;
+    return $this->registrant_ids = \Drupal::entityQuery('registrant')
+      ->condition('registration', $this->id(), '=')
+      ->execute();
   }
 
   /**
@@ -137,6 +135,11 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function hasIdentity(EntityInterface $identity) {
+    foreach ($this->identities_unsaved as $identity_unsaved) {
+      if ($identity == $identity_unsaved) {
+        return TRUE;
+      }
+    }
     foreach ($this->getRegistrants() as $registrant) {
       if ($registrant->hasIdentity($identity)) {
         return TRUE;
@@ -153,15 +156,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       // Identity already exists on this registration.
       throw new \Exception('Duplicate identity on registration');
     }
-    if ($this->isNew()) {
-      // Registration needs an ID before a registrant can be saved.
-      throw new \Exception('Registration not saved');
-    }
-    $registrant = entity_create('registrant', ['registration' => $this])
-      ->setIdentity($identity);
-    $registrant->save();
-    $this->registrant_ids[] = $registrant->id();
-    return $registrant;
+    $this->identities_unsaved[] = $identity;
   }
 
   /**
@@ -282,6 +277,14 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
+
+    foreach ($this->identities_unsaved as $k => $identity) {
+      $registrant = Registrant::create(['registration' => $this])
+        ->setIdentity($identity);
+      $registrant->save();
+      unset($this->identities_unsaved[$k]);
+    }
+
     $trigger_id = $update ? 'entity:registration:update' : 'entity:registration:new';
     \Drupal::service('rng.event_manager')->getMeta($this->getEvent())
       ->trigger($trigger_id, ['registrations' => [$this]]);

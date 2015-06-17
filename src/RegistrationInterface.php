@@ -86,9 +86,6 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
    *
    * @param \Drupal\Core\Entity\EntityInterface $identity
    *   The identity to add.
-   *
-   * @return \Drupal\rng\RegistrantInterface
-   *   The newly created registrant.
    */
   public function addIdentity(EntityInterface $identity);
 

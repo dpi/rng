@@ -212,4 +212,5 @@ Each template requires content suitable to the channel.');
   protected function isActive() {
     return !empty($this->configuration['active']);
   }
+
 }
