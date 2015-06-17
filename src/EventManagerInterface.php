@@ -63,7 +63,7 @@ interface EventManagerInterface {
   /**
    * Get the meta instance for an event.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An event entity.
    *
    * @return \Drupal\rng\EventMeta|NULL
@@ -73,6 +73,17 @@ interface EventManagerInterface {
    *   If the $entity is not an event.
    */
   public function getMeta(EntityInterface $entity);
+
+  /**
+   * Determines if an entity is an event.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   An event entity.
+   *
+   * @return boolean
+   *   Whether the entity is an event.
+   */
+  public function isEvent(EntityInterface $entity);
 
   /**
    * Get event type config for an event bundle.

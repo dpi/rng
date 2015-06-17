@@ -197,7 +197,9 @@ Each template requires content suitable to the channel.');
    */
   public function getTemplateCollection() {
     if (isset($this->configuration['template_collection'])) {
-      return $this->entityManager->getStorage('courier_template_collection')->load($this->configuration['template_collection']);
+      return $this->entityManager
+        ->getStorage('courier_template_collection')
+        ->load($this->configuration['template_collection']);
     }
     return NULL;
   }

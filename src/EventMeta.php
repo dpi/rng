@@ -368,7 +368,7 @@ class EventMeta implements EventMetaInterface {
     $config = $this->configFactory->get('rng.settings');
     $identity_types = $config->get('identity_types');
     $allowed_identity_types = is_array($identity_types) ? $identity_types : [];
-    $available_identity_types = array_keys($this->identityChannelManager->getChannels());
+    $available_identity_types = $this->identityChannelManager->getIdentityTypes();
     return array_intersect($allowed_identity_types, $available_identity_types);
   }
 

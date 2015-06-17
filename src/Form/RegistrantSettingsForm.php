@@ -94,16 +94,17 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#tree' => TRUE,
     ];
 
-    foreach ($this->identityChannelManager->getChannels() as $identity_entity_type => $channels) {
+    foreach ($this->identityChannelManager->getIdentityTypes() as $identity_type) {
+      $channels = $this->identityChannelManager->getChannelsForIdentityType($identity_type);
       $channels_string = [];
       foreach ($channels as $channel) {
         $entity_type = $this->entityManager->getDefinition($channel);
         $channels_string[] = $entity_type->getLabel();
       }
 
-      $entity_type = $this->entityManager->getDefinition($identity_entity_type);
+      $entity_type = $this->entityManager->getDefinition($identity_type);
 
-      $form['contactables'][$identity_entity_type] = [
+      $form['contactables'][$identity_type] = [
         '#type' => 'checkbox',
         '#title' => $this->t('@label (@provider)', [
           '@label' => $entity_type->getLabel(), '@provider' => $entity_type->getProvider(),
@@ -111,7 +112,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
         '#description' => $this->t('Supported channels: @channels', [
           '@channels' => implode(', ', $channels_string),
         ]),
-        '#default_value' => in_array($identity_entity_type, $identity_types),
+        '#default_value' => in_array($identity_type, $identity_types),
       ];
     }
 
