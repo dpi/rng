@@ -9,9 +9,6 @@ namespace Drupal\rng\Breadcrumb;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Access\AccessManagerInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\courier\IdentityChannelManagerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -30,27 +27,6 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   use StringTranslationTrait;
 
   /**
-   * The entity manager.
-   *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entity_manager;
-
-  /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
-   */
-  protected $accessManager;
-
-  /**
-   * The current user account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * The identity channel manager.
    *
    * @var \Drupal\courier\IdentityChannelManagerInterface
@@ -67,21 +43,12 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * Constructs the RegistrationBreadcrumbBuilder.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager service.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user account.
    * @param \Drupal\courier\IdentityChannelManagerInterface $identity_channel_manager
    *   The identity channel manager.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, AccessManagerInterface $access_manager, AccountInterface $account, IdentityChannelManagerInterface $identity_channel_manager, EventManagerInterface $event_manager) {
-    $this->entity_manager = $entity_manager;
-    $this->accessManager = $access_manager;
-    $this->account = $account;
+  public function __construct(IdentityChannelManagerInterface $identity_channel_manager, EventManagerInterface $event_manager) {
     $this->identityChannelManager = $identity_channel_manager;
     $this->eventManager = $event_manager;
   }
