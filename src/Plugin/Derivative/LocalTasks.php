@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Plugin\Derivative\RNGLocalTasks.
+ * Contains \Drupal\rng\Plugin\Derivative\LocalTasks.
  */
 
 namespace Drupal\rng\Plugin\Derivative;
@@ -16,7 +16,7 @@ use Drupal\rng\EventManagerInterface;
 /**
  * Provides dynamic tasks for RNG.
  */
-class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
+class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
 
   /**
    * The RNG event manager.
@@ -26,7 +26,7 @@ class RNGLocalTasks extends DeriverBase implements ContainerDeriverInterface {
   protected $eventManager;
 
   /**
-   * Constructs a RNGLocalTasks object.
+   * Constructs a LocalTasks object.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.

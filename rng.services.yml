@@ -9,7 +9,7 @@ services:
     tags:
       - { name: breadcrumb_builder, priority: 100 }
   rng.route_subscriber:
-    class: Drupal\rng\Routing\RNGRouteSubscriber
+    class: Drupal\rng\Routing\RouteSubscriber
     arguments: ['@entity.manager', '@rng.event_manager']
     tags:
       - { name: event_subscriber }

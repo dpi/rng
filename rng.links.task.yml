@@ -1,6 +1,6 @@
 rng.local_tasks:
   class: \Drupal\Core\Menu\LocalTaskDefault
-  deriver: \Drupal\rng\Plugin\Derivative\RNGLocalTasks
+  deriver: \Drupal\rng\Plugin\Derivative\LocalTasks
 
 # Registrations
 entity.registration.canonical:

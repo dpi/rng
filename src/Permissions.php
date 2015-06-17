@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RNGPermissions.
+ * Contains \Drupal\rng\Permissions.
  */
 
 namespace Drupal\rng;
@@ -13,7 +13,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 /**
  * Define a permission generator.
  */
-class RNGPermissions {
+class Permissions {
 
   use StringTranslationTrait;
   use UrlGeneratorTrait;

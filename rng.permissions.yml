@@ -19,4 +19,4 @@ administer registration entity:
   restrict access: TRUE
 
 permission_callbacks:
-  - \Drupal\rng\RNGPermissions::eventProxyRolePermissions
+  - \Drupal\rng\Permissions::eventProxyRolePermissions
