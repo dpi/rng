@@ -4,7 +4,7 @@ services:
     arguments: ['@entity.manager']
     parent: container.trait
   rng.breadcrumb:
-    class: Drupal\rng\RegistrationBreadcrumbBuilder
+    class: Drupal\rng\Breadcrumb\RegistrationBreadcrumbBuilder
     arguments: ['@entity.manager', '@access_manager', '@current_user']
     tags:
       - { name: breadcrumb_builder, priority: 100 }

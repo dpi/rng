@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RegistrationBreadcrumbBuilder.
+ * Contains \Drupal\rng\Breadcrumb\RegistrationBreadcrumbBuilder.
  */
 
-namespace Drupal\rng;
+namespace Drupal\rng\Breadcrumb;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -16,9 +16,10 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Link;
 
 /**
- * Provides a breadcrumb builder for RNG.
+ * Provides a breadcrumb builder for registrations.
  */
 class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -57,7 +58,6 @@ class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $this->accessManager = $access_manager;
     $this->account = $account;
   }
-
 
   /**
    * {@inheritdoc}
