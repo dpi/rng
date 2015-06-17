@@ -13,6 +13,10 @@ services:
     arguments: ['@entity.manager', '@access_manager', '@current_user']
     tags:
       - { name: breadcrumb_builder, priority: 100 }
+  rng.breadcrumb.rule_component:
+    class: Drupal\rng\Breadcrumb\RuleComponentBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 100 }
   rng.breadcrumb.courier_template:
     class: Drupal\rng\Breadcrumb\TemplateBreadcrumbBuilder
     arguments: ['@entity.manager', '@access_manager', '@current_user', '@plugin.manager.identity_channel', '@rng.event_manager']
