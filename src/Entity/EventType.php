@@ -58,12 +58,16 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   /**
    * The ID of the event entity type.
    *
+   * Matches entities with this entity type.
+   *
    * @var string
    */
   protected $entity_type;
 
   /**
    * The ID of the event bundle type.
+   *
+   * Matches entities with this bundle.
    *
    * @var string
    */
@@ -225,9 +229,9 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public function calculateDependencies() {
     parent::calculateDependencies();
     $entity_type = \Drupal::entityManager()
-      ->getDefinition($this->entity_type);
+      ->getDefinition($this->getEventEntityTypeId());
     if ($entity_type) {
-      if ($entity_type->getBundleEntityType()) {
+      if ($entity_type->getBundleEntityType() !== 'bundle') {
         $bundle = \Drupal::entityManager()
           ->getStorage($entity_type->getBundleEntityType())
           ->load($this->getEventBundle());
@@ -235,7 +239,6 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
           $this->addDependency('config', $bundle->getConfigDependencyName());
         }
       }
-      // Entity type does not use bundles (bundle=entity_type_id)
       else {
         $this->addDependency('module', $entity_type->getProvider());
       }
