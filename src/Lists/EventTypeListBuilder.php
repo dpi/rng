@@ -58,19 +58,21 @@ class EventTypeListBuilder extends ConfigEntityListBuilder {
     /** @var \Drupal\rng\EventTypeInterface $entity **/
     $operations = parent::getDefaultOperations($entity);
 
-    $entity_type = \Drupal::entityManager()
-      ->getDefinition($entity->getEventEntityTypeId());
+    if ($this->moduleHandler->moduleExists('field_ui')) {
+      $entity_type = \Drupal::entityManager()
+        ->getDefinition($entity->getEventEntityTypeId());
 
-    if ($entity_type->get('field_ui_base_route')) {
-      $options = [];
-      if ($entity_type->getBundleEntityType() !== 'bundle') {
-        $options[$entity_type->getBundleEntityType()] = $entity->getEventBundle();
+      if ($entity_type->get('field_ui_base_route')) {
+        $options = [];
+        if ($entity_type->getBundleEntityType() !== 'bundle') {
+          $options[$entity_type->getBundleEntityType()] = $entity->getEventBundle();
+        }
+        $operations['manage-fields'] = [
+          'title' => t('Event setting defaults'),
+          'weight' => 15,
+          'url' => Url::fromRoute("entity." . $entity->getEventEntityTypeId() . ".field_ui_fields", $options),
+        ];
       }
-      $operations['manage-fields'] = [
-        'title' => t('Event setting defaults'),
-        'weight' => 15,
-        'url' => Url::fromRoute("entity." . $entity->getEventEntityTypeId() . ".field_ui_fields", $options),
-      ];
     }
 
     return $operations;

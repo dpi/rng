@@ -19,7 +19,7 @@ use Drupal\Core\Url;
  */
 class EventTypeTest extends RNGTestBase {
 
-  public static $modules = array('node');
+  public static $modules = array('node', 'field_ui');
 
   function testEventType() {
     $web_user = $this->drupalCreateUser(['administer event types', 'access administration pages']);
@@ -63,7 +63,9 @@ class EventTypeTest extends RNGTestBase {
 
     // Event type list
     $this->assertUrl('admin/config/rng/event_types', [], 'Browser was redirected to event type list.');
-    $this->assertRaw('<td>node.event</td>', 'Event Type shows in list');
+    $this->assertRaw('<td>Content: event</td>', 'Event Type shows in list');
+    $options = ['node_type' => 'event'];
+    $this->assertLinkByHref(Url::fromRoute("entity.node.field_ui_fields", $options)->toString());
 
     // Edit form
     $edit = [];
