@@ -53,6 +53,13 @@ interface EventMetaInterface {
   public function isAcceptingRegistrations();
 
   /**
+   * Get the reply-to e-mail address for mails sent from this event.
+   *
+   * @return string
+   */
+  public function getReplyTo();
+
+  /**
    * Checks if a registrant is allowed to register more than once on this event.
    *
    * @return boolean

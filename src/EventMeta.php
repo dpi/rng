@@ -106,6 +106,13 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function getReplyTo() {
+    return $this->getEvent()->{EventManagerInterface::FIELD_EMAIL_REPLY_TO}->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function duplicateRegistrantsAllowed() {
     return !empty($this->getEvent()->{EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS}->value);
   }

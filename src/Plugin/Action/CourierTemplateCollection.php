@@ -9,11 +9,13 @@ namespace Drupal\rng\Plugin\Action;
 
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\courier\IdentityChannelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Creates a template collection and provides a user interface to its templates.
@@ -41,6 +43,13 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
   protected $identityChannelManager;
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a RegistrantBasicEmail object.
    *
    * @param array $configuration
@@ -53,11 +62,14 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
    *   The entity manager.
    * @param \Drupal\courier\IdentityChannelManager $identity_channel_manager
    *   The identity channel manager.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, IdentityChannelManager $identity_channel_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, IdentityChannelManager $identity_channel_manager, EventManagerInterface $event_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityManager = $entity_manager;
     $this->identityChannelManager = $identity_channel_manager;
+    $this->eventManager = $event_manager;
   }
 
   /**
@@ -66,7 +78,8 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
       $container->get('entity.manager'),
-      $container->get('plugin.manager.identity_channel')
+      $container->get('plugin.manager.identity_channel'),
+      $container->get('rng.event_manager')
     );
   }
 
@@ -165,18 +178,19 @@ Each template requires content suitable to the channel.');
    */
   public function execute($context = NULL) {
     if ($this->isActive() && ($collection_original = $this->getTemplateCollection())) {
-      $event = NULL;
       foreach ($context['registrations'] as $registration) {
+        $options = [];
         /** @var \Drupal\rng\RegistrationInterface $registration */
-        if (!$event) {
-          $event = $registration->getEvent();
+        if (($event = $registration->getEvent()) instanceof EntityInterface) {
+          $event_meta = $this->eventManager->getMeta($event);
+          $options['channels']['courier_email']['reply_to'] = $event_meta->getReplyTo();
           $collection_original->addTokenValue($event->getEntityTypeId(), $event);
         }
         $collection = clone $collection_original;
         $collection->addTokenValue('registration', $registration);
         foreach ($registration->getRegistrants() as $registrant) {
           $identity = $registrant->getIdentity();
-          $this->identityChannelManager->sendMessage($collection, $identity);
+          $this->identityChannelManager->sendMessage($collection, $identity, $options);
         }
       }
     }
