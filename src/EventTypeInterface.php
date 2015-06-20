@@ -46,6 +46,19 @@ interface EventTypeInterface extends ConfigEntityInterface {
   function setEventBundle($bundle);
 
   /**
+   * Gets which permission on event entity grants 'event manage' permission.
+   */
+  function getEventManageOperation();
+
+  /**
+   * Sets operation to mirror from the event entity.
+   *
+   * @param string $permission
+   *   The operation to mirror.
+   */
+  function setEventManageOperation($permission);
+
+  /**
    * Create or clean up courier_context if none exist for an entity type.
    *
    * @param string $entity_type

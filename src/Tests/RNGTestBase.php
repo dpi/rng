@@ -33,7 +33,7 @@ abstract class RNGTestBase extends WebTestBase {
       'label' => 'Event Type A',
       'entity_type' => $entity_type->getEntityType()->getBundleOf(),
       'bundle' => $entity_type->id(),
-      'mirror_update_permission' => 'update',
+      'mirror_operation_to_event_manage' => 'update',
     ]);
     $event_type->save();
     \Drupal::service('router.builder')->rebuildIfNeeded();

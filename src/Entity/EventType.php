@@ -77,12 +77,12 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    * Mirror update permissions.
    *
    * The operation to mirror from the parent entity. For example, if the user
-   * has 'update' permission on the event entity and you want to mirror it. You
-   * should set this to 'update'.
+   * has permission to do 'update' operation on the event entity and you want
+   * to mirror it. You should set this to 'update'.
    *
    * @var string
    */
-  public $mirror_update_permission;
+  public $mirror_operation_to_event_manage;
 
   /**
    * Fields to add to event bundles.
@@ -125,6 +125,21 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   function setEventBundle($bundle) {
     $this->bundle = $bundle;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getEventManageOperation() {
+    return $this->mirror_operation_to_event_manage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setEventManageOperation($permission) {
+    $this->mirror_operation_to_event_manage = $permission;
     return $this;
   }
 

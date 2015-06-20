@@ -72,6 +72,7 @@ class EventTypeForm extends EntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
+    /** @var \Drupal\rng\EventTypeInterface $event_type */
     $event_type = $this->entity;
 
     if (!$event_type->isNew()) {
@@ -150,7 +151,7 @@ class EventTypeForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => t('Mirror manage registrations with update permission'),
       '#description' => t('Allow users to <strong>manage registrations</strong> if they have <strong>update</strong> permission on an event entity.'),
-      '#default_value' => ((boolean) (isset($event_type->mirror_update_permission) ? $event_type->mirror_update_permission : TRUE)),
+      '#default_value' => (boolean)(($event_type->getEventManageOperation() !== NULL) ? $event_type->getEventManageOperation() : TRUE),
     );
 
     return $form;
@@ -168,6 +169,7 @@ class EventTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\rng\EventTypeInterface $event_type */
     $event_type = $this->getEntity();
 
     if ($event_type->isNew()) {
@@ -189,7 +191,8 @@ class EventTypeForm extends EntityForm {
     }
 
     // Set to the access operation for event.
-    $event_type->mirror_update_permission = $form_state->getValue('mirror_update') ? 'update' : '';
+    $op = $form_state->getValue('mirror_update') ? 'update' : '';
+    $event_type->setEventManageOperation($op);
 
     $status = $event_type->save();
 

@@ -35,6 +35,6 @@ rng.event_type.*.*:
     bundle:
       type: string
       label: 'Bundle'
-    mirror_update_permission:
+    mirror_operation_to_event_manage:
       type: string
-      label: 'Mirror update permission from event to manage registrations permission.'
+      label: 'Mirrors another operation grant from the event to event manage.'
