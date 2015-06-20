@@ -1,0 +1,49 @@
+language: php
+
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: 7.0
+
+mysql:
+  database: rng_test
+  username: root
+  encoding: utf8
+
+before_install:
+  - sudo apt-get update > /dev/null
+
+install:
+  - sudo apt-get install -y --force-yes php5-cgi php5-mysql
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer global require drush/drush:dev-master
+
+before_script:
+  - cd ../..
+  - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - mysql -e 'create database rng_test'
+  - mkdir /tmp/rng_temp
+  - mv * /tmp/rng_temp/
+  - git clone http://git.drupal.org/project/drupal.git drupal --depth 1 --branch 8.0.x
+  - mv /tmp/rng_temp drupal/modules/
+  - cd drupal/
+  - drush --yes site-install testing --db-url=mysql://root:@127.0.0.1/rng_test
+  # https://github.com/drush-ops/drush/issues/5 :
+  # Infinite loop when trying to enable not available extensions in Drupal 8
+  # get dependencies manually:
+  - git clone https://github.com/dpi/courier.git modules/courier
+  - git clone --branch 8.x-1.x http://git.drupal.org/project/dynamic_entity_reference.git modules/dynamic_entity_reference
+  - drush --yes en rng
+  - drush --yes en simpletest
+  - drush runserver 127.0.0.1:8080 &
+  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+
+script:
+  - php core/scripts/run-tests.sh --module rng --verbose --color --php `which php` --url http://127.0.0.1:8080 | tee /tmp/test.txt; TEST_EXIT=${PIPESTATUS[0]}; echo $TEST_EXIT
+  - TEST_OUTPUT=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?; echo $TEST_OUTPUT
+  - if [ $TEST_EXIT -eq 0 ] && [ $TEST_OUTPUT -eq 0 ]; then exit 0; else exit 1; fi
