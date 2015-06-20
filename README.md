@@ -44,8 +44,8 @@ See MAINTAINERS.txt for a list of official developers.
     entity, allowing users to create registrations by providing an email
     address.
  *  __EventType__: and entity maintaining configuration, and default
-    values for EventConfig. Each EventType is associated with an event
-    bundle. This type exists pending bug #2361775.
+    values for EventConfig. Each EventType is associated with another
+    entity/bundle combination.
 
 # Model
 

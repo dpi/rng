@@ -20,7 +20,7 @@ class EventTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete settings for event %label and all associated registrations?', array(
+    return $this->t('Are you sure you want to delete event type %label?', array(
       '%label' => $this->entity->label(),
     ));
   }
