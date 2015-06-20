@@ -74,7 +74,7 @@ class EventTypeTest extends RNGTestBase {
 
     // Delete form
     $this->drupalGet('admin/config/rng/event_types/manage/node.event/delete');
-    $this->assertRaw('Are you sure you want to delete settings for event node.event and all associated registrations?', 'Event Type delete form rendered.');
+    $this->assertRaw('Are you sure you want to delete event type node.event?', 'Event Type delete form rendered.');
 
     $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/delete', [], t('Delete'));
     $this->assertRaw(t('Event type %label was deleted.', $t_args), 'Event Type delete form saved');
