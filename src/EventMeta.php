@@ -143,6 +143,20 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function removeRegistrationType($registration_type_id) {
+    /** @var \Drupal\Core\Field\FieldItemListInterface $registration_types */
+    $registration_types = &$this->entity->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
+    foreach ($registration_types->getValue() as $key => $value) {
+      if ($value['target_id'] == $registration_type_id) {
+        $registration_types->removeItem($key);
+      }
+    }
+    return $this->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCapacity() {
     $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
     if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {

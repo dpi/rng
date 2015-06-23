@@ -88,14 +88,10 @@ class RegistrationType extends ConfigEntityBundleBase implements RegistrationTyp
             ->execute();
 
           foreach ($ids as $id) {
-            $event = $event_storage->load($id);
-            $registration_types = &$event->{EventManagerInterface::FIELD_REGISTRATION_TYPE};
-            foreach ($registration_types->getValue() as $key => $value) {
-              if ($value['target_id'] == $registration_type->id()) {
-                $registration_types->removeItem($key);
-              }
-            }
-            $event->save();
+            $event_manager
+              ->getMeta($event_storage->load($id))
+              ->removeRegistrationType($registration_type->id())
+              ->save();
           }
         }
       }

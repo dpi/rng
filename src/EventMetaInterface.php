@@ -95,6 +95,17 @@ interface EventMetaInterface {
   public function registrationTypeIsValid(RegistrationTypeInterface $registration_type);
 
   /**
+   * Removes an allowed registration type from the event.
+   *
+   * @param string $registration_type_id
+   *   The ID of a registration_type entity.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The modified event.
+   */
+  public function removeRegistrationType($registration_type_id);
+
+  /**
    * Gets configuration for maximum permitted registrations on this event.
    *
    * @return integer|EventMetaInterface::CAPACITY_UNLIMITED

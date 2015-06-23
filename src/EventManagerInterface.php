@@ -66,7 +66,7 @@ interface EventManagerInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An event entity.
    *
-   * @return \Drupal\rng\EventMeta|NULL
+   * @return \Drupal\rng\EventMetaInterface|NULL
    *   An event meta object.
    *
    * @throws \Drupal\rng\Exception\InvalidEventException
