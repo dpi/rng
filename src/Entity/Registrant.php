@@ -62,9 +62,27 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * {@inheritdoc}
    */
+  public function clearIdentity() {
+    $this->identity->setValue(NULL);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function hasIdentity(EntityInterface $entity) {
     $keys = $this->getIdentityId();
     return $entity->getEntityTypeId() == $keys['entity_type'] && $entity->id() == $keys['entity_id'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getRegistrantsIdsForIdentity(EntityInterface $identity) {
+    return \Drupal::entityQuery('registrant')
+      ->condition('identity__target_type', $identity->getEntityTypeId(), '=')
+      ->condition('identity__target_id', $identity->id(), '=')
+      ->execute();
   }
 
   /**

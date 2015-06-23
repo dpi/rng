@@ -6,6 +6,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\rng\Entity\RuleSchedule;
+use Drupal\rng\Entity\Registrant;
 
 /**
  * Implements hook_help().
@@ -78,4 +79,20 @@ function rng_cron() {
     ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '>')
     ->execute();
   $rule_scheduler_storage->delete($rule_scheduler_storage->loadMultiple($ids));
+}
+
+/**
+ * Implements hook_entity_predelete().
+ */
+function rng_entity_predelete(EntityInterface $entity) {
+  /** @var \Drupal\courier\IdentityChannelManagerInterface $icm */
+  $icm = \Drupal::service('plugin.manager.identity_channel');
+  if (in_array($entity->getEntityType(), $icm->getIdentityTypes())) {
+    // Remove registrant references to this identity.
+    $registrant_ids = Registrant::getRegistrantsIdsForIdentity($entity);
+    foreach (Registrant::loadMultiple($registrant_ids) as $registrant) {
+      $registrant->clearIdentity();
+      $registrant->save();
+    }
+  }
 }
