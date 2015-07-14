@@ -89,14 +89,10 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
    * @return array
    *   - template_collection: integer: ID of a courier_template_collection
    *     entity. Automatically filled after first submission.
-   *   - active: boolean: Whether the templates associated with the template
-   *     collection are ready to be sent. The message will not be sent until
-   *     this is set to true.
    */
   public function defaultConfiguration() {
     return array(
       'template_collection' => NULL,
-      'active' => FALSE,
     );
   }
 
@@ -129,13 +125,6 @@ Each template requires content suitable to the channel.');
       }
     }
 
-    $form['draft'] = [
-      '#type' => 'checkbox',
-      '#title' => 'Draft',
-      '#default_value' => empty($configuration['active']),
-      '#description' => 'Uncheck when all templates are ready.',
-    ];
-
     return $form;
   }
 
@@ -143,7 +132,6 @@ Each template requires content suitable to the channel.');
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['active'] = $form_state->getValue('draft') === 0;
 
     $configuration = $this->getConfiguration();
 
@@ -216,17 +204,6 @@ Each template requires content suitable to the channel.');
         ->load($this->configuration['template_collection']);
     }
     return NULL;
-  }
-
-  /**
-   * Whether the templates in the collection are ready to be sent/no longer in
-   * draft mode.
-   *
-   * @return bool
-   *   Whether the template collection is active.
-   */
-  protected function isActive() {
-    return !empty($this->configuration['active']);
   }
 
 }

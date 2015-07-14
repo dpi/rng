@@ -68,8 +68,6 @@ class MessageListForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $form['status']['#tree'] = TRUE;
-
     $header = [
       $this->t('Trigger'),
       $this->t('Date'),
@@ -91,7 +89,6 @@ class MessageListForm extends FormBase {
       'entity:registration:update' => $this->t('When registrations are updated.'),
       'rng:custom:date' => $this->t('Current date is after a date.'),
     ];
-
 
     $destination = $this->redirectDestination->getAsArray();
     $form['#rng_event'] = $route_match->getParameter($event);
