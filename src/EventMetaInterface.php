@@ -189,7 +189,7 @@ interface EventMetaInterface {
    *   The status of the rules, or set to NULL for any status.
    *
    * @return \Drupal\rng\RuleInterface[]
-   *   An array of rng_rule entities.
+   *   An array of rng_rule entities keyed by rule ID.
    */
   function getRules($trigger = NULL, $defaults = FALSE, $is_active = TRUE);
 

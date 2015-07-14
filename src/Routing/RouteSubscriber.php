@@ -104,7 +104,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         $route = new Route(
           $canonical_path . '/event/messages',
           array(
-            '_controller' => '\Drupal\rng\Controller\EventController::listing_messages',
+            '_form' => '\Drupal\rng\Form\MessageListForm',
             '_title' => 'Messages',
             'event' => $entity_type,
           ),
