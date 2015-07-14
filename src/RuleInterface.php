@@ -31,6 +31,25 @@ interface RuleInterface extends ContentEntityInterface {
   public function getTriggerID();
 
   /**
+   * Determine if the can be executed.
+   *
+   * @return bool
+   *   Whether the rule can be executed.
+   */
+  public function isActive();
+
+  /**
+   * Set if the rule can be executed.
+   *
+   * @param bool $is_active
+   *   Whether the rule can be executed.
+
+   * @return \Drupal\rng\RuleInterface
+   *   Return this object for chaining.
+   */
+  public function setIsActive($is_active);
+
+  /**
    * Get actions for the rule.
    *
    * @return \Drupal\rng\RuleComponentInterface[]

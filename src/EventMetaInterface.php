@@ -185,11 +185,13 @@ interface EventMetaInterface {
    *   The trigger ID for the rule.
    * @param boolean $defaults
    *   If there are no rules in the database, generate some unsaved rules.
+   * @param boolean|NULL $is_active
+   *   The status of the rules, or set to NULL for any status.
    *
    * @return \Drupal\rng\RuleInterface[]
    *   An array of rng_rule entities.
    */
-  function getRules($trigger = NULL, $defaults = FALSE);
+  function getRules($trigger = NULL, $defaults = FALSE, $is_active = TRUE);
 
   /**
    * Gets site default access rules and associated conditions and actions.

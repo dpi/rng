@@ -229,14 +229,20 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  function getRules($trigger = NULL, $defaults = FALSE) {
+  function getRules($trigger = NULL, $defaults = FALSE, $is_active = TRUE) {
     $query = $this->buildRuleQuery();
 
     if ($trigger) {
       $query->condition('trigger_id', $trigger, '=');
     }
 
-    $rules = $this->entityManager->getStorage('rng_rule')->loadMultiple($query->execute());
+    if (isset($is_active)) {
+      $query->condition('status', $is_active, '=');
+    }
+
+    $rules = $this->entityManager
+      ->getStorage('rng_rule')
+      ->loadMultiple($query->execute());
     if ($defaults && !$rules) {
       return $this->getDefaultRules($trigger);
     }
@@ -280,6 +286,7 @@ class EventMeta implements EventMetaInterface {
       $rule = $this->entityManager->getStorage('rng_rule')->create(array(
         'event' => array('entity' => $this->getEvent()),
         'trigger_id' => 'rng_event.register',
+        'status' => TRUE,
       ));
       foreach (['condition', 'action'] as $component_type) {
         if (isset($definition[$component_type])) {

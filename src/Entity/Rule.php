@@ -68,6 +68,21 @@ class Rule extends ContentEntityBase implements RuleInterface {
   /**
    * {@inheritdoc}
    */
+  public function isActive() {
+    return $this->get('status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIsActive($is_active) {
+    $this->set('status', $is_active);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConditions() {
     $action_ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
@@ -199,7 +214,9 @@ class Rule extends ContentEntityBase implements RuleInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))
-      ->setDescription(t('Whether this rule should run if the trigger is used. 0=disabled, 1=active.'));
+      ->setDescription(t('Whether this rule should run if the trigger is used. 0=disabled, 1=active.'))
+      ->setDefaultValue(FALSE)
+      ->setRequired(TRUE);
 
     return $fields;
   }

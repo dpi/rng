@@ -90,7 +90,7 @@ class RuleListBuilder extends EntityListBuilder {
    */
   public function load() {
     if (isset($this->event)) {
-      return $this->eventManager->getMeta($this->event)->getRules();
+      return $this->eventManager->getMeta($this->event)->getRules(NULL, FALSE, NULL);
     }
     return parent::load();
   }
@@ -114,6 +114,7 @@ class RuleListBuilder extends EntityListBuilder {
     $header['trigger'] = t('Trigger ID');
     $header['conditions'] = t('Conditions');
     $header['actions'] = t('Actions');
+    $header['status'] = t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -152,6 +153,8 @@ class RuleListBuilder extends EntityListBuilder {
         'query' => $this->redirectDestination->getAsArray(),
       );
     }
+
+    $row['status'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
 
     return $row + parent::buildRow($entity);
   }

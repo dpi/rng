@@ -177,7 +177,7 @@ Each template requires content suitable to the channel.');
    *     registrations to send the message.
    */
   public function execute($context = NULL) {
-    if ($this->isActive() && ($collection_original = $this->getTemplateCollection())) {
+    if ($collection_original = $this->getTemplateCollection()) {
       foreach ($context['registrations'] as $registration) {
         $options = [];
         /** @var \Drupal\rng\RegistrationInterface $registration */

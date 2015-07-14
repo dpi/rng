@@ -249,7 +249,9 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     // list of communication related action plugin ids.
     $communication_actions = array('rng_courier_message');
 
-    $rules = $this->eventManager->getMeta($event)->getRules();
+    $rules = $this->eventManager
+      ->getMeta($event)
+      ->getRules(NULL, FALSE, NULL);
     foreach ($rules as $rule) {
       /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $action) {
@@ -276,8 +278,7 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
             }
           }
 
-          $configuration = $action->getConfiguration();
-          $row['status'] = !empty($configuration['active']) ? $this->t('Active') : $this->t('Draft');
+          $row['status'] = $rule->isActive() ? $this->t('Active') : $this->t('Inactive');
 
           if ($action->access('edit')) {
             $links['edit-templates'] = [
