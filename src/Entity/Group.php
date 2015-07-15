@@ -191,7 +191,7 @@ class Group extends ContentEntityBase implements GroupInterface {
         // Remove entity field references from registrations to group.
         foreach ($event_meta->getRegistrations() as $registration) {
           $registration
-            ->removeGroup($group)
+            ->removeGroup($group->id())
             ->save();
         }
       }

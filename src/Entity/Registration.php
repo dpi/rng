@@ -177,9 +177,11 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeGroup(GroupInterface $group) {
-    if (($key = array_search($group, $this->getGroups())) !== FALSE) {
-      $this->groups->removeItem($key);
+  public function removeGroup($group_id) {
+    foreach ($this->groups->getValue() as $key => $value) {
+      if ($value['target_id'] == $group_id) {
+        $this->groups->removeItem($key);
+      }
     }
     return $this;
   }

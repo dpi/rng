@@ -189,6 +189,8 @@ class MessageListForm extends FormBase {
           ->save();
       }
     }
+
+    drupal_set_message($this->t('Messages saved.'));
   }
 
 }

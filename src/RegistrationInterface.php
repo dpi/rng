@@ -111,12 +111,12 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
   /**
    * Remove a group from the registration.
    *
-   * @param \Drupal\rng\GroupInterface $group
-   *   The group to remove.
+   * @param int $group_id
+   *   The ID of a rng_group entity.
    *
    * @return \Drupal\rng\RegistrationInterface
    *   Returns registration for chaining.
    */
-  public function removeGroup(GroupInterface $group);
+  public function removeGroup($group_id);
 
 }
