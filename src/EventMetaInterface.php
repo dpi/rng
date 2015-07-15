@@ -109,7 +109,7 @@ interface EventMetaInterface {
    * Removes references to a default group from the event.
    *
    * @param int $group_id
-   *   The ID of a rng_group entity.
+   *   The ID of a registration_group entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    *   The modified event.

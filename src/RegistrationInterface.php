@@ -112,7 +112,7 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
    * Remove a group from the registration.
    *
    * @param int $group_id
-   *   The ID of a rng_group entity.
+   *   The ID of a registration_group entity.
    *
    * @return \Drupal\rng\RegistrationInterface
    *   Returns registration for chaining.

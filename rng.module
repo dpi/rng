@@ -7,6 +7,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
+use Drupal\rng\Exception\InvalidEventException;
 
 /**
  * Implements hook_help().
@@ -95,4 +96,28 @@ function rng_entity_predelete(EntityInterface $entity) {
       $registrant->save();
     }
   }
+
+  // Delete related entities when an event is deleted.
+  /** @var \Drupal\rng\EventManagerInterface $event_manager */
+  $event_manager = \Drupal::service('rng.event_manager');
+  try{
+    $event_meta = $event_manager->getMeta($entity);
+
+    // Delete registrations.
+    \Drupal::entityManager()
+      ->getStorage('registration')
+      ->delete($event_meta->getRegistrations());
+
+    // Delete groups.
+    \Drupal::entityManager()
+      ->getStorage('registration_group')
+      ->delete($event_meta->getGroups());
+
+    // Delete rules.
+    \Drupal::entityManager()
+      ->getStorage('rng_rule')
+      ->delete($event_meta->getRules(NULL, FALSE, NULL));
+  }
+  // Not an event, thrown by getMeta().
+  catch (InvalidEventException $e) { }
 }

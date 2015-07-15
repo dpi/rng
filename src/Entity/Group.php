@@ -172,7 +172,7 @@ class Group extends ContentEntityBase implements GroupInterface {
    * {@inheritdoc}
    *
    * @param static[] $entities
-   *   An array of rng_group entities.
+   *   An array of registration_group entities.
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     /** @var \Drupal\rng\EventManagerInterface $event_manager */
