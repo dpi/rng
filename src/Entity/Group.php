@@ -12,6 +12,8 @@ use Drupal\rng\GroupInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\rng\EventManagerInterface;
 
 /**
  * Defines the application group entity class.
@@ -164,6 +166,28 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setTranslatable(TRUE);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param static[] $entities
+   *   An array of rng_group entities.
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    /** @var \Drupal\rng\EventManagerInterface $event_manager */
+    $event_manager = \Drupal::service('rng.event_manager');
+
+    foreach ($entities as $group) {
+      // Remove entity field references from the event to group in
+      // $event->{EventManagerInterface::FIELD_REGISTRATION_GROUPS}
+      if ($event = $group->getEvent()) {
+        $event_manager
+          ->getMeta($event)
+          ->removeGroup($group->id())
+          ->save();
+      }
+    }
   }
 
 }

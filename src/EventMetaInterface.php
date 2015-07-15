@@ -95,7 +95,7 @@ interface EventMetaInterface {
   public function registrationTypeIsValid(RegistrationTypeInterface $registration_type);
 
   /**
-   * Removes an allowed registration type from the event.
+   * Removes references to an allowed registration type from the event.
    *
    * @param string $registration_type_id
    *   The ID of a registration_type entity.
@@ -104,6 +104,17 @@ interface EventMetaInterface {
    *   The modified event.
    */
   public function removeRegistrationType($registration_type_id);
+
+  /**
+   * Removes references to a default group from the event.
+   *
+   * @param int $group_id
+   *   The ID of a rng_group entity.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The modified event.
+   */
+  public function removeGroup($group_id);
 
   /**
    * Gets configuration for maximum permitted registrations on this event.

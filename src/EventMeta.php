@@ -157,6 +157,20 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function removeGroup($group_id) {
+    /** @var \Drupal\Core\Field\FieldItemListInterface $groups */
+    $groups = &$this->entity->{EventManagerInterface::FIELD_REGISTRATION_GROUPS};
+    foreach ($groups->getValue() as $key => $value) {
+      if ($value['target_id'] == $group_id) {
+        $groups->removeItem($key);
+      }
+    }
+    return $this->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCapacity() {
     $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
     if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {
