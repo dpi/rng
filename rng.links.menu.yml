@@ -12,7 +12,7 @@ rng.config:
 
 rng.event.overview:
   title: 'Event types'
-  parent: rng.config
+  parent: system.admin_structure
   description: 'Manage which entity bundles are designated as events.'
   route_name: rng.event_type.overview
 

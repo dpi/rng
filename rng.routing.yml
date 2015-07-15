@@ -112,7 +112,7 @@ entity.rng_rule_component.edit_form:
 
 # event_type entities
 entity.event_type.add:
-  path: '/admin/config/rng/event_types/add'
+  path: '/admin/structure/rng/event_types/add'
   defaults:
     _entity_form: 'event_type.add'
     _title: 'Add event type'
@@ -120,7 +120,7 @@ entity.event_type.add:
     _permission: 'administer event types'
 
 entity.event_type.edit_form:
-  path: '/admin/config/rng/event_types/manage/{event_type}/edit'
+  path: '/admin/structure/rng/event_types/manage/{event_type}/edit'
   defaults:
     _entity_form: 'event_type.edit'
     _title: 'Edit event type'
@@ -128,7 +128,7 @@ entity.event_type.edit_form:
     _permission: 'administer event types'
 
 entity.event_type.delete_form:
-  path: '/admin/config/rng/event_types/manage/{event_type}/delete'
+  path: '/admin/structure/rng/event_types/manage/{event_type}/delete'
   defaults:
     _entity_form: 'event_type.delete'
     _title: 'Delete event type'
@@ -136,7 +136,7 @@ entity.event_type.delete_form:
     _permission: 'administer event types'
 
 rng.event_type.overview:
-  path: '/admin/config/rng/event_types'
+  path: '/admin/structure/rng/event_types'
   defaults:
     _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'event_type'
