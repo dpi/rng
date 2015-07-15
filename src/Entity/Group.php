@@ -179,13 +179,21 @@ class Group extends ContentEntityBase implements GroupInterface {
     $event_manager = \Drupal::service('rng.event_manager');
 
     foreach ($entities as $group) {
-      // Remove entity field references from the event to group in
-      // $event->{EventManagerInterface::FIELD_REGISTRATION_GROUPS}
       if ($event = $group->getEvent()) {
-        $event_manager
-          ->getMeta($event)
+        $event_meta = $event_manager->getMeta($event);
+
+        // Remove entity field references from the event to group in
+        // $event->{EventManagerInterface::FIELD_REGISTRATION_GROUPS}
+        $event_meta
           ->removeGroup($group->id())
           ->save();
+
+        // Remove entity field references from registrations to group.
+        foreach ($event_meta->getRegistrations() as $registration) {
+          $registration
+            ->removeGroup($group)
+            ->save();
+        }
       }
     }
   }
