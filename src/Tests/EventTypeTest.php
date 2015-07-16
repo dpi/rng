@@ -28,7 +28,7 @@ class EventTypeTest extends RNGTestBase {
     // Create and delete the testing event type
     $event_bundle = $this->drupalCreateContentType();
     $event_type = $this->createEventType($event_bundle);
-    $this->drupalGet('admin/config/rng/event_types/manage/' . $event_type->id() . '/edit');
+    $this->drupalGet('admin/structure/rng/event_types/manage/' . $event_type->id() . '/edit');
     $event_type->delete();
     $event_bundle->delete();
 
@@ -39,7 +39,7 @@ class EventTypeTest extends RNGTestBase {
 
     // No events
     $this->assertEqual(0, count(EventType::loadMultiple()), 'There are no event type entities.');
-    $this->drupalGet('admin/config/rng/event_types');
+    $this->drupalGet('admin/structure/rng/event_types');
     $this->assertRaw('No event types found.', 'Event Type list is empty');
 
     // There are no courier contexts.
@@ -51,7 +51,7 @@ class EventTypeTest extends RNGTestBase {
     // Add
     $t_args = ['%label' => 'node.event'];
     $edit = [];
-    $this->drupalPostForm('admin/config/rng/event_types/add', $edit, t('Save'));
+    $this->drupalPostForm('admin/structure/rng/event_types/add', $edit, t('Save'));
     $node_type = NodeType::load('event');
 
     $this->assertEqual(1, count(EventType::loadMultiple()), 'Event type exists in database.');
@@ -62,21 +62,21 @@ class EventTypeTest extends RNGTestBase {
     $this->assertTrue(CourierContext::load('rng_registration_node'), 'Courier context entity created for this event type\' entity type.');
 
     // Event type list
-    $this->assertUrl('admin/config/rng/event_types', [], 'Browser was redirected to event type list.');
+    $this->assertUrl('admin/structure/rng/event_types', [], 'Browser was redirected to event type list.');
     $this->assertRaw('<td>Content: event</td>', 'Event Type shows in list');
     $options = ['node_type' => 'event'];
     $this->assertLinkByHref(Url::fromRoute("entity.node.field_ui_fields", $options)->toString());
 
     // Edit form
     $edit = [];
-    $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/edit', $edit, t('Save'));
+    $this->drupalPostForm('admin/structure/rng/event_types/manage/node.event/edit', $edit, t('Save'));
     $this->assertRaw(t('%label event type updated.', $t_args), 'Event Type edit form saved');
 
     // Delete form
-    $this->drupalGet('admin/config/rng/event_types/manage/node.event/delete');
+    $this->drupalGet('admin/structure/rng/event_types/manage/node.event/delete');
     $this->assertRaw('Are you sure you want to delete event type node.event?', 'Event Type delete form rendered.');
 
-    $this->drupalPostForm('admin/config/rng/event_types/manage/node.event/delete', [], t('Delete'));
+    $this->drupalPostForm('admin/structure/rng/event_types/manage/node.event/delete', [], t('Delete'));
     $this->assertRaw(t('Event type %label was deleted.', $t_args), 'Event Type delete form saved');
 
     $this->assertEqual(0, count(EventType::loadMultiple()), 'Event type deleted from database.');

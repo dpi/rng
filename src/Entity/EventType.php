@@ -35,8 +35,8 @@ use Drupal\field\Entity\FieldConfig;
  *     "label" = "id"
  *   },
  *   links = {
- *     "edit-form" = "/admin/config/rng/event_types/manage/{event_type}/edit",
- *     "delete-form" = "/admin/config/rng/event_types/manage/{event_type}/delete"
+ *     "edit-form" = "/admin/structure/rng/event_types/manage/{event_type}/edit",
+ *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete"
  *   }
  * )
  */
