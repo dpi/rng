@@ -58,10 +58,10 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         'user' => $user, // replace with rng_identity.
       ];
 
-      $rules = $this->eventManager->getMeta($event)->getRules();
+      $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register', TRUE);
       foreach ($rules as $rule) {
         if ($this->ruleGrantsOperation($rule, $operation) && $rule->evaluateConditions($context_values)) {
-          return AccessResult::allowed();
+          return AccessResult::allowed()->cachePerUser();
         }
       }
     }
