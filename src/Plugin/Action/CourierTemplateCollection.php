@@ -16,6 +16,7 @@ use Drupal\courier\IdentityChannelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\courier\Entity\TemplateCollection;
 
 /**
  * Creates a template collection and provides a user interface to its templates.
@@ -115,11 +116,18 @@ Each template requires content suitable to the channel.');
     if ($template_collection = $this->getTemplateCollection()) {
       foreach ($template_collection->getTemplates() as $entity) {
         $item = [];
-        $item[] = [
-          '#type' => 'link',
-          '#title' => $entity->getEntityType()->getLabel(),
-          '#url' => $entity->urlInfo('edit-form'),
-        ];
+        if ($entity->hasLinkTemplate('edit-form')) {
+          $item[] = [
+            '#type' => 'link',
+            '#title' => $entity->getEntityType()->getLabel(),
+            '#url' => $entity->urlInfo('edit-form'),
+          ];
+        }
+        else {
+          $item[] = [
+            '#markup' => $entity->getEntityType()->getLabel(),
+          ];
+        }
 
         $form['links']['#items'][] = $item;
       }
@@ -132,23 +140,15 @@ Each template requires content suitable to the channel.');
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-
     $configuration = $this->getConfiguration();
 
     // Create new
     if (!isset($configuration['template_collection'])) {
-
-      /** @var \Drupal\courier\TemplateCollectionInterface $template_collection */
-      $template_collection = $this->entityManager->getStorage('courier_template_collection')->create(
-        ['template' => 'rng_custom']
-      );
-      $template_collection->save();
-
-      if (!$template_collection->isNew()) {
-        $templates[] = $this->entityManager->getStorage('courier_email')->create();
-        foreach ($templates as $template) {
-          $template_collection->setTemplate($template);
-        }
+      $template_collection = TemplateCollection::create([
+        'template' => 'rng_custom',
+      ]);
+      if ($template_collection->save()) {
+        $this->identityChannelManager->addTemplates($template_collection);
         $template_collection->save();
       }
 

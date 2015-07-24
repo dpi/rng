@@ -58,6 +58,8 @@ class RouteSubscriber extends RouteSubscriberBase {
           '_entity_is_event' => 'TRUE',
         ];
         $options = [];
+        // Option will invoke EntityConverter ParamConverter to upcast the
+        // entity in $canonical_path.
         $options['parameters'][$entity_type]['type'] = 'entity:' . $entity_type;
 
         // Manage Event.

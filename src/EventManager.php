@@ -1,9 +1,9 @@
 <?php
 
-  /**
-   * @file
-   * Contains \Drupal\rng\EventManager.
-   */
+/**
+ * @file
+ * Contains \Drupal\rng\EventManager.
+ */
 
 namespace Drupal\rng;
 

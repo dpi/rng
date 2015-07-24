@@ -279,7 +279,7 @@ interface EventMetaInterface {
   public function getRegistrants($entity_type_id = NULL);
 
   /**
-   * Count number of identities the current  has proxy register access
+   * Count number of identities the current user has proxy register access
    * including himself.
    *
    * @return integer
