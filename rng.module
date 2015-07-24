@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\Exception\InvalidEventException;
+use Drupal\courier\Entity\TemplateCollection;
 
 /**
  * Implements hook_help().
@@ -37,6 +38,20 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
       }
     }
   }
+
+  if ($operation == 'update') {
+    /** @var \Drupal\courier\IdentityChannelManagerInterface $icm */
+    $icm = \Drupal::service('plugin.manager.identity_channel');
+    // If this entity is a channel/template type.
+    if (in_array($entity->getEntityTypeId(), array_keys($icm->getChannels()))) {
+      /** @var $entity \Drupal\courier\ChannelInterface */
+      if ($template_collection = TemplateCollection::getTemplateCollectionForTemplate($entity)) {
+        // Allow editing template if the user has 'manage event' for the event.
+        return AccessResult::allowedIf(($owner = $template_collection->getOwner()) && $owner->access('manage event'));
+      }
+    }
+  }
+
   return AccessResult::neutral();
 }
 
