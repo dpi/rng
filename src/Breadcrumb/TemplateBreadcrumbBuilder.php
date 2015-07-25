@@ -116,7 +116,7 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   private function getComponent(EntityInterface $event, TemplateCollectionInterface $template_collection) {
     $rules = $this->eventManager
       ->getMeta($event)
-      ->getRules();
+      ->getRules(NULL, FALSE, NULL);
     foreach ($rules as $rule) {
       foreach ($rule->getActions() as $component) {
         if ($component->getPluginId() == 'rng_courier_message') {
