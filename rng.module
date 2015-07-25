@@ -5,6 +5,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\courier\ChannelInterface;
 use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\Exception\InvalidEventException;
@@ -43,10 +44,7 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
   }
 
   if ($operation == 'update') {
-    /** @var \Drupal\courier\IdentityChannelManagerInterface $identity_channel_manager */
-    $identity_channel_manager = \Drupal::service('plugin.manager.identity_channel');
-    if ($identity_channel_manager->isTemplate($entity)) {
-      /** @var $entity \Drupal\courier\ChannelInterface */
+    if ($entity instanceof ChannelInterface) {
       if ($template_collection = TemplateCollection::getTemplateCollectionForTemplate($entity)) {
         // Allow editing template if the user has 'manage event' for the event.
         return AccessResult::allowedIf(($owner = $template_collection->getOwner()) && $owner->access('manage event'))
