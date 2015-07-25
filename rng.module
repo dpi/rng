@@ -9,6 +9,8 @@ use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\Exception\InvalidEventException;
 use Drupal\courier\Entity\TemplateCollection;
+use Drupal\rng\RuleComponentInterface;
+use Drupal\rng\Plugin\Action\CourierTemplateCollection;
 
 /**
  * Implements hook_help().
@@ -136,4 +138,15 @@ function rng_entity_predelete(EntityInterface $entity) {
   }
   // Not an event, thrown by getMeta().
   catch (InvalidEventException $e) { }
+
+  if ($entity instanceof RuleComponentInterface) {
+    // Delete a TemplateCollection if the entity is a component with
+    // configuration for 'rng_courier_message'.
+    if ($entity->getPluginId() == 'rng_courier_message') {
+      $action = $entity->createInstance();
+      if (($action instanceof CourierTemplateCollection) && ($template_collection = $action->getTemplateCollection())) {
+        $template_collection->delete();
+      }
+    }
+  }
 }

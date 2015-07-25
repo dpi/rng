@@ -29,10 +29,10 @@ interface RuleComponentInterface extends ContentEntityInterface {
   public function setRule(RuleInterface $rule);
 
   /**
-   * Gets the action type.
+   * Gets the component type.
    *
    * @return string
-   *   The action type.
+   *   The component type: 'action' or 'condition'.
    */
   public function getType();
 

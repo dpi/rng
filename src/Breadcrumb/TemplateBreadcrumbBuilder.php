@@ -57,7 +57,8 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    if ($template_collection = $this->getTemplateCollection($route_match)) {
+    $template_collection = $this->getTemplateCollection($route_match);
+    if ($template_collection instanceof TemplateCollection) {
       $owner = $template_collection->getOwner();
       return $this->eventManager->isEvent($owner);
     }
@@ -75,8 +76,7 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    */
   private function getTemplateCollection(RouteMatchInterface $route_match) {
     if ($template = $this->getTemplate($route_match)) {
-      $template_collection = TemplateCollection::getTemplateCollectionForTemplate($template);
-      return $template_collection;
+      return TemplateCollection::getTemplateCollectionForTemplate($template);
     }
     return NULL;
   }
@@ -114,9 +114,10 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    *   this event.
    */
   private function getComponent(EntityInterface $event, TemplateCollectionInterface $template_collection) {
-    $rules = $this->eventManager->getMeta($event)->getRules();
+    $rules = $this->eventManager
+      ->getMeta($event)
+      ->getRules();
     foreach ($rules as $rule) {
-      /* @var \Drupal\rng\RuleInterface $rule */
       foreach ($rule->getActions() as $component) {
         if ($component->getPluginId() == 'rng_courier_message') {
           $action = $component->createInstance();
@@ -134,10 +135,11 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    * {@inheritdoc}
    */
   public function build(RouteMatchInterface $route_match) {
-    $links = array(Link::createFromRoute($this->t('Home'), '<front>'));
-    $template_collection = $this->getTemplateCollection($route_match);
-    $template = $this->getTemplate($route_match);
+    $links = [
+      Link::createFromRoute($this->t('Home'), '<front>'),
+    ];
 
+    $template_collection = $this->getTemplateCollection($route_match);
     if ($event = $template_collection->getOwner()) {
       $links[] = new Link($event->label(), $event->urlInfo());
     }
@@ -148,9 +150,10 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     }
 
     // Add breadcrumb to entity if not on the canonical route.
+    $template = $this->getTemplate($route_match);
     $urlInfo = $template->urlInfo();
     if ($urlInfo->getRouteName() != $route_match->getRouteName()) {
-      $links[] = new Link($template->label(), $urlInfo);
+      $links[] = new Link($template->getEntityType()->getLabel(), $urlInfo);
     }
 
     return $links;
