@@ -9,7 +9,7 @@ namespace Drupal\rng\Breadcrumb;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\courier\IdentityChannelManagerInterface;
+use Drupal\courier\Service\IdentityChannelManagerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\courier\ChannelInterface;
@@ -29,7 +29,7 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * The identity channel manager.
    *
-   * @var \Drupal\courier\IdentityChannelManagerInterface
+   * @var \Drupal\courier\Service\IdentityChannelManagerInterface
    */
   protected $identityChannelManager;
 
@@ -43,7 +43,7 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * Constructs the RegistrationBreadcrumbBuilder.
    *
-   * @param \Drupal\courier\IdentityChannelManagerInterface $identity_channel_manager
+   * @param \Drupal\courier\Service\IdentityChannelManagerInterface $identity_channel_manager
    *   The identity channel manager.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.

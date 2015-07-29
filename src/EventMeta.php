@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
-use Drupal\courier\IdentityChannelManager;
+use Drupal\courier\Service\IdentityChannelManager;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -50,7 +50,7 @@ class EventMeta implements EventMetaInterface {
   /**
    * The identity channel manager.
    *
-   * @var \Drupal\courier\IdentityChannelManager
+   * @var \Drupal\courier\Service\IdentityChannelManager
    */
   protected $identityChannelManager;
 
@@ -63,7 +63,7 @@ class EventMeta implements EventMetaInterface {
    *   The config factory service.
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_plugin_manager
    *   The selection plugin manager.
-   * @param \Drupal\courier\IdentityChannelManager $identity_channel_manager
+   * @param \Drupal\courier\Service\IdentityChannelManager $identity_channel_manager
    *   The identity channel manager.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.

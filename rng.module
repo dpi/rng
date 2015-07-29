@@ -102,7 +102,7 @@ function rng_cron() {
  * Implements hook_entity_predelete().
  */
 function rng_entity_predelete(EntityInterface $entity) {
-  /** @var \Drupal\courier\IdentityChannelManagerInterface $icm */
+  /** @var \Drupal\courier\Service\IdentityChannelManagerInterface $icm */
   $icm = \Drupal::service('plugin.manager.identity_channel');
   if (in_array($entity->getEntityType(), $icm->getIdentityTypes())) {
     // Remove registrant references to this identity.
