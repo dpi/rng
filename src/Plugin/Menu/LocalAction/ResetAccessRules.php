@@ -12,11 +12,14 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Modifies the reset access rules action.
  */
 class ResetAccessRules extends LocalActionDefault {
+
+  use StringTranslationTrait;
 
   /**
    * The RNG event manager.

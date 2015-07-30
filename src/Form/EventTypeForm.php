@@ -82,7 +82,7 @@ class EventTypeForm extends EntityForm {
     }
 
     if ($event_type->isNew()) {
-      $bundle_options = array();
+      $bundle_options = [];
       // Generate a list of fieldable bundles which are not events.
       foreach ($this->entityManager->getDefinitions() as $entity_type) {
         if ($entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
@@ -133,9 +133,8 @@ class EventTypeForm extends EntityForm {
         '#title' => $this->t('Bundle'),
         '#options' => $bundle_options,
         '#default_value' => $event_type->id(),
-        '#required' => TRUE,
         '#disabled' => !$event_type->isNew(),
-        '#empty_option' => $bundle_options ?: t('No Bundles Available'),
+        '#empty_option' => $bundle_options ? NULL : t('No Bundles Available'),
       );
     }
 
