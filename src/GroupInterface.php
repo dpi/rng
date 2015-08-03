@@ -78,4 +78,25 @@ interface GroupInterface extends ContentEntityInterface {
    */
   public function setDescription($description);
 
+  /**
+   * Get required groups.
+   *
+   * Groups required for this group to be added to a registration.
+   *
+   * @return \Drupal\rng\GroupInterface[]
+   *   Groups required for this group.
+   */
+  public function getDependentGroups();
+
+  /**
+   * Get conflicting groups.
+   *
+   * Groups which cannot exist on a registration for this for this group to be
+   * added.
+   *
+   * @return \Drupal\rng\GroupInterface[]
+   *   Groups that conflict with this group.
+   */
+  public function getConflictingGroups();
+
 }

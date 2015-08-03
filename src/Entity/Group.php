@@ -14,6 +14,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\rng\EventManagerInterface;
+use Drupal\rng\Exception\InvalidEventException;
 
 /**
  * Defines the application group entity class.
@@ -103,6 +104,20 @@ class Group extends ContentEntityBase implements GroupInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDependentGroups() {
+    return $this->groups_dependent->referencedEntities();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConflictingGroups() {
+    return $this->groups_conflicting->referencedEntities();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
         ->setLabel(t('Group ID'))
@@ -165,6 +180,28 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDescription(t('The last time the group was edited.'))
       ->setTranslatable(TRUE);
 
+    $fields['groups_dependent'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Dependent groups'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setDescription(t('Groups required for this group to be added to a registration.'))
+      ->setSetting('target_type', 'registration_group')
+      ->setSetting('handler', 'siblings')
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 70,
+      ]);
+
+    $fields['groups_conflicting'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Conflicting groups'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setDescription(t('Groups cannot exist on a registration for this for this group to be added.'))
+      ->setSetting('target_type', 'registration_group')
+      ->setSetting('handler', 'siblings')
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 75,
+      ]);
+
     return $fields;
   }
 
@@ -180,20 +217,24 @@ class Group extends ContentEntityBase implements GroupInterface {
 
     foreach ($entities as $group) {
       if ($event = $group->getEvent()) {
-        $event_meta = $event_manager->getMeta($event);
+        // Dont bother if the entity is no longer an event, or event is deleted.
+        try {
+          $event_meta = $event_manager->getMeta($event);
 
-        // Remove entity field references from the event to group in
-        // $event->{EventManagerInterface::FIELD_REGISTRATION_GROUPS}
-        $event_meta
-          ->removeGroup($group->id())
-          ->save();
-
-        // Remove entity field references from registrations to group.
-        foreach ($event_meta->getRegistrations() as $registration) {
-          $registration
+          // Remove entity field references from the event to group in
+          // $event->{EventManagerInterface::FIELD_REGISTRATION_GROUPS}
+          $event_meta
             ->removeGroup($group->id())
             ->save();
+
+          // Remove entity field references from registrations to group.
+          foreach ($event_meta->getRegistrations() as $registration) {
+            $registration
+              ->removeGroup($group->id())
+              ->save();
+          }
         }
+        catch (InvalidEventException $e) {}
       }
     }
   }

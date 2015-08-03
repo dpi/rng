@@ -16,7 +16,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\rng\GroupInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\rng\Entity\Registrant;
 
 /**
  * Defines the registration entity class.
@@ -170,7 +169,13 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function addGroup(GroupInterface $group) {
-    $this->groups->appendItem($group);
+    // Do not add the group if it is already related.
+    if (!in_array($group, $this->getGroups())) {
+      if ($group->getEvent() != $this->getEvent()) {
+        throw new \Exception('Group and registration events do not match.');
+      }
+      $this->groups->appendItem($group);
+    }
     return $this;
   }
 
@@ -231,7 +236,8 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setLabel(t('Groups'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setDescription(t('The groups the registration is assigned.'))
-      ->setSetting('target_type', 'registration_group');
+      ->setSetting('target_type', 'registration_group')
+      ->addConstraint('RegistrationGroupSibling');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))
@@ -265,10 +271,11 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
     }
 
     // Add group defaults event settings.
-    /* @var $event_meta \Drupal\rng\EventManagerInterface */
-    $event_meta = \Drupal::service('rng.event_manager');
+    /* @var $event_manager \Drupal\rng\EventManagerInterface */
+    $event_manager = \Drupal::service('rng.event_manager');
+    $event_meta = $event_manager->getMeta($this->getEvent());
     if ($this->isNew()) {
-      foreach ($event_meta->getMeta($this->getEvent())->getDefaultGroups() as $group) {
+      foreach ($event_meta->getDefaultGroups() as $group) {
         $this->addGroup($group);
       }
     }
