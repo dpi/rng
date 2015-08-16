@@ -1,5 +1,5 @@
 rng.settings:
-  type: mapping
+  type: config_entity
   label: 'RNG settings'
   mapping:
     identity_types:
