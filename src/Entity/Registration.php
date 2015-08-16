@@ -156,6 +156,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       throw new \Exception('Duplicate identity on registration');
     }
     $this->identities_unsaved[] = $identity;
+    return $this;
   }
 
   /**

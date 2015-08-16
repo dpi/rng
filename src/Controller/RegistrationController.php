@@ -70,7 +70,9 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
     }
     else {
       $render['links'] = array(
-        '#title' => $this->t('Select registration type'),
+        '#title' => $this->t('Select @entity_type', [
+          '@entity_type' => \Drupal::entityManager()->getDefinition('registration_type')->getLabel(),
+        ]),
         '#theme' => 'item_list',
         '#items' => [],
       );

@@ -70,7 +70,7 @@ interface EventMetaInterface {
   /**
    * Gets a list of registration types IDs allowed for this event.
    *
-   * @return integer[]
+   * @return string[]
    *   An array of registration_type IDs.
    */
   public function getRegistrationTypeIds();
@@ -78,7 +78,7 @@ interface EventMetaInterface {
   /**
    * Gets a list of registration types allowed for this event.
    *
-   * @return \Drupal\rng\RegistrationTypeInterface
+   * @return \Drupal\rng\RegistrationTypeInterface[]
    *   An array of registration_type entities.
    */
   public function getRegistrationTypes();
@@ -290,10 +290,23 @@ interface EventMetaInterface {
   /**
    * Get identity entity types valid for this event.
    *
-   * @return array
+   * @return string[]
    *   Array of entity types IDs.
    */
   public function getIdentityTypes();
+
+  /**
+   * Determine if identities can registers.
+   *
+   * @param string $entity_type
+   *   An identity entity type ID.
+   * @param int[] $entity_ids
+   *   An array of identity entity IDs.
+   *
+   * @return boolean
+   *   Whether the identities can register.
+   */
+  public function identitiesCanRegister($entity_type, array $entity_ids);
 
   /**
    * Clones the site default access rules onto the event.

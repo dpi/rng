@@ -101,9 +101,10 @@ class RegistrationForm extends ContentEntityForm {
       ];
 
       $self = FALSE;
+      $event_meta = $this->eventManager->getMeta($event);
       // create a register radio option for current user.
       // list of entity reference field types, ordered by radio default priority.
-      $entity_types = $this->eventManager->getMeta($event)->getIdentityTypes();
+      $entity_types = $event_meta->getIdentityTypes();
 
       // Radio order is alphabetical. (ex: self).
       $sorted = $entity_types;
@@ -121,7 +122,7 @@ class RegistrationForm extends ContentEntityForm {
 
         if ($entity_type_id == 'user') {
           // if duplicate registrants is allowed || user is not already a registrant.
-          if ($this->eventManager->getMeta($event)->duplicateRegistrantsAllowed() || count($selection->validateReferenceableEntities([$current_user->id()]))) {
+          if ($event_meta->identitiesCanRegister('user', [$current_user->id()])) {
             $self = TRUE;
             $count--;
           }

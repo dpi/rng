@@ -86,6 +86,9 @@ interface RegistrationInterface extends ContentEntityInterface, EntityChangedInt
    *
    * @param \Drupal\Core\Entity\EntityInterface $identity
    *   The identity to add.
+   *
+   * @return \Drupal\rng\RegistrationInterface
+   *   Returns registration for chaining.
    */
   public function addIdentity(EntityInterface $identity);
 

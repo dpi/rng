@@ -417,6 +417,32 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function identitiesCanRegister($entity_type, array $entity_ids) {
+    if (in_array($entity_type, $this->getIdentityTypes())) {
+      if ($this->duplicateRegistrantsAllowed()) {
+        return $entity_ids;
+      }
+      else {
+        $options = [
+          'target_type' => $entity_type,
+          'handler' => 'rng_register',
+          'handler_settings' => [
+            'event_entity_type' => $this->getEvent()->getEntityTypeId(),
+            'event_entity_id' => $this->getEvent()->id(),
+          ],
+        ];
+
+        /* @var $selection \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
+        $selection = $this->selectionPluginManager->getInstance($options);
+        return $selection->validateReferenceableEntities($entity_ids);
+      }
+    }
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   function addDefaultAccess() {
     $rules = $this->getDefaultRules('rng_event.register');
     foreach ($rules as $rule) {
