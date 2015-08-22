@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\rng\EventManagerInterface;
 use Drupal\rng\Exception\InvalidEventException;
 
 /**
@@ -23,6 +22,8 @@ use Drupal\rng\Exception\InvalidEventException;
  *   id = "registration_group",
  *   label = @Translation("Registration group"),
  *   handlers = {
+ *     "views_data" = "Drupal\rng\Views\RegistrationGroupViewsData",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\rng\AccessControl\GroupAccessControlHandler",
  *     "list_builder" = "\Drupal\rng\Lists\GroupListBuilder",
  *     "form" = {
@@ -135,7 +136,7 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDescription(t('The group language code.'));
 
     $fields['event'] = BaseFieldDefinition::create('dynamic_entity_reference')
-      ->setLabel(t('Identity'))
+      ->setLabel(t('Event'))
       ->setDescription(t('The groups event, or leave empty for global.'))
       ->setReadOnly(TRUE);
 
@@ -194,7 +195,7 @@ class Group extends ContentEntityBase implements GroupInterface {
     $fields['groups_conflicting'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Conflicting groups'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setDescription(t('Groups cannot exist on a registration for this for this group to be added.'))
+      ->setDescription(t('Groups cannot exist on a registration for this group to be added.'))
       ->setSetting('target_type', 'registration_group')
       ->setSetting('handler', 'siblings')
       ->setDisplayOptions('form', [

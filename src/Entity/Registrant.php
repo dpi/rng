@@ -20,6 +20,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   id = "registrant",
  *   label = @Translation("Registrant"),
  *   handlers = {
+ *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder"
  *   },
  *   admin_permission = "administer rng",
  *   base_table = "registrant",

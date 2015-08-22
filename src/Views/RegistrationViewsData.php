@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\RegistrationViewsData.
+ * Contains \Drupal\rng\Views\RegistrationViewsData.
  */
 
 namespace Drupal\rng\Views;
@@ -13,18 +13,40 @@ use Drupal\views\EntityViewsData;
  * Provides views data for registration entities.
  */
 class RegistrationViewsData extends EntityViewsData {
+
   /**
    * {@inheritdoc}
    */
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $data['registration']['table']['group'] = t('Registration table');
+    // Add base field reference for groups
+    $registration_definition = \Drupal::entityManager()->getDefinition('registration');
+    $group_definition = \Drupal::entityManager()->getDefinition('registration_group');
 
-    $data['registration_field_data']['event']['label'] = t('Event');
-    $data['registration_field_data']['created']['label'] = t('Created');
-    $data['registration_field_data']['updated']['label'] = t('Updated');
-    $data['registration_field_data']['status']['label'] = t('Status');
+    $t_args = [
+      '@origin_label' => $registration_definition->getLabel(),
+      '@target_label' => $group_definition->getLabel(),
+    ];
+
+    $data['registration__groups']['table']['entity type']  = $registration_definition->id();
+    $data['registration__groups']['table']['group']  = $group_definition->getLabel();
+    $data['registration__groups']['table']['join']['registration_field_data'] = [
+      'left_field' => 'id',
+      'field' => 'entity_id',
+    ];
+
+    $psuedo_field = 'rng_registration__registration_group';
+    $data['registration__groups'][$psuedo_field]['relationship'] = [
+      'title' => t('@origin_labels', $t_args),
+      'label' => t('@origin_labels', $t_args),
+      'group' => $registration_definition->getLabel(),
+      'help' => t('References to the @target_labels of a @origin_label.', $t_args),
+      'id' => 'standard',
+      'base' => 'registration_group_field_data',
+      'base field' => $group_definition->getKey('id'),
+      'relationship field' => 'groups_target_id',
+    ];
 
     return $data;
   }
