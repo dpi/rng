@@ -20,7 +20,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   id = "registrant",
  *   label = @Translation("Registrant"),
  *   handlers = {
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "Drupal\rng\Views\RegistrantViewsData",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder"
  *   },
