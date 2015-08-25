@@ -105,6 +105,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     $fields['registration'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Registration'))
+      ->setDescription(t('The registration associated with this registrant.'))
       ->setSetting('target_type', 'registration')
       ->setCardinality(1)
       ->setReadOnly(TRUE);
