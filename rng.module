@@ -37,7 +37,7 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
       if ($event_type->getEventManageOperation() != 'manage event') {
         if ($entity->access($event_type->getEventManageOperation(), $account)) {
           return AccessResult::allowed()
-            ->cacheUntilEntityChanges($entity);
+            ->addCacheableDependency($entity);
         }
       }
     }
@@ -48,7 +48,7 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
       if ($template_collection = TemplateCollection::getTemplateCollectionForTemplate($entity)) {
         // Allow editing template if the user has 'manage event' for the event.
         return AccessResult::allowedIf(($owner = $template_collection->getOwner()) && $owner->access('manage event'))
-          ->cacheUntilEntityChanges($owner);
+          ->addCacheableDependency($owner);
       }
     }
   }
