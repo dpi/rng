@@ -38,8 +38,8 @@ class RegistrationViewsData extends EntityViewsData {
 
     $psuedo_field = 'rng_registration__registration_group';
     $data['registration__groups'][$psuedo_field]['relationship'] = [
-      'title' => t('@origin_labels', $t_args),
-      'label' => t('@origin_labels', $t_args),
+      'title' => t('@target_labels', $t_args),
+      'label' => t('@target_labels', $t_args),
       'group' => $registration_definition->getLabel(),
       'help' => t('References to the @target_labels of a @origin_label.', $t_args),
       'id' => 'standard',

@@ -20,11 +20,6 @@ class RegistrantViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $registration_definition = \Drupal::entityManager()->getDefinition('registration');
-    $registrant_definition = \Drupal::entityManager()->getDefinition('registrant');
-
-    $data['registrant']['table']['entity type']  = $registration_definition->id();
-    $data['registrant']['table']['group']  = $registrant_definition->getLabel();
     $data['registrant']['table']['join']['registration_field_data'] = [
       'left_field' => 'id',
       'field' => 'registration',
