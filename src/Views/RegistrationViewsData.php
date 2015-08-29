@@ -20,20 +20,37 @@ class RegistrationViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    // Add base field reference for groups
     $registration_definition = \Drupal::entityManager()->getDefinition('registration');
     $group_definition = \Drupal::entityManager()->getDefinition('registration_group');
 
+      // Add base field reference for groups
     $t_args = [
       '@origin_label' => $registration_definition->getLabel(),
       '@target_label' => $group_definition->getLabel(),
     ];
 
-    $data['registration__groups']['table']['entity type']  = $registration_definition->id();
     $data['registration__groups']['table']['group']  = $group_definition->getLabel();
     $data['registration__groups']['table']['join']['registration_field_data'] = [
       'left_field' => 'id',
       'field' => 'entity_id',
+    ];
+
+    $data['registration__groups']['groups_target_id'] = [
+      'title' => t('Group ID'),
+      'help' => t('A @target_labels group ID.', $t_args),
+      'field' => [
+        'id' => 'numeric',
+      ],
+      'argument' => [
+        'id' => 'numeric',
+      ],
+      'filter' => [
+        'id' => 'numeric',
+        'allow empty' => TRUE,
+      ],
+      'sort' => [
+        'id' => 'standard',
+      ],
     ];
 
     $psuedo_field = 'rng_registration__registration_group';

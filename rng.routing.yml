@@ -68,6 +68,14 @@ rng.registration_type.overview:
     _permission: 'administer registration types'
 
 # registration group entities
+entity.registration_group.canonical:
+  path: '/rng/group/{registration_group}/edit'
+  defaults:
+    _entity_form: 'registration_group.edit'
+    _title: 'Edit registration group'
+  requirements:
+    _entity_access: 'registration_group.update'
+
 entity.registration_group.edit_form:
   path: '/rng/group/{registration_group}/edit'
   defaults:
