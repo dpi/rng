@@ -240,13 +240,6 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
       ->setSetting('target_type', 'registration_group')
       ->addConstraint('RegistrationGroupSibling');
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Status'))
-      ->setDescription(t('Status of the Registration: 0 = cancelled, 1 = active.'))
-      ->setTranslatable(FALSE)
-      ->setRevisionable(TRUE)
-      ->setDefaultValue(TRUE);
-
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
       ->setDescription(t('Time the Registration was created.'))
