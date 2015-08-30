@@ -13,6 +13,7 @@ use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\courier\Entity\CourierContext;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\Core\Entity\Entity\EntityFormMode;
 
 /**
  * Defines the event type entity.
@@ -89,14 +90,14 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    *
    * @var array
    */
-  var $fields = array(
+  var $fields = [
     EventManagerInterface::FIELD_REGISTRATION_TYPE,
     EventManagerInterface::FIELD_REGISTRATION_GROUPS,
     EventManagerInterface::FIELD_STATUS,
     EventManagerInterface::FIELD_CAPACITY,
     EventManagerInterface::FIELD_EMAIL_REPLY_TO,
     EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
-  );
+  ];
 
   /**
    * {@inheritdoc}
@@ -194,6 +195,18 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
+
+    // Create mode for the entity type.
+    $mode_id = $this->entity_type . '.rng_event';
+    if (!EntityFormMode::load($mode_id)) {
+      EntityFormMode::create([
+        'id' => $mode_id,
+        'targetEntityType' => $this->entity_type,
+        'label' => 'Event Settings',
+        'status' => TRUE,
+      ])->save();
+    }
+
     if (!$update) {
       module_load_include('inc', 'rng', 'rng.field.defaults');
       foreach ($this->fields as $field) {
@@ -201,6 +214,39 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         rng_add_event_field_config($field, $this->getEventEntityTypeId(), $this->getEventBundle());
       }
     }
+
+    $display = entity_get_form_display($this->entity_type, $this->bundle, 'rng_event');
+    if ($display->isNew()) {
+      // EntityDisplayBase::init() adds default fields. Remove them.
+      foreach (array_keys($display->getComponents()) as $name) {
+        if (!in_array($name, $this->fields)) {
+          $display->removeComponent($name);
+        }
+      }
+
+      // Weight is the key.
+      $field_weights = [
+        EventManagerInterface::FIELD_STATUS,
+        EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
+        EventManagerInterface::FIELD_CAPACITY,
+        EventManagerInterface::FIELD_EMAIL_REPLY_TO,
+        EventManagerInterface::FIELD_REGISTRATION_TYPE,
+        EventManagerInterface::FIELD_REGISTRATION_GROUPS,
+      ];
+
+      module_load_include('inc', 'rng', 'rng.field.defaults');
+      foreach ($this->fields as $name) {
+        rng_add_event_form_display_defaults($display, $name);
+        if (in_array($name, $field_weights)) {
+          $component = $display->getComponent($name);
+          $component['weight'] = array_search($name, $field_weights);
+          $display->setComponent($name, $component);
+        }
+      }
+
+      $display->save();
+    }
+
     // Rebuild routes and local tasks
     \Drupal::service('router.builder')->setRebuildNeeded();
     // Rebuild local actions https://github.com/dpi/rng/issues/18
@@ -212,9 +258,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function delete() {
     foreach ($this->fields as $field) {
-      $field = FieldConfig::loadByName(
-        $this->getEventEntityTypeId(), $this->getEventBundle(), $field
-      );
+      $field = FieldConfig::loadByName($this->getEventEntityTypeId(), $this->getEventBundle(), $field);
       if ($field) {
         $field->delete();
       }
