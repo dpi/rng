@@ -160,7 +160,8 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDisplayOptions('form', array(
         'type' => 'string_textfield',
         'weight' => 0,
-      ));
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Description'))
@@ -169,7 +170,8 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDisplayOptions('form', array(
         'type' => 'text_textfield',
         'weight' => 50,
-      ));
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created on'))
@@ -190,7 +192,8 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 70,
-      ]);
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['groups_conflicting'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Conflicting groups'))
@@ -201,7 +204,8 @@ class Group extends ContentEntityBase implements GroupInterface {
       ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 75,
-      ]);
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
