@@ -29,6 +29,9 @@ class RegistrationGroupViewsData extends EntityViewsData {
       '@target_label' => $registration_definition->getLabel(),
     ];
 
+    // Target ID can be NULL.
+    $data['registration_group_field_data']['event__target_id']['filter']['allow empty'] = TRUE;
+
     // Reverse relationship (Target to Origin)
     $psuedo_field = 'rng_registration_group__registration';
     $data['registration_group_field_data'][$psuedo_field]['relationship'] = [
