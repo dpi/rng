@@ -216,7 +216,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     }
 
     $display = entity_get_form_display($this->entity_type, $this->bundle, 'rng_event');
-    if (!$update || $display->isNew()) {
+    if ($display->isNew()) {
       // EntityDisplayBase::init() adds default fields. Remove them.
       foreach (array_keys($display->getComponents()) as $name) {
         if (!in_array($name, $this->fields)) {
@@ -261,6 +261,11 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
       $field = FieldConfig::loadByName($this->getEventEntityTypeId(), $this->getEventBundle(), $field);
       if ($field) {
         $field->delete();
+      }
+
+      $display = entity_get_form_display($this->entity_type, $this->bundle, 'rng_event');
+      if (!$display->isNew()) {
+        $display->delete();
       }
     }
     parent::delete();
