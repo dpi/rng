@@ -111,9 +111,9 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     case EventManagerInterface::FIELD_CAPACITY:
       $definition = array(
         'label' => 'Maximum registrations',
-        'description' => t('Maximum amount of registrations for this event. Leave empty for unlimited.'),
+        'description' => t('Maximum amount of registrations for this event.'),
         'settings' => array(
-          'min' => -1,
+          'min' => 1,
         ),
       );
       break;
@@ -181,7 +181,7 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
 
     case EventManagerInterface::FIELD_CAPACITY:
       $form_display->setComponent($field_name, array(
-        'type' => 'number',
+        'type' => 'unlimited_number',
       ));
       break;
 
