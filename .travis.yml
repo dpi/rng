@@ -38,6 +38,7 @@ before_script:
   # get dependencies manually:
   - git clone https://github.com/dpi/courier.git modules/courier
   - git clone --branch 8.x-1.x http://git.drupal.org/project/dynamic_entity_reference.git modules/dynamic_entity_reference
+  - git clone --branch 8.x-1.x http://git.drupal.org/project/unlimited_number.git modules/unlimited_number
   - drush --yes en rng
   - drush --yes en simpletest
   - drush runserver 127.0.0.1:8080 &
