@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\rng\RegistrationTypeInterface;
+use Drupal\rng\Entity\Registration;
 
 /**
  * Controller for registration entities.
@@ -109,18 +110,16 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
    * @param string $event
    *   The parameter to find the event entity.
    *
-   * @param RegistrationTypeInterface $registration_type
+   * @param \Drupal\rng\RegistrationTypeInterface $registration_type
    *   The type of registration.
    *
    * @return array A registration form.
    */
   public function RegistrationAdd(RouteMatchInterface $route_match, $event, RegistrationTypeInterface $registration_type) {
     $event_entity = $route_match->getParameter($event);
-    $registration = $this->entityManager()
-      ->getStorage('registration')
-      ->create(array(
-        'type' => $registration_type->id(),
-      ));
+    $registration = Registration::create([
+      'type' => $registration_type->id(),
+    ]);
     $registration->setEvent($event_entity);
     return $this->entityFormBuilder()->getForm($registration, 'add', array($event_entity));
   }

@@ -13,6 +13,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\courier\Service\IdentityChannelManager;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\rng\Entity\Rule;
+use Drupal\rng\Entity\RuleComponent;
 
 /**
  * Meta event wrapper for RNG.
@@ -297,16 +299,15 @@ class EventMeta implements EventMetaInterface {
 
     $rules = [];
     foreach ($definitions as $definition) {
-      $rule = $this->entityManager->getStorage('rng_rule')->create(array(
+      $rule = Rule::create([
         'event' => array('entity' => $this->getEvent()),
         'trigger_id' => 'rng_event.register',
         'status' => TRUE,
-      ));
+      ]);
       foreach (['condition', 'action'] as $component_type) {
         if (isset($definition[$component_type])) {
           foreach ($definition[$component_type] as $plugin_id => $configuration) {;
-            $component = $this->entityManager->getStorage('rng_rule_component')
-              ->create([])
+            $component = RuleComponent::create()
               ->setType($component_type)
               ->setPluginId($plugin_id)
               ->setConfiguration($configuration);

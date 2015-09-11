@@ -16,6 +16,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rng\Entity\RuleComponent;
+use Drupal\rng\Entity\Rule;
 
 /**
  * Creates a rule with a rng_courier_message action.
@@ -138,19 +139,17 @@ class MessageActionForm extends FormBase {
     $template_collection->save();
     drupal_set_message(t('Templates created.'));
 
-    /* @var $action \Drupal\rng\RuleComponentInterface*/
-    $action = $this->entityManager->getStorage('rng_rule_component')->create();
-    $action->setPluginId($this->actionPlugin->getPluginId());
-    $action->setConfiguration($this->actionPlugin->getConfiguration());
-    $action->setType('action');
+    $action = RuleComponent::create([])
+      ->setPluginId($this->actionPlugin->getPluginId())
+      ->setConfiguration($this->actionPlugin->getConfiguration())
+      ->setType('action');
 
     $trigger_id = $form_state->getValue('trigger');
 
-    /** @var \Drupal\rng\RuleInterface $rule */
-    $rule = $this->entityManager->getStorage('rng_rule')->create(array(
+    $rule = Rule::create([
       'event' => array('entity' => $event),
       'trigger_id' => $trigger_id,
-    ));
+    ]);
     $rule->save();
     $action->setRule($rule)->save();
 

@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\rng\EventManagerInterface;
+use Drupal\node\Entity\NodeType;
 
 /**
  * Form controller for event config entities.
@@ -221,12 +222,12 @@ class EventTypeForm extends EntityForm {
     $i = 0;
     $separator = '_';
     $id = $prefix;
-    while ($this->entityManager->getStorage('node_type')->load($id)) {
+    while (NodeType::load($id)) {
       $i++;
       $id = $prefix . $separator . $i;
     }
 
-    $node_type = $this->entityManager->getStorage('node_type')->create([
+    $node_type = NodeType::create([
       'type' => $id,
       'name' => $id,
     ]);
