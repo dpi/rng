@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rng\GroupInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Breadcrumb\Breadcrumb;
 
 /**
  * Provides a breadcrumb builder for groups.
@@ -40,7 +41,10 @@ class GroupBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $links[] = new Link($event->label(), $event->urlInfo());
     }
 
-    return $links;
+    $breadcrumb = new Breadcrumb();
+    return $breadcrumb
+      ->setLinks($links)
+      ->setCacheContexts(['route.name']);
   }
 
 }

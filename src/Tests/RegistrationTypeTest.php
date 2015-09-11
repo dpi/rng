@@ -19,6 +19,8 @@ use Drupal\rng\EventManagerInterface;
  */
 class RegistrationTypeTest extends RNGSiteTestBase {
 
+  public static $modules = ['block'];
+
   /**
    * @var \Drupal\Core\Entity\EntityInterface
    */
@@ -37,6 +39,9 @@ class RegistrationTypeTest extends RNGSiteTestBase {
     $this->event = $this->createEntity($this->event_bundle, [
       'uid' => \Drupal::currentUser()->id()
     ]);
+
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
   }
 
   function testRegistrationTypes() {

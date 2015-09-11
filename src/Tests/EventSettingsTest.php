@@ -7,14 +7,20 @@
 
 namespace Drupal\rng\Tests;
 
-use Drupal\Core\Url;
-
 /**
  * Tests event settings page.
  *
  * @group rng
  */
 class EventSettingsTest extends RNGSiteTestBase {
+
+  public static $modules = ['block'];
+
+  protected function setUp() {
+    parent::setUp();
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
+  }
 
   /**
    * Create two bundles of the same entity type, one bundle is an event type.

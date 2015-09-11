@@ -18,6 +18,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\courier\TemplateCollectionInterface;
 use Drupal\rng\Plugin\Action\CourierTemplateCollection;
 use Drupal\Core\Link;
+use Drupal\Core\Breadcrumb\Breadcrumb;
 
 /**
  * Provides a breadcrumb builder for templates related to an event.
@@ -156,7 +157,10 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $links[] = new Link($template->getEntityType()->getLabel(), $urlInfo);
     }
 
-    return $links;
+    $breadcrumb = new Breadcrumb();
+    return $breadcrumb
+      ->setLinks($links)
+      ->setCacheContexts(['route.name']);
   }
 
 }

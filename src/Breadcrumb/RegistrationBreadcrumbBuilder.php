@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rng\RegistrationInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Breadcrumb\Breadcrumb;
 
 /**
  * Provides a breadcrumb builder for registrations.
@@ -43,7 +44,10 @@ class RegistrationBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $links[] = new Link($registration->label(), $registration->urlInfo());
     }
 
-    return $links;
+    $breadcrumb = new Breadcrumb();
+    return $breadcrumb
+      ->setLinks($links)
+      ->setCacheContexts(['route.name']);
   }
 
 }

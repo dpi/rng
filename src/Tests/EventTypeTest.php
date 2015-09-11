@@ -19,7 +19,13 @@ use Drupal\Core\Url;
  */
 class EventTypeTest extends RNGTestBase {
 
-  public static $modules = array('node', 'field_ui');
+  public static $modules = ['node', 'field_ui', 'block'];
+
+  protected function setUp() {
+    parent::setUp();
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
+  }
 
   function testEventType() {
     $web_user = $this->drupalCreateUser(['administer event types', 'access administration pages']);
