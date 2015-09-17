@@ -306,7 +306,7 @@ class EventMeta implements EventMetaInterface {
       ]);
       foreach (['condition', 'action'] as $component_type) {
         if (isset($definition[$component_type])) {
-          foreach ($definition[$component_type] as $plugin_id => $configuration) {;
+          foreach ($definition[$component_type] as $plugin_id => $configuration) {
             $component = RuleComponent::create()
               ->setType($component_type)
               ->setPluginId($plugin_id)
@@ -326,7 +326,7 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   function isDefaultRules($trigger) {
-    return (boolean)!$this->getRules($trigger);
+    return (boolean) !$this->getRules($trigger);
   }
 
   /**

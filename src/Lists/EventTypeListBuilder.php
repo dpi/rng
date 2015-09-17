@@ -103,7 +103,7 @@ class EventTypeListBuilder extends ConfigEntityListBuilder {
       $row['machine_name'] = $this->t('@entity_type: @bundle', $t_args);
     }
     else {
-      // Entity type does not use bundles
+      // Entity type does not use bundles.
       $row['machine_name'] = $this->t('@entity_type', $t_args);
     }
 

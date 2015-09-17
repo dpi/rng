@@ -239,7 +239,8 @@ class Group extends ContentEntityBase implements GroupInterface {
               ->save();
           }
         }
-        catch (InvalidEventException $e) {}
+        catch (InvalidEventException $e) {
+        }
       }
     }
   }

@@ -65,7 +65,7 @@ class UserRNGSelection extends RNGSelectionBase {
 
     // Apply proxy registration permissions for the current user.
     $proxy_count = 0;
-    // if user can register `authenticated` users:
+    // If user can register `authenticated` users:
     $all_users = FALSE;
     $group = $query->orConditionGroup();
 
@@ -96,7 +96,7 @@ class UserRNGSelection extends RNGSelectionBase {
       $query->condition($group);
     }
     else {
-      // cancel the query:
+      // Cancel the query:
       $query->condition($this->entityType->getKey('id'), NULL, 'IS NULL');
     }
 

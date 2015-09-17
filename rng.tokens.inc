@@ -5,22 +5,20 @@
  * Builds tokens for RNG.
  */
 
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\Component\Utility\Xss;
 use Drupal\rng\RegistrationInterface;
 
 /**
  * Implements hook_token_info().
  */
 function rng_token_info() {
-  // Token types
+  // Token types.
   $tokens['types']['registration'] = [
     'name' => t('Registrations'),
     'description' => t('Tokens for registrations.'),
     'needs-data' => 'registration',
   ];
 
-  // Tokens
+  // Tokens.
   $tokens['tokens']['registration']['id'] = [
     'name' => t("ID"),
     'description' => t("Unique ID of the registration."),

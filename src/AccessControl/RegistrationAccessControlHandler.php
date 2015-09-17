@@ -30,6 +30,9 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
    */
   protected $eventManager;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(EntityTypeInterface $entity_type) {
     parent::__construct($entity_type);
     $this->eventManager = \Drupal::service('rng.event_manager');
@@ -55,7 +58,8 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       $context_values = [
         'event' => $event,
         'registration' => $entity,
-        'user' => $user, // replace with rng_identity.
+        'user' => $user,
+      // Replace with rng_identity.
       ];
 
       $rules = $this->eventManager->getMeta($event)->getRules('rng_event.register', TRUE);

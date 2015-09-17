@@ -16,6 +16,9 @@ use Drupal\Core\Url;
  */
 class RegistrantSettingTest extends RNGTestBase {
 
+  /**
+   * Test registrant settings.
+   */
   function testRegistrantSettings() {
     $web_user = $this->drupalCreateUser(['administer rng', 'access administration pages']);
     $this->drupalLogin($web_user);

@@ -54,11 +54,13 @@ class RegistrationTypeDeleteForm extends EntityConfirmFormBase {
     drupal_set_message($this->t('Cannot delete registration type.'), 'warning');
 
     $form['#title'] = $this->getQuestion();
-    $form['description'] = array('#markup' => $this->formatPlural(
-      $count,
-      'Unable to delete registration type. It is used by @count registration.',
-      'Unable to delete registration type. It is used by @count registrations.'
-    ));
+    $form['description'] = array(
+      '#markup' => $this->formatPlural(
+        $count,
+        'Unable to delete registration type. It is used by @count registration.',
+        'Unable to delete registration type. It is used by @count registrations.'
+      ),
+    );
 
     return $form;
   }

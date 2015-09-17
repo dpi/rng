@@ -160,7 +160,7 @@ class MessageActionForm extends FormBase {
         ->setPluginId('rng_rule_scheduler');
       $rule_component->save();
 
-      // Save the ID into config
+      // Save the ID into config.
       $rule_component->setConfiguration([
         'rng_rule_component' => $rule_component->id(),
       ]);

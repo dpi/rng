@@ -66,7 +66,7 @@ class MessageListForm extends FormBase {
   }
 
   /**
-   * Get a list of rules
+   * Get a list of rules.
    *
    * @param \Drupal\Core\Entity\EntityInterface $event
    *   An event entity.
@@ -75,7 +75,7 @@ class MessageListForm extends FormBase {
    *   An array of rng_rule entities keyed by rule ID.
    */
   protected function getCommunicationRules(EntityInterface $event) {
-    // list of communication related action plugin ids.
+    // List of communication related action plugin ids.
     $communication_actions = ['rng_courier_message'];
     $rules = [];
 

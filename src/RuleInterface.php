@@ -43,7 +43,7 @@ interface RuleInterface extends ContentEntityInterface {
    *
    * @param bool $is_active
    *   Whether the rule can be executed.
-
+   *
    * @return \Drupal\rng\RuleInterface
    *   Return this object for chaining.
    */

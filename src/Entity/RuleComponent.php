@@ -117,7 +117,8 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
 
     $manager = \Drupal::service('plugin.manager.action');
     $plugin = $manager->createInstance($action_id, $action_configuration);
-    $plugin->execute($context); // @todo context is not standard
+    // @todo context is not standard
+    $plugin->execute($context);
   }
 
   /**
@@ -137,7 +138,7 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
       ->setRequired(TRUE)
       ->setSetting('target_type', 'rng_rule');
 
-    // hijack action entity for conditions...
+    // Hijack action entity for conditions...
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
       ->setDescription(t('Whether this is an action or condition.'))

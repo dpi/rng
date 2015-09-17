@@ -68,13 +68,16 @@ class CurrentTime extends ConditionPluginBase {
         0 => $this->t('After this date'),
         1 => $this->t('Before this date'),
       ],
-      '#default_value' => (int)$this->isNegated(),
+      '#default_value' => (int) $this->isNegated(),
       '#weight' => 100,
     );
 
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['date'] = $form_state->getValue('date')->format('U');
@@ -93,10 +96,16 @@ class CurrentTime extends ConditionPluginBase {
     }
   }
 
+  /**
+   * Gets the date in configuration.
+   */
   function getDate() {
     return $this->configuration['date'];
   }
 
+  /**
+   * Formats the date for display.
+   */
   function getDateFormatted() {
     return is_numeric($this->getDate()) ? DrupalDateTime::createFromTimestamp($this->getDate()) : $this->t('Not configured');
   }

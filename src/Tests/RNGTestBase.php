@@ -93,7 +93,6 @@ abstract class RNGTestBase extends WebTestBase {
    *
    * @return \Drupal\rng\Entity\Registration
    *   A saved registration entity.
-   *
    */
   function createRegistration(ContentEntityInterface $event, $registration_type_id) {
     $registration = Registration::create([

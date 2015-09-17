@@ -107,7 +107,8 @@ class RegistrantSettingsForm extends ConfigFormBase {
       $form['contactables'][$identity_type] = [
         '#type' => 'checkbox',
         '#title' => $this->t('@label (@provider)', [
-          '@label' => $entity_type->getLabel(), '@provider' => $entity_type->getProvider(),
+          '@label' => $entity_type->getLabel(),
+          '@provider' => $entity_type->getProvider(),
         ]),
         '#description' => $this->t('Supported channels: @channels', [
           '@channels' => implode(', ', $channels_string),

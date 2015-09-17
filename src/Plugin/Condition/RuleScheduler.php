@@ -69,7 +69,9 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
     ] + parent::defaultConfiguration();
   }
 
-
+  /**
+   * Get rule_component entity ID.
+   */
   public function getRuleComponentId() {
     if (isset($this->configuration['rng_rule_component'])) {
       return $this->configuration['rng_rule_component'];
@@ -77,6 +79,9 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
     return NULL;
   }
 
+  /**
+   * Gets the rule scheduler entity.
+   */
   public function getRuleScheduler() {
     if (isset($this->configuration['rng_rule_scheduler'])) {
       return RuleSchedule::load($this->configuration['rng_rule_scheduler']);
@@ -90,15 +95,18 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['date']['#description'] = t('Rule will trigger once on this date.');
-    unset ($form['negate']);
+    unset($form['negate']);
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['negate'] = FALSE;
 
-    // Create new scheduler if rule_component is provided
+    // Create new scheduler if rule_component is provided.
     if ($this->getRuleComponentId() && !$this->getRuleScheduler()) {
       $rule_scheduler = RuleSchedule::create([
         'component' => $this->getRuleComponentId(),
@@ -107,7 +115,7 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
       $this->configuration['rng_rule_scheduler'] = $rule_scheduler->id();
     }
 
-    // Mirror the date into the scheduler
+    // Mirror the date into the scheduler.
     if ($rule_scheduler = $this->getRuleScheduler()) {
       $rule_scheduler->setDate($this->configuration['date']);
       $rule_scheduler->save();

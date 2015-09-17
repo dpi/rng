@@ -41,9 +41,9 @@ class Rule extends ContentEntityBase implements RuleInterface {
 
   /**
    * Internal cache of components to associate with this rule when it is saved.
-   * 
+   *
    * @see \Drupal\rng\RuleInterface->addComponent()
-   * 
+   *
    * @var array
    */
   protected $components_unsaved = [

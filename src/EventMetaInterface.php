@@ -194,9 +194,9 @@ interface EventMetaInterface {
    *
    * @param string|NULL $trigger
    *   The trigger ID for the rule.
-   * @param boolean $defaults
+   * @param bool $defaults
    *   If there are no rules in the database, generate some unsaved rules.
-   * @param boolean|NULL $is_active
+   * @param bool $is_active
    *   The status of the rules, or set to NULL for any status.
    *
    * @return \Drupal\rng\RuleInterface[]

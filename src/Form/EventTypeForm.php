@@ -150,7 +150,7 @@ class EventTypeForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => t('Mirror manage registrations with update permission'),
       '#description' => t('Allow users to <strong>manage registrations</strong> if they have <strong>update</strong> permission on an event entity.'),
-      '#default_value' => (boolean)(($event_type->getEventManageOperation() !== NULL) ? $event_type->getEventManageOperation() : TRUE),
+      '#default_value' => (boolean) (($event_type->getEventManageOperation() !== NULL) ? $event_type->getEventManageOperation() : TRUE),
     );
 
     return $form;
@@ -217,7 +217,7 @@ class EventTypeForm extends EntityForm {
    *   A node type entity.
    */
   private function createContentType($prefix) {
-    // Generate a unique id
+    // Generate a unique ID.
     $i = 0;
     $separator = '_';
     $id = $prefix;

@@ -65,7 +65,7 @@ class EventManager implements EventManagerInterface {
    * {@inheritdoc}
    */
   public function isEvent(EntityInterface $entity) {
-    return (boolean)$this->eventType($entity->getEntityTypeId(), $entity->bundle());
+    return (boolean) $this->eventType($entity->getEntityTypeId(), $entity->bundle());
   }
 
   /**

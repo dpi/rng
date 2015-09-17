@@ -203,10 +203,12 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
         $rows[] = $row;
 
         if ($scope_all) {
-          $rows[] = [[
+          $rows[] = [
+            [
             'data' => $this->t('<strong>Warning:</strong> selecting view, update, or delete grants access to any registration on this event.'),
             'colspan' => 5,
-          ]];
+            ]
+          ];
         }
       }
     }

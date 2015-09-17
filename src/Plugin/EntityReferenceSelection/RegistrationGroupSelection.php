@@ -39,6 +39,9 @@ class RegistrationGroupSelection extends SelectionBase {
     return $query;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function entityQueryAlter(SelectInterface $query) {
     // @todo, allow global groups via query alter
     // ->condition('event__target_type', NULL, 'IS NULL')

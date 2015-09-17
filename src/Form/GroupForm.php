@@ -40,6 +40,9 @@ class GroupForm extends ContentEntityForm {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $group = $this->entity
       ->setSource(NULL);

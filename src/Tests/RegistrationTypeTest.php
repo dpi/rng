@@ -44,15 +44,18 @@ class RegistrationTypeTest extends RNGSiteTestBase {
     $this->drupalPlaceBlock('local_actions_block');
   }
 
+  /**
+   * Test registration types in UI.
+   */
   function testRegistrationTypes() {
     $web_user = $this->drupalCreateUser(['administer registration types', 'access administration pages']);
     $this->drupalLogin($web_user);
 
-    // Create and delete the testing registration type
+    // Create and delete the testing registration type.
     $this->drupalGet('admin/structure/rng/registration_types/manage/' . $this->registration_type->id());
     $this->registration_type->delete();
 
-    // Administration
+    // Administration.
     $this->drupalGet('admin/structure');
     $this->assertLinkByHref(Url::fromRoute('rng.registration_type.overview')->toString());
 
@@ -60,20 +63,20 @@ class RegistrationTypeTest extends RNGSiteTestBase {
     $this->assertRaw('No registration types found.', 'Registration type list is empty');
     $this->assertEqual(0, count(RegistrationType::loadMultiple()));
 
-    // Local action
+    // Local action.
     $this->assertLinkByHref(Url::fromRoute('entity.registration_type.add')->toString());
 
-    // Add
+    // Add.
     $edit = ['label' => 'Foobar1', 'id' => 'foobar'];
     $this->drupalPostForm('admin/structure/rng/registration_types/add', $edit, t('Save'));
     $this->assertRaw(t('%label registration type was added.', ['%label' => 'Foobar1']));
     $this->assertEqual(1, count(RegistrationType::loadMultiple()));
 
-    // Registration type list
+    // Registration type list.
     $this->assertUrl(Url::fromRoute('rng.registration_type.overview', [], ['absolute' => TRUE])->toString(), []);
     $this->assertRaw('<td>Foobar1</td>', 'New registration type shows in list.');
 
-    // Edit
+    // Edit.
     $edit = ['label' => 'Foobar2'];
     $this->drupalPostForm('admin/structure/rng/registration_types/manage/foobar', $edit, t('Save'));
     $this->assertRaw(t('%label registration type was updated.', ['%label' => 'Foobar2']));
@@ -95,14 +98,17 @@ class RegistrationTypeTest extends RNGSiteTestBase {
     $this->drupalGet('admin/structure/rng/registration_types/manage/foobar/delete');
     $this->assertRaw(t('This action cannot be undone.'));
 
-    // Delete
+    // Delete.
     $this->drupalPostForm('admin/structure/rng/registration_types/manage/foobar/delete', [], t('Delete'));
     $this->assertRaw(t('Registration type %label was deleted.', ['%label' => 'Foobar2']));
     $this->assertEqual(0, count(RegistrationType::loadMultiple()), 'Registration type entity removed from storage.');
   }
 
+  /**
+   * Test registration type deletion.
+   */
   function testRegistrationTypeAPIDelete() {
-    // associate event with registration type
+    // Associate event with registration type.
     $this->event->{EventManagerInterface::FIELD_REGISTRATION_TYPE}
       ->appendItem(['target_id' => $this->registration_type->id()]);
     $this->event->save();

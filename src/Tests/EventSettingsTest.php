@@ -16,6 +16,9 @@ class EventSettingsTest extends RNGSiteTestBase {
 
   public static $modules = ['block'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');
@@ -83,13 +86,13 @@ class EventSettingsTest extends RNGSiteTestBase {
 
     $event = $this->createEntity($this->event_bundle);
 
-    // local task appears on canonical route
+    // Local task appears on canonical route.
     $base_url = 'node/1';
     $this->drupalGet($event->urlInfo());
     $this->assertLinkByHref($base_url . '/event');
     $this->assertLinkByHref($base_url . '/registrations');
 
-    // event settings form
+    // Event settings form.
     $this->drupalGet('node/1/event');
     $this->assertLink('Settings');
     $this->assertLinkByHref($base_url . '/event/access');

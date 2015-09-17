@@ -10,6 +10,9 @@ namespace Drupal\rng\Plugin\Validation\Constraint;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validates registration groups dependencies and conflicts.
+ */
 class RegistrationGroupSiblingValidator extends ConstraintValidator {
 
   /**

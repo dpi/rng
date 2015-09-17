@@ -106,6 +106,9 @@ class RuleComponentForm extends ContentEntityForm {
     $this->plugin->submitConfigurationForm($form, $form_state);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\rng\RuleComponentInterface $component */
     $component = $this->getEntity();

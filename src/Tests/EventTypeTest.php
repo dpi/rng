@@ -13,7 +13,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
 
 /**
- * Tests event types
+ * Tests event types.
  *
  * @group rng
  */
@@ -21,29 +21,35 @@ class EventTypeTest extends RNGTestBase {
 
   public static $modules = ['node', 'field_ui', 'block'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
   }
 
+  /**
+   * Test event types in UI.
+   */
   function testEventType() {
     $web_user = $this->drupalCreateUser(['administer event types', 'access administration pages']);
     $this->drupalLogin($web_user);
 
-    // Create and delete the testing event type
+    // Create and delete the testing event type.
     $event_bundle = $this->drupalCreateContentType();
     $event_type = $this->createEventType($event_bundle);
     $this->drupalGet('admin/structure/rng/event_types/manage/' . $event_type->id() . '/edit');
     $event_type->delete();
     $event_bundle->delete();
 
-    // Event types button on admin
+    // Event types button on admin.
     $this->drupalGet('admin/structure');
     $this->assertLinkByHref(Url::fromRoute('rng.event_type.overview')->toString());
     $this->assertRaw('Manage which entity bundles are designated as events.', 'Button shows in administration.');
 
-    // No events
+    // No events.
     $this->assertEqual(0, count(EventType::loadMultiple()), 'There are no event type entities.');
     $this->drupalGet('admin/structure/rng/event_types');
     $this->assertRaw('No event types found.', 'Event Type list is empty');
@@ -51,10 +57,10 @@ class EventTypeTest extends RNGTestBase {
     // There are no courier contexts.
     $this->assertEqual(0, count(CourierContext::loadMultiple()), 'There are no courier context entities.');
 
-    // Local action
+    // Local action.
     $this->assertLinkByHref(Url::fromRoute('entity.event_type.add')->toString());
 
-    // Add
+    // Add.
     $t_args = ['%label' => 'node.event'];
     $edit = [];
     $this->drupalPostForm('admin/structure/rng/event_types/add', $edit, t('Save'));
@@ -67,18 +73,18 @@ class EventTypeTest extends RNGTestBase {
     // Courier context created?
     $this->assertTrue(CourierContext::load('rng_registration_node'), 'Courier context entity created for this event type\' entity type.');
 
-    // Event type list
+    // Event type list.
     $this->assertUrl('admin/structure/rng/event_types', [], 'Browser was redirected to event type list.');
     $this->assertRaw('<td>Content: event</td>', 'Event Type shows in list');
     $options = ['node_type' => 'event'];
     $this->assertLinkByHref(Url::fromRoute("entity.node.field_ui_fields", $options)->toString());
 
-    // Edit form
+    // Edit form.
     $edit = [];
     $this->drupalPostForm('admin/structure/rng/event_types/manage/node.event/edit', $edit, t('Save'));
     $this->assertRaw(t('%label event type updated.', $t_args), 'Event Type edit form saved');
 
-    // Delete form
+    // Delete form.
     $this->drupalGet('admin/structure/rng/event_types/manage/node.event/delete');
     $this->assertRaw('Are you sure you want to delete event type node.event?', 'Event Type delete form rendered.');
 

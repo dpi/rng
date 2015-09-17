@@ -142,7 +142,7 @@ Each template requires content suitable to the channel.');
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $configuration = $this->getConfiguration();
 
-    // Create new
+    // Create new.
     if (!isset($configuration['template_collection'])) {
       $template_collection = TemplateCollection::create([
         'template' => 'rng_custom',

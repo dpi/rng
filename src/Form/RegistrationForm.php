@@ -102,7 +102,7 @@ class RegistrationForm extends ContentEntityForm {
 
       $self = FALSE;
       $event_meta = $this->eventManager->getMeta($event);
-      // create a register radio option for current user.
+      // Create a register radio option for current user.
       // list of entity reference field types, ordered by radio default priority.
       $entity_types = $event_meta->getIdentityTypes();
 
@@ -121,7 +121,7 @@ class RegistrationForm extends ContentEntityForm {
         $count = $selection->countReferenceableEntities();
 
         if ($entity_type_id == 'user') {
-          // if duplicate registrants is allowed || user is not already a registrant.
+          // If duplicate registrants is allowed || user is not already a registrant.
           if ($event_meta->identitiesCanRegister('user', [$current_user->id()])) {
             $self = TRUE;
             $count--;
@@ -158,7 +158,7 @@ class RegistrationForm extends ContentEntityForm {
 
           // Add link: The 'add' link is something invented by RNG, it is not a
           // standard link.
-          // @todo: replace with add and reference ajax popup + form
+          // @todo: replace with add and reference ajax popup + form.
           if ($add_link = $entity_type->getLinkTemplate('add-form')) {
             $form['identity_information']['identity'][$entity_type_id]['add'] = [
               '#type' => 'link',
@@ -222,6 +222,9 @@ class RegistrationForm extends ContentEntityForm {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $registration = $this->entity;
 
@@ -255,7 +258,6 @@ class RegistrationForm extends ContentEntityForm {
     else {
       drupal_set_message(t('Registration was updated.', $t_args));
     }
-
 
     if ($registration->id()) {
       if ($registration->access('view')) {

@@ -20,7 +20,7 @@ class RegistrationGroupViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    // Add base field reference for groups
+    // Add base field reference for groups.
     $registration_definition = \Drupal::entityManager()->getDefinition('registration');
     $group_definition = \Drupal::entityManager()->getDefinition('registration_group');
 
@@ -32,7 +32,7 @@ class RegistrationGroupViewsData extends EntityViewsData {
     // Target ID can be NULL.
     $data['registration_group_field_data']['event__target_id']['filter']['allow empty'] = TRUE;
 
-    // Reverse relationship (Target to Origin)
+    // Reverse relationship (Target to Origin).
     $psuedo_field = 'rng_registration_group__registration';
     $data['registration_group_field_data'][$psuedo_field]['relationship'] = [
       'title' => t('@target_labels', $t_args),

@@ -247,7 +247,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
       $display->save();
     }
 
-    // Rebuild routes and local tasks
+    // Rebuild routes and local tasks.
     \Drupal::service('router.builder')->setRebuildNeeded();
     // Rebuild local actions https://github.com/dpi/rng/issues/18
     \Drupal::service('plugin.manager.menu.local_action')->clearCachedDefinitions();
@@ -281,7 +281,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
       EventType::courierContextCC($event_type->entity_type, 'delete');
     }
 
-    // Rebuild routes and local tasks
+    // Rebuild routes and local tasks.
     \Drupal::service('router.builder')->setRebuildNeeded();
     // Rebuild local actions https://github.com/dpi/rng/issues/18
     \Drupal::service('plugin.manager.menu.local_action')->clearCachedDefinitions();
