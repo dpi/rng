@@ -61,6 +61,8 @@ class EventSettingsTest extends RNGSiteTestBase {
     $this->drupalGet($base_url . '/event');
     $this->assertResponse(403);
 
+    // Ensure that after removing an event type, the Event links do not persist
+    // for other entities of the same entity type, but different bundle.
     foreach ([403, 404] as $code) {
       $event_type = array_shift($event_types);
       $event_type->delete();
@@ -90,7 +92,6 @@ class EventSettingsTest extends RNGSiteTestBase {
     $base_url = 'node/1';
     $this->drupalGet($event->urlInfo());
     $this->assertLinkByHref($base_url . '/event');
-    $this->assertLinkByHref($base_url . '/registrations');
 
     // Event settings form.
     $this->drupalGet('node/1/event');
