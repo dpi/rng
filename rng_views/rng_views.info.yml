@@ -1,0 +1,10 @@
+name: RNG Views
+type: module
+description: 'Improved Views integration for RNG.'
+package: RNG
+core: 8.x
+dependencies:
+  - rng
+  - views
+  - veoa
+  - views_advanced_routing

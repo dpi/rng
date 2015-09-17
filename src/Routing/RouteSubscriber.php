@@ -154,19 +154,6 @@ class RouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("rng.event.$entity_type.group.add", $route);
 
-        // Registration list.
-        $route = new Route(
-          $canonical_path . '/registrations',
-          array(
-            '_controller' => '\Drupal\rng\Controller\RegistrationController::listing',
-            '_title' => 'Registrations',
-            'event' => $entity_type,
-          ),
-          $manage_requirements,
-          $options
-        );
-        $collection->add("rng.event.$entity_type.registrations", $route);
-
         // Register.
         $route = new Route(
           $canonical_path . '/register',

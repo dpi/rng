@@ -13,6 +13,7 @@ use Drupal\rng\EventManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Route;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Checks that an entity is an event type.
@@ -39,7 +40,9 @@ class EntityIsEventCheck implements AccessInterface {
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
     if ($event = $route->getDefault('event')) {
       $event = $route_match->getParameter($event);
-      return AccessResult::allowedIf($this->eventManager->isEvent($event));
+      if ($event instanceof EntityInterface) {
+        return AccessResult::allowedIf($this->eventManager->isEvent($event));
+      }
     }
     return AccessResult::neutral();
   }

@@ -1,0 +1,171 @@
+<?php
+
+use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\views\Entity\View;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * event_type_edit_form
+ */
+function rng_views_form_event_type_form_alter(&$form, FormStateInterface &$form_state) {
+  $form['actions']['submit']['#submit'][] = 'rng_views_form_event_type_form_alter_submit';
+  $form_object = $form_state->getFormObject();
+  /** @var \Drupal\rng\Entity\EventType $event_type */
+  $event_type = $form_object->getEntity();
+  $entity_type = NULL;
+  if (!empty($event_type->getEventEntityTypeId())) {
+    $entity_type = \Drupal::entityManager()
+      ->getDefinition($event_type->getEventEntityTypeId());
+  }
+
+  $form['views'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Views'),
+    '#tree' => TRUE,
+    '#weight' => 20,
+  );
+
+  $title = t('Create registration list');
+  if ($entity_type && $view = View::load('rng_registrations_' . $entity_type->id())) {
+    /** @var View $view */
+    if ($view->hasLinkTemplate('edit-form')) {
+      $title = t('Create registration list (<a href="@view_link">view already exists</a>)', [
+        '@view_link' => $view->urlInfo()->toString(),
+      ]);
+    }
+    else {
+      $title = t('Create registration list (view already exists)');
+    }
+  }
+
+  $form['views']['registration_list'] = [
+    '#type' => 'checkbox',
+    '#title' => $title,
+    '#description' => t('Lists all registrations for an event. View is visible as a tab on event entity pages.'),
+  ];
+}
+
+/**
+ * Form submission handler.
+ *
+ * @see rng_views_form_event_type_form_alter().
+ */
+function rng_views_form_event_type_form_alter_submit($form, FormStateInterface $form_state) {
+  $form_object = $form_state->getFormObject();
+  $event_type = $form_object->getEntity();
+
+  $entity_type_id = $event_type->getEventEntityTypeId();
+  if ($entity_type = \Drupal::entityManager()->getDefinition($event_type->getEventEntityTypeId())) {
+    $views = $form_state->getValue('views');
+    if ($views['registration_list']) {
+      $view = rng_views_event_registrations($entity_type);
+      $view->save();
+      drupal_set_message(t('!link view created.',[
+        '!link' => $view->link(),
+      ]));
+    }
+  }
+}
+
+/**
+ * Creates a registration list view based off `event.registrations.yml`.
+ *
+ * YAML file contains a premade registration view with relationship to nodes.
+ * This function will overwrite node relationship with the passed entity.
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The event entity type.
+ */
+function rng_views_event_registrations(EntityTypeInterface $entity_type) {
+  $t_args = [
+    '@entity_type' => $entity_type->getLabel(),
+    '@entity_type_id' => $entity_type->getLabel(),
+  ];
+
+  $base_path = \Drupal::moduleHandler()->getModule('rng_views')->getPath();
+  $yaml = Yaml::decode(file_get_contents($base_path . '/extra/event.registrations.yml'));
+
+  /** @var View $view */
+  $view = \Drupal::entityManager()
+    ->getStorage('view')
+    ->createFromStorageRecord($yaml);
+
+  $view_id = 'rng_registrations_' . $entity_type->id();
+  $i = 1;
+  while (View::load($view_id)) {
+    $view_id = 'rng_registrations_' . $i;
+    $i++;
+  }
+
+  $view
+    ->set('id', $view_id)
+    ->set('originalId', NULL)
+    ->set('uuid', NULL)
+    ->set('label', t('RNG: @entity_type: Registrations', $t_args))
+    ->set('description', t('Registrations for @entity_type events.', $t_args))
+    ->set('tag', implode(', ', [
+      'rng', 'event', 'list', $entity_type->id(),
+    ]));
+
+  // Dependencies
+  $dependencies = $view->get('dependencies');
+  if (array_key_exists('module', $dependencies)) {
+    // Remove node module from dependencies.
+    $dependencies['module'] = array_diff_key($view->get('dependencies')['module'], ['node']);
+  }
+  $dependencies['module'][] = $entity_type->getProvider();
+
+  // Master display.
+  $defaults = $view->getDisplay('default');
+
+  // VEOA Access.
+  $defaults['display_options']['access']['options']['parameter'] = $entity_type->id();
+  $defaults['display_options']['access']['options']['entity_type'] = $entity_type->id();
+  $defaults['display_options']['access']['options']['operation'] = 'manage event';
+
+  // DER Relationship.
+  $relationship = $defaults['display_options']['relationships']['node__event'];
+
+  // $target_entity__$origin_base_field_name
+  $rid = $entity_type->id() . '__event';
+  $defaults['display_options']['relationships'] = [
+    $rid => [
+      'id' => $rid,
+      'field' => $entity_type->id() . '__event',
+      'admin_label' => t('Event: @entity_type', $t_args),
+    ] + $relationship
+  ];
+
+  // Argument
+  $argument = $defaults['display_options']['arguments']['nid'];
+
+  $aid = $entity_type->getKey('id');
+  $defaults['display_options']['arguments'] = [
+    $aid => [
+      'id' => $aid,
+      'table' => $entity_type->getDataTable() ?: $entity_type->getBaseTable(),
+      'field' => $entity_type->getKey('id'),
+      'relationship' => $rid,
+      'entity_type' => $entity_type->id(),
+      'entity_field' => $entity_type->getKey('id'),
+    ] + $argument,
+  ];
+
+  // Routing.
+  if ($canonical_path = $entity_type->getLinkTemplate('canonical')) {
+    $page = $view->getDisplay('page_1');
+    $views_canonical_path = str_replace(
+      '{' . $entity_type->id() . '}',
+      '%' . $entity_type->id(),
+      $canonical_path
+    );
+
+    $page['display_options']['path'] = $views_canonical_path . '/registrations';
+    $page['display_options']['display_extenders']['views_advanced_routing_route']['route']['defaults']['event'] = $entity_type->id();
+  }
+
+  return $view;
+}

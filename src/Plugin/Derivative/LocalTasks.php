@@ -94,13 +94,6 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'weight' => 40,
         );
 
-        $this->derivatives["rng.event.$entity_type.registrations"] = array(
-          'title' => t('Registration List'),
-          'route_name' => "rng.event.$entity_type.registrations",
-          'base_route' => "entity.$entity_type.canonical",
-          'weight' => 35,
-        );
-
         $this->derivatives["rng.event.$entity_type.register.type_list"] = array(
           'route_name' => "rng.event.$entity_type.register.type_list",
           'base_route' => "entity.$entity_type.canonical",

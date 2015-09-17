@@ -142,7 +142,6 @@ class EventTypeForm extends EntityForm {
     $form['settings'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Settings'),
-      '#open' => TRUE,
     );
 
     // Mirror permission.
