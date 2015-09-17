@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\rng\EventManagerInterface;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Provides dynamic tasks for RNG.
@@ -54,8 +55,13 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     $this->derivatives = [];
 
-    $event_types = $this->eventManager->getEventTypes();
-    foreach (array_keys($event_types) as $entity_type) {
+    /** @var \Drupal\rng\Entity\EventType[] $event_types */
+    foreach ($this->eventManager->getEventTypes() as $entity_type => $event_types) {
+      $cache_tags = [];
+      foreach ($event_types as $event_type) {
+        $cache_tags = Cache::mergeTags($cache_tags, $event_type->getCacheTags());
+      }
+
       // Only need one set of tasks task per entity type.
       if ($this->routeProvider->getRouteByName("entity.$entity_type.canonical")) {
         $event_default = "rng.event.$entity_type.event.default";
@@ -64,6 +70,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'base_route' => "entity.$entity_type.canonical",
           'route_name' => "rng.event.$entity_type.event",
           'weight' => 30,
+          'cache_tags' => $cache_tags,
         );
 
         $this->derivatives["rng.event.$entity_type.event.settings"] = array(
@@ -71,6 +78,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'route_name' => $this->derivatives[$event_default]['route_name'],
           'parent_id' => 'rng.local_tasks:' . $event_default,
           'weight' => 10,
+          'cache_tags' => $cache_tags,
         );
 
         $this->derivatives["rng.event.$entity_type.event.access"] = array(
@@ -78,6 +86,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'route_name' => "rng.event.$entity_type.access",
           'parent_id' => 'rng.local_tasks:' . $event_default,
           'weight' => 20,
+          'cache_tags' => $cache_tags,
         );
 
         $this->derivatives["rng.event.$entity_type.event.messages"] = array(
@@ -85,6 +94,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'route_name' => "rng.event.$entity_type.messages",
           'parent_id' => 'rng.local_tasks:' . $event_default,
           'weight' => 30,
+          'cache_tags' => $cache_tags,
         );
 
         $this->derivatives["rng.event.$entity_type.event.group.list"] = array(
@@ -92,6 +102,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'route_name' => "rng.event.$entity_type.group.list",
           'parent_id' => 'rng.local_tasks:' . $event_default,
           'weight' => 40,
+          'cache_tags' => $cache_tags,
         );
 
         $this->derivatives["rng.event.$entity_type.register.type_list"] = array(
@@ -99,6 +110,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'base_route' => "entity.$entity_type.canonical",
           'title' => t('Register'),
           'weight' => 40,
+          'cache_tags' => $cache_tags,
         );
       }
     }
