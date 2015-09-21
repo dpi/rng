@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\rng\Exception\InvalidEventException;
+use Drupal\user\Entity\User;
 
 /**
  * Access controller for the registration entity.
@@ -54,7 +55,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       $event = $entity->getEvent();
 
       // Event access rules.
-      $user = entity_load('user', $account->id());
+      $user = User::load($account->id());
       $context_values = [
         'event' => $event,
         'registration' => $entity,

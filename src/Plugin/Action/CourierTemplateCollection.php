@@ -144,9 +144,7 @@ Each template requires content suitable to the channel.');
 
     // Create new.
     if (!isset($configuration['template_collection'])) {
-      $template_collection = TemplateCollection::create([
-        'template' => 'rng_custom',
-      ]);
+      $template_collection = TemplateCollection::create();
       if ($template_collection->save()) {
         $this->courierManager->addTemplates($template_collection);
         $template_collection->save();
@@ -172,10 +170,10 @@ Each template requires content suitable to the channel.');
         if (($event = $registration->getEvent()) instanceof EntityInterface) {
           $event_meta = $this->eventManager->getMeta($event);
           $options['channels']['courier_email']['reply_to'] = $event_meta->getReplyTo();
-          $collection_original->addTokenValue($event->getEntityTypeId(), $event);
+          $collection_original->setTokenValue($event->getEntityTypeId(), $event);
         }
         $collection = clone $collection_original;
-        $collection->addTokenValue('registration', $registration);
+        $collection->setTokenValue('registration', $registration);
         foreach ($registration->getRegistrants() as $registrant) {
           $identity = $registrant->getIdentity();
           $this->courierManager->sendMessage($collection, $identity, $options);

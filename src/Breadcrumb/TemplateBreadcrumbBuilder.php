@@ -61,7 +61,7 @@ class TemplateBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $template_collection = $this->getTemplateCollection($route_match);
     if ($template_collection instanceof TemplateCollection) {
       $owner = $template_collection->getOwner();
-      return $this->eventManager->isEvent($owner);
+      return $owner instanceof EntityInterface && $this->eventManager->isEvent($owner);
     }
     return FALSE;
   }
