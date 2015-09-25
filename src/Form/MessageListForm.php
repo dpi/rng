@@ -8,6 +8,7 @@
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Routing\RedirectDestinationInterface;
+use Drupal\courier\Entity\TemplateCollection;
 use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,6 +16,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rng\Plugin\Condition\CurrentTime;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\rng\RuleInterface;
 
 /**
  * Creates message list form.
@@ -99,94 +101,68 @@ class MessageListForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $header = [
-      $this->t('Trigger'),
-      $this->t('Date'),
-      [
-        'data' => $this->t('Enabled'),
-        'class' => ['checkbox'],
-      ],
-      $this->t('Operations'),
-    ];
-    $form['action_list'] = [
-      '#type' => 'table',
-      '#header' => $header,
-      '#title' => $this->t('Messages'),
-      '#empty' => $this->t('No messages found for this event.'),
-    ];
-
-    $rng_triggers = [
-      'entity:registration:new' => $this->t('When registrations are created.'),
-      'entity:registration:update' => $this->t('When registrations are updated.'),
-      'rng:custom:date' => $this->t('Current date is after a date.'),
-    ];
-
-    $destination = $this->redirectDestination->getAsArray();
     $form['#rng_event'] = $route_match->getParameter($event);
+
+    // @todo: move trigger definitions to a discovery service.
+    $rng_triggers = [
+      'entity:registration:new' => $this->t('Registration creation'),
+      'entity:registration:update' => $this->t('Registration updated'),
+      'rng:custom:date' => $this->t('Send on a date'),
+    ];
+
+    // Actions.
+    $form['actions'] = [
+      '#type' => 'details',
+      '#attributes' => [
+        'class' => ['container-inline'],
+      ],
+      '#open' => TRUE,
+    ];
+    $form['actions']['operation'] = [
+      '#title' => $this->t('With selection'),
+      '#type' => 'select',
+      '#options' => [
+        'enable' => $this->t('Enable messages'),
+        'disable' => $this->t('Disable messages'),
+        'delete' => $this->t('Delete messages'),
+      ],
+      '#empty_option' => $this->t(' - Select - '),
+      '#button_type' => 'primary',
+    ];
+    $form['actions']['enable'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Save'),
+      '#button_type' => 'primary',
+    ];
+
+    // List items.
+    $form['list'] = [
+      '#type' => 'courier_template_collection_list',
+      '#checkboxes' => TRUE,
+      '#items' => [],
+    ];
+
     foreach ($this->getCommunicationRules($form['#rng_event']) as $rid => $rule) {
-      foreach ($rule->getActions() as $action) {
-        $row = [];
-        $links = [];
-        // @todo: move trigger definitions to a discovery service.
-        $trigger_id = $rule->getTriggerID();
-        $row['trigger']['#markup'] = isset($rng_triggers[$trigger_id]) ? $rng_triggers[$trigger_id] : $trigger_id;
-
-        $row['date']['#markup'] = $this->t('N/A');
-        foreach ($rule->getConditions() as $component) {
+      $trigger_id = $rule->getTriggerID();
+      if ($template_collection = $this->getTemplateCollectionForRule($rule)) {
+        // Add description for date conditions.
+        $description = NULL;
+        if ($component = $this->getDateCondition($rule)) {
           $condition = $component->createInstance();
-          if ($condition instanceof CurrentTime) {
-            $row['date']['#markup'] = $condition->getDateFormatted();
-            if ($component->access('edit')) {
-              $links['edit-date'] = [
-                'title' => $this->t('Edit date'),
-                'url' => $component->urlInfo('edit-form'),
-                'query' => $destination,
-              ];
-            }
-          }
+          $description = $condition->getDateFormatted();
         }
 
-        $row['status'] = [
-          '#type' => 'checkbox',
-          '#title' => $this->t('Active'),
-          '#title_display' => 'invisible',
-          '#default_value' => (bool) $rule->isActive(),
-          '#wrapper_attributes' => [
-            'class' => [
-              'checkbox',
-            ],
-          ],
+        $form['list']['#items'][$rule->id()] = [
+          '#title' => $this->t('@label (@status)', [
+            '@label' => isset($rng_triggers[$trigger_id]) ? $rng_triggers[$trigger_id] : $trigger_id,
+            '@status' => $rule->isActive() ? $this->t('active') : $this->t('disabled'),
+          ]),
+          '#description' => $description,
+          '#template_collection' => $template_collection,
+          '#operations' => $this->getOperations($rule),
         ];
-
-        if ($action->access('edit')) {
-          $links['edit-templates'] = [
-            'title' => $this->t('Edit templates'),
-            'url' => $action->urlInfo('edit-form'),
-            'query' => $destination,
-          ];
-        }
-        if ($rule->access('delete')) {
-          $links['delete'] = [
-            'title' => $this->t('Delete'),
-            'url' => $rule->urlInfo('delete-form'),
-            'query' => $destination,
-          ];
-        }
-
-        $row['operations']['data'] = [
-          '#type' => 'operations',
-          '#links' => $links,
-        ];
-
-        $form['action_list'][$rid] = $row;
       }
     }
-
-    $form['actions'] = ['#type' => 'actions'];
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => t('Save'),
-    ];
 
     return $form;
   }
@@ -195,17 +171,113 @@ class MessageListForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_rules = $form_state->getValue('action_list');
-    foreach ($this->getCommunicationRules($form['#rng_event']) as $rid => $rule) {
-      $enabled = !empty($form_rules[$rid]['status']);
-      if ($rule->isActive() != $enabled) {
-        $rule
-          ->setIsActive($enabled)
-          ->save();
+    $message = NULL;
+    $operation = $form_state->getValue(['operation']);
+
+    // Checkbox is checked, keyed by rule ID.
+    $checkbox = $form_state->getValue(['list', 'checkboxes']);
+
+    // A list of checked rules.
+    $rules = [];
+    foreach ($this->getCommunicationRules($form['#rng_event']) as $rule) {
+      // Checkbox is checked.
+      if ($checkbox[$rule->id()]) {
+        $rules[] = $rule;
       }
     }
 
-    drupal_set_message($this->t('Messages saved.'));
+    /** @var RuleInterface $rule */
+    foreach ($rules as $rule) {
+      if (in_array($operation, ['enable', 'disable'])) {
+        $operation_active = $operation == 'enable';
+        if ($rule->isActive() != $operation_active) {
+          $rule
+            ->setIsActive($operation_active)
+            ->save();
+        }
+        $message = ($operation == 'enable') ? $this->t('Messages enabled.') : $this->t('Messages disabled.');
+      }
+      elseif ($operation == 'delete') {
+        $rule->delete();
+        $message = $this->t('Messages deleted');
+      }
+    }
+
+    drupal_set_message($message ? $message : $this->t('No action performed.'));
+  }
+
+  /**
+   * Gets the template collection from an action on the rule.
+   *
+   * @param \Drupal\rng\RuleInterface $rule
+   *   The rule.
+   *
+   * @return \Drupal\courier\TemplateCollectionInterface|NULL
+   *   A template collection entity, or NULL if no template collection is
+   *   associated.
+   */
+  protected function getTemplateCollectionForRule(RuleInterface $rule) {
+    foreach ($rule->getActions() as $action) {
+      $conf = $action->getConfiguration();
+      $id = $conf['template_collection'];
+      if ($id && $template_collection = TemplateCollection::load($id)) {
+        return $template_collection;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Gets the condition containing a date instance.
+   *
+   * @param \Drupal\rng\RuleInterface $rule
+   *   The rule.
+   *
+   * @return \Drupal\rng\RuleComponentInterface|NULL
+   *   A rule component entity, or NULL if no date condition is associated.
+   */
+  protected function getDateCondition(RuleInterface $rule) {
+    foreach ($rule->getConditions() as $component) {
+      $condition = $component->createInstance();
+      if ($condition instanceof CurrentTime) {
+        return $component;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Gets operations for a rule.
+   *
+   * @param \Drupal\rng\RuleInterface $rule
+   *   The rule.
+   *
+   * @return array
+   *   An array of links suitable for an 'operations' element.
+   */
+  protected function getOperations(RuleInterface $rule) {
+    $links = [];
+    $destination = $this->redirectDestination->getAsArray();
+
+    if ($component = $this->getDateCondition($rule)) {
+      if ($component->access('edit')) {
+        $links['edit-date'] = [
+          'title' => $this->t('Edit date'),
+          'url' => $component->urlInfo('edit-form'),
+          'query' => $destination,
+        ];
+      }
+    }
+
+    if ($rule->access('delete')) {
+      $links['delete'] = [
+        'title' => $this->t('Delete'),
+        'url' => $rule->urlInfo('delete-form'),
+        'query' => $destination,
+      ];
+    }
+
+    return $links;
   }
 
 }

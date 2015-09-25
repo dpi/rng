@@ -103,7 +103,7 @@ class MessageActionForm extends FormBase {
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Add message and edit templates'),
+      '#value' => t('Create message'),
     );
     $form['actions']['cancel'] = array(
       '#type' => 'link',
@@ -167,7 +167,10 @@ class MessageActionForm extends FormBase {
       $rule_component->save();
     }
 
-    $form_state->setRedirectUrl($action->urlInfo('edit-form'));
+    $entity_type = $event->getEntityTypeId();
+    $form_state->setRedirectUrl(Url::fromRoute('rng.event.' . $entity_type . '.messages', [
+      $entity_type => $event->id(),
+    ]));
   }
 
 }
