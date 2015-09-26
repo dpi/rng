@@ -129,9 +129,9 @@ class MessageListForm extends FormBase {
       '#empty_option' => $this->t(' - Select - '),
       '#button_type' => 'primary',
     ];
-    $form['actions']['enable'] = [
+    $form['actions']['apply'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Save'),
+      '#value' => $this->t('Apply'),
       '#button_type' => 'primary',
     ];
 
