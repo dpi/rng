@@ -10,7 +10,7 @@ namespace Drupal\rng\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\courier\Service\IdentityChannelManager;
+use Drupal\courier\Service\IdentityChannelManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -30,7 +30,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
   /**
    * The identity channel manager.
    *
-   * @var \Drupal\courier\Service\IdentityChannelManager
+   * @var \Drupal\courier\Service\IdentityChannelManagerInterface
    */
   protected $identityChannelManager;
 
@@ -41,10 +41,10 @@ class RegistrantSettingsForm extends ConfigFormBase {
    *   The factory for configuration objects.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
-   * @param \Drupal\courier\Service\IdentityChannelManager $identity_channel_manager
+   * @param \Drupal\courier\Service\IdentityChannelManagerInterface $identity_channel_manager
    *   The identity channel manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, IdentityChannelManager $identity_channel_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, IdentityChannelManagerInterface $identity_channel_manager) {
     parent::__construct($config_factory);
     $this->entityManager = $entity_manager;
     $this->identityChannelManager = $identity_channel_manager;
