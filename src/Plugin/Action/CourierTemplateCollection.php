@@ -101,37 +101,13 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    // @todo: replace w/ inline entity forms.
-    $form['#title'] = $this->t('Edit templates');
-    $form['description']['#markup'] = $this->t('Registrants have an option to choose which channel they will receive the message.
-Each template requires content suitable to the channel.');
-
-    $form['links'] = array(
-      '#title' => $this->t('Channels'),
-      '#theme' => 'item_list',
-      '#items' => [],
-    );
-
-    $configuration = $this->getConfiguration();
     if ($template_collection = $this->getTemplateCollection()) {
-      foreach ($template_collection->getTemplates() as $entity) {
-        $item = [];
-        if ($entity->hasLinkTemplate('edit-form')) {
-          $item[] = [
-            '#type' => 'link',
-            '#title' => $entity->getEntityType()->getLabel(),
-            '#url' => $entity->urlInfo('edit-form'),
-          ];
-        }
-        else {
-          $item[] = [
-            '#markup' => $entity->getEntityType()->getLabel(),
-          ];
-        }
-
-        $form['links']['#items'][] = $item;
-      }
+      $form['template_collection']['#markup'] = $this->t('Template collection #@id', ['@id' => $template_collection->id()]);
     }
+    else {
+      drupal_set_message('No template collection entity found.', 'warning');
+    }
+
 
     return $form;
   }

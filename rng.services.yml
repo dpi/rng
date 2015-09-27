@@ -15,11 +15,6 @@ services:
     class: Drupal\rng\Breadcrumb\RuleComponentBreadcrumbBuilder
     tags:
       - { name: breadcrumb_builder, priority: 100 }
-  rng.breadcrumb.courier_template:
-    class: Drupal\rng\Breadcrumb\TemplateBreadcrumbBuilder
-    arguments: ['@plugin.manager.identity_channel', '@rng.event_manager']
-    tags:
-      - { name: breadcrumb_builder, priority: 100 }
   rng.route_subscriber:
     class: Drupal\rng\Routing\RouteSubscriber
     arguments: ['@entity.manager', '@rng.event_manager']

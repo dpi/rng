@@ -6,6 +6,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\courier\ChannelInterface;
+use Drupal\courier\TemplateCollectionInterface;
 use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\Exception\InvalidEventException;
@@ -47,9 +48,25 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
     if ($entity instanceof ChannelInterface) {
       if ($template_collection = TemplateCollection::getTemplateCollectionForTemplate($entity)) {
         // Allow editing template if the user has 'manage event' for the event.
-        return AccessResult::allowedIf(($owner = $template_collection->getOwner()) && $owner->access('manage event'))
-          ->addCacheableDependency($owner);
+        if ($owner = $template_collection->getOwner()) {
+          $event_manager = \Drupal::service('rng.event_manager');
+          /** @var \Drupal\rng\EventManagerInterface $event_manager */
+          if ($event_manager->isEvent($owner)) {
+            return AccessResult::allowedIf($owner->access('manage event'))
+              ->addCacheableDependency($owner);
+          }
+        }
       }
+    }
+  }
+
+  if ($operation == 'templates' && $entity instanceof TemplateCollectionInterface) {
+    $owner = $entity->getOwner();
+    /** @var \Drupal\rng\EventManagerInterface $event_manager */
+    $event_manager = \Drupal::service('rng.event_manager');
+    if ($owner && $event_manager->isEvent($owner) && $owner->access('manage event')) {
+      return AccessResult::allowed()
+        ->addCacheableDependency($owner);
     }
   }
 
