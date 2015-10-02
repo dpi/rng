@@ -45,7 +45,7 @@ class RuleComponentBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $breadcrumb = new Breadcrumb();
     return $breadcrumb
       ->setLinks($links)
-      ->setCacheContexts(['route.name']);
+      ->addCacheContexts(['route.name']);
   }
 
 }

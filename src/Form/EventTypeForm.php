@@ -89,7 +89,7 @@ class EventTypeForm extends EntityForm {
         if ($entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
           foreach ($this->entityManager->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
             if (!$this->eventManager->eventType($entity_type->id(), $bundle)) {
-              $bundle_options[$entity_type->getLabel()][$entity_type->id() . '.' . $bundle] = $bundle_info['label'];
+              $bundle_options[(string) $entity_type->getLabel()][$entity_type->id() . '.' . $bundle] = $bundle_info['label'];
             }
           }
         }

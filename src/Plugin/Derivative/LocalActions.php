@@ -11,6 +11,7 @@ namespace Drupal\rng\Plugin\Derivative;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,6 +25,13 @@ class LocalActions extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
    * The RNG event manager.
    *
    * @var \Drupal\rng\EventManagerInterface
@@ -33,12 +41,15 @@ class LocalActions extends DeriverBase implements ContainerDeriverInterface {
   /**
    * Constructs a LocalTasks object.
    *
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(RouteProviderInterface $route_provider, EventManagerInterface $event_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, RouteProviderInterface $route_provider, EventManagerInterface $event_manager) {
+    $this->entityManager = $entity_manager;
     $this->routeProvider = $route_provider;
     $this->eventManager = $event_manager;
   }
@@ -48,6 +59,7 @@ class LocalActions extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
+      $container->get('entity.manager'),
       $container->get('router.route_provider'),
       $container->get('rng.event_manager')
     );
@@ -61,7 +73,9 @@ class LocalActions extends DeriverBase implements ContainerDeriverInterface {
 
     /** @var \Drupal\rng\Entity\EventType[] $event_types */
     foreach ($this->eventManager->getEventTypes() as $entity_type => $event_types) {
-      $cache_tags = [];
+      $cache_tags = $this->entityManager
+        ->getDefinition($entity_type)
+        ->getListCacheTags();
       foreach ($event_types as $event_type) {
         $cache_tags = Cache::mergeTags($cache_tags, $event_type->getCacheTags());
       }

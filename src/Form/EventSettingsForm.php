@@ -79,6 +79,7 @@ class EventSettingsForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\Core\Entity\EntityInterface $event */
     $event = $form_state->get('event');
     $form_state->get('form_display')->extractFormValues($event, $form, $form_state);
     $event->save();
