@@ -44,12 +44,9 @@ class Rule extends ContentEntityBase implements RuleInterface {
    *
    * @see \Drupal\rng\RuleInterface->addComponent()
    *
-   * @var array
+   * @var \Drupal\rng\RuleComponentInterface[]
    */
-  protected $components_unsaved = [
-    'action' => [],
-    'condition' => [],
-  ];
+  protected $components_unsaved = [];
 
   /**
    * {@inheritdoc}
@@ -84,22 +81,34 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * {@inheritdoc}
    */
   public function getConditions() {
-    $action_ids = \Drupal::entityQuery('rng_rule_component')
+    $ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'condition', '=')
       ->execute();
-    return entity_load_multiple('rng_rule_component', $action_ids) + $this->components_unsaved['condition'];
+
+    return array_merge(
+      $ids ? RuleComponent::loadMultiple($ids) : [],
+      array_filter($this->components_unsaved, function ($component) {
+        return $component->getType() == 'condition';
+      })
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getActions() {
-    $action_ids = \Drupal::entityQuery('rng_rule_component')
+    $ids = \Drupal::entityQuery('rng_rule_component')
       ->condition('rule', $this->id(), '=')
       ->condition('type', 'action', '=')
       ->execute();
-    return entity_load_multiple('rng_rule_component', $action_ids) + $this->components_unsaved['action'];
+
+    return array_merge(
+      $ids ? RuleComponent::loadMultiple($ids) : [],
+      array_filter($this->components_unsaved, function ($component) {
+        return $component->getType() == 'action';
+      })
+    );
   }
 
   /**
@@ -107,13 +116,11 @@ class Rule extends ContentEntityBase implements RuleInterface {
    *
    * Components are not saved until the rule is saved.
    *
-   * @param string $type
-   *   The type of component. Possible values: 'action' or 'condition'.
    * @param \Drupal\rng\RuleComponentInterface $component
    *   The rule component entity.
    */
-  public function addComponent($type, RuleComponentInterface $component) {
-    $this->components_unsaved[$type][] = $component;
+  public function addComponent(RuleComponentInterface $component) {
+    $this->components_unsaved[] = $component;
   }
 
   /**
@@ -154,13 +161,11 @@ class Rule extends ContentEntityBase implements RuleInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-    foreach ($this->components_unsaved as $type => $components) {
-      foreach ($components as $k => $component) {
-        /** @var \Drupal\rng\RuleComponentInterface $component */
-        $component->setRule($this);
-        $component->save();
-        unset($this->components_unsaved[$type][$k]);
-      }
+    foreach ($this->components_unsaved as $k => $component) {
+      $component
+        ->setRule($this)
+        ->save();
+      unset($this->components_unsaved[$k]);
     }
   }
 

@@ -311,7 +311,7 @@ class EventMeta implements EventMetaInterface {
               ->setType($component_type)
               ->setPluginId($plugin_id)
               ->setConfiguration($configuration);
-            $rule->addComponent($component_type, $component);
+            $rule->addComponent($component);
           }
         }
       }
