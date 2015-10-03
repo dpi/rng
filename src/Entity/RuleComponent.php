@@ -51,7 +51,7 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
    * {@inheritdoc}
    */
   public function setRule(RuleInterface $rule) {
-    $this->set('rule', array('entity' => $rule));
+    $this->set('rule', ['entity' => $rule]);
     return $this;
   }
 
@@ -104,21 +104,23 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
    * {@inheritdoc}
    */
   public function createInstance() {
-    $condition_manager = \Drupal::service('plugin.manager.' . $this->getType());
-    return $condition_manager->createInstance($this->getPluginId(), $this->getConfiguration());
+    if (in_array($this->getType(), ['action', 'condition'])) {
+      $manager = \Drupal::service('plugin.manager.' . $this->getType());
+      return $manager->createInstance($this->getPluginId(), $this->getConfiguration());
+    }
+    else {
+      throw new \Exception('Invalid RuleComponent type.');
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function execute(array $context) {
-    $action_id = $this->getPluginId();
-    $action_configuration = $this->getConfiguration();
-
-    $manager = \Drupal::service('plugin.manager.action');
-    $plugin = $manager->createInstance($action_id, $action_configuration);
     // @todo context is not standard
-    $plugin->execute($context);
+    $this
+      ->createInstance()
+      ->execute($context);
   }
 
   /**
@@ -126,8 +128,8 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Action ID'))
-      ->setDescription(t('The rule ID.'))
+      ->setLabel(t('Rule Component ID'))
+      ->setDescription(t('The rule component ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
@@ -138,22 +140,22 @@ class RuleComponent extends ContentEntityBase implements RuleComponentInterface 
       ->setRequired(TRUE)
       ->setSetting('target_type', 'rng_rule');
 
-    // Hijack action entity for conditions...
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
       ->setDescription(t('Whether this is an action or condition.'))
       ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
+    // @todo Change field ID.
     $fields['action'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Action'))
-      ->setDescription(t('The action ID.'))
+      ->setLabel(t('Plugin ID'))
+      ->setDescription(t('The plugin ID.'))
       ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
     $fields['configuration'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Configuration'))
-      ->setDescription(t('The action configuration.'))
+      ->setDescription(t('The component configuration.'))
       ->setRequired(TRUE);
 
     return $fields;

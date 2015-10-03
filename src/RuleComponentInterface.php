@@ -6,12 +6,14 @@
  */
 
 namespace Drupal\rng;
+
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Provides an interface for event action entities.
+ * Provides an interface for rule component entities.
  */
 interface RuleComponentInterface extends ContentEntityInterface {
+
   /**
    * Gets the rule entity.
    *
@@ -21,9 +23,9 @@ interface RuleComponentInterface extends ContentEntityInterface {
   public function getRule();
 
   /**
-   * Sets the rule for the action.
+   * Sets the rule for the component.
    *
-   * @return RuleComponentInterface
+   * @return \Drupal\rng\RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setRule(RuleInterface $rule);
@@ -37,12 +39,12 @@ interface RuleComponentInterface extends ContentEntityInterface {
   public function getType();
 
   /**
-   * Sets the action type.
+   * Sets the component type.
    *
    * @param string $type
-   *   The type of action: 'action' or 'condition'.
+   *   The type of component: 'action' or 'condition'.
    *
-   * @return RuleComponentInterface
+   * @return \Drupal\rng\RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setType($type);
@@ -61,29 +63,32 @@ interface RuleComponentInterface extends ContentEntityInterface {
    * @param string $plugin_id
    *   The plugin ID.
    *
-   * @return RuleComponentInterface
+   * @return \Drupal\rng\RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setPluginId($plugin_id);
 
   /**
-   * Gets the configuration for the action.
+   * Gets the configuration for the component.
    *
    * @return array
-   *   Configuration for the action.
+   *   Configuration for the component.
    */
   public function getConfiguration();
 
   /**
    * Sets the plugin configuration.
    *
-   * @return RuleComponentInterface
+   * @param array $configuration
+   *   Mixed configuration
+   *
+   * @return \Drupal\rng\RuleComponentInterface
    *   Return this object for chaining.
    */
   public function setConfiguration(array $configuration);
 
   /**
-   * Gets the configuration for the action.
+   * Gets the configuration for the component.
    *
    * This should only be used if the caller does not have access to dependency
    * injection.
@@ -93,16 +98,17 @@ interface RuleComponentInterface extends ContentEntityInterface {
    *
    * @return \Drupal\Core\Condition\ConditionPluginBase|\Drupal\Core\Action\ConfigurableActionBase|NULL
    *   A condition or action plugin. Or NULL if the plugin does not exist.
+   *
+   * @throws \Exception
+   *   If the plugin type is invalid.
    */
   public function createInstance();
 
   /**
-   * Execute the action.
+   * Execute the component.
    *
    * @param array $context
    *   Context of execution.
-   *
-   * @return NULL
    */
   public function execute(array $context);
 
