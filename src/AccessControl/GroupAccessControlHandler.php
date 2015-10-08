@@ -23,7 +23,7 @@ class GroupAccessControlHandler extends EntityAccessControlHandler {
    * @param \Drupal\rng\GroupInterface $entity
    *   A group entity.
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     $account = $this->prepareUser($account);
     $event = $entity->getEvent();
 

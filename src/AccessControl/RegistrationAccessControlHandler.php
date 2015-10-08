@@ -45,7 +45,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
    * @param \Drupal\rng\RegistrationInterface $entity
    *   A registration entity.
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     $account = $this->prepareUser($account);
 
     if (!$account->isAnonymous() && in_array($operation, array('view', 'update', 'delete'))) {

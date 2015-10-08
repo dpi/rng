@@ -28,7 +28,7 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_entity_access().
  */
-function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account, $langcode) {
+function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
   if ($operation == 'manage event') {
     /** @var \Drupal\rng\EventTypeInterface $event_type */
     $event_type = \Drupal::service('rng.event_manager')
