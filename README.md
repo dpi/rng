@@ -30,12 +30,20 @@ See MAINTAINERS.txt for a list of official developers.
 
 # Dependencies
 
+__RNG__
+
  *  [Dynamic Entity Reference](https://www.drupal.org/project/dynamic_entity_reference)
  *  [Courier](https://www.drupal.org/project/courier)
+ *  [Unlimited Number](https://www.drupal.org/project/unlimited_number)
+
+__RNG Views sub module__
+
+ *  [Views Entity Operation Access](https://www.drupal.org/project/veoa)
+ *  [Views Advanced Routing](https://www.drupal.org/project/views_advanced_routing)
 
 # Terms
 
- *  __Event__: any content (fieldable) entity.
+ *  __Event__: any content entity.
  *  __Registration type__: bundle entity for Registrations.
  *  __Registration__: an entity that associates with one Event, and has at least
     one child Registrant. Each Registration has at least one owner Registrant.
@@ -56,11 +64,11 @@ See MAINTAINERS.txt for a list of official developers.
            └─► Rule(s) ─┬─► Action(s)
                         └─► Condition(s)
 
-A Registration is a fieldable entity that is associated with an Event entity,
-and maintains relationships to Identities via Registrant entities.
-Each Registrant holds the relationship between one Registration and one 
-Identity. Registrant entities are fieldable, and thus can hold meta information
-about how an Identity relates to a Registration.
+A Registration is a content entity that associated with an Event entity, and 
+maintains relationships to Identities via Registrant entities. Each Registrant
+maintains a relationship between a Registration and an Identity. Registrant 
+entities are content, and thus can hold meta information in fields describing 
+how an Identity relates to a Registration.
 
 # Usage
 
