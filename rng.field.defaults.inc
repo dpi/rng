@@ -162,15 +162,15 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
 function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_display, $field_name = '') {
   switch ($field_name) {
     case EventManagerInterface::FIELD_REGISTRATION_TYPE:
-      $form_display->setComponent($field_name, array(
-        'type' => 'options_select',
-      ));
+      $form_display->setComponent($field_name, [
+        'type' => 'rng_registration_type',
+      ]);
       break;
 
     case EventManagerInterface::FIELD_REGISTRATION_GROUPS:
-      $form_display->setComponent($field_name, array(
-        'type' => 'options_select',
-      ));
+      $form_display->setComponent($field_name, [
+        'type' => 'rng_registration_group',
+      ]);
       break;
 
     case EventManagerInterface::FIELD_STATUS:
