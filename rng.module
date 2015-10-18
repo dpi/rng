@@ -13,6 +13,7 @@ use Drupal\rng\Exception\InvalidEventException;
 use Drupal\courier\Entity\TemplateCollection;
 use Drupal\rng\RuleComponentInterface;
 use Drupal\rng\Plugin\Action\CourierTemplateCollection;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_help().
@@ -163,5 +164,32 @@ function rng_entity_predelete(EntityInterface $entity) {
         $template_collection->delete();
       }
     }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function rng_theme() {
+  return [
+    'registration' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for registration templates.
+ *
+ * Default template: registration.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_registration(array &$variables) {
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
   }
 }
