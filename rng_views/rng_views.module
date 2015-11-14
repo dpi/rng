@@ -63,8 +63,9 @@ function rng_views_form_event_type_form_alter_submit($form, FormStateInterface $
     if ($views['registration_list']) {
       $view = rng_views_event_registrations($entity_type);
       $view->save();
-      drupal_set_message(t('!link view created.',[
-        '!link' => $view->link(),
+      drupal_set_message(t('<a href=":url">%label</a> view created.',[
+        '%label' => $view->label(),
+        ':url' => $view->toUrl()->toString(),
       ]));
     }
   }

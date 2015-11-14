@@ -175,10 +175,10 @@ class EventTypeForm extends EntityForm {
       if ($this->moduleHandler->moduleExists('node') && ($form_state->getValue('entity_type') == 'node')) {
         $node_type = $this->createContentType('event');
         $t_args = [
-          '%name' => $node_type->label(),
-          '!link' => $node_type->link(),
+          '%label' => $node_type->label(),
+          ':url' => $node_type->toUrl()->toString(),
         ];
-        drupal_set_message(t('The content type !link has been added.', $t_args));
+        drupal_set_message(t('The content type <a href=":url">%label</a> has been added.', $t_args));
         $event_type->setEventEntityTypeId($node_type->getEntityType()->getBundleOf());
         $event_type->setEventBundle($node_type->id());
       }

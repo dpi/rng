@@ -62,8 +62,8 @@ class EventOperation extends ConditionPluginBase {
     }
 
     return $this->t(
-      !$this->isNegated() ? 'Logged-in user has access to operations on event: !operations' : 'Logged-in user does not have access to operations on event: !operations',
-      ['!operations' => count($operations) > 1 ? implode($this->t(' and '), $operations) : reset($operations)]
+      !$this->isNegated() ? 'Logged-in user has access to operations on event: @operations' : 'Logged-in user does not have access to operations on event: @operations',
+      ['@operations' => count($operations) > 1 ? implode($this->t(' and '), $operations) : reset($operations)]
     );
   }
 

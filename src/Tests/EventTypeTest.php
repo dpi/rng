@@ -64,10 +64,16 @@ class EventTypeTest extends RNGTestBase {
     $t_args = ['%label' => 'node.event'];
     $edit = [];
     $this->drupalPostForm('admin/structure/rng/event_types/add', $edit, t('Save'));
+
+    /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = NodeType::load('event');
 
     $this->assertEqual(1, count(EventType::loadMultiple()), 'Event type exists in database.');
-    $this->assertRaw(t('The content type !link has been added.', ['!link' => $node_type->link()]), 'Node was created for Event Type');
+
+    $this->assertRaw(t('The content type <a href=":url">%label</a> has been added.', [
+      '%label' => $node_type->label(),
+      ':url' => $node_type->toUrl()->toString(),
+    ]), 'Node was created for Event Type');
     $this->assertRaw(t('%label event type added.', $t_args), 'Event Type created');
 
     // Courier context created?
