@@ -55,12 +55,6 @@ abstract class RNGTestBase extends WebTestBase {
    */
   function createEntity(ConfigEntityInterface $entity_type, $settings = []) {
     // @todo change to custom entity
-    /*
-    $entity_type_id = $entity_type->getEntityType()->getBundleOf();
-    $entity = \Drupal::entityManager()->getStorage($entity_type_id)->create([
-      'type' => $entity_type->id(),
-    ] + $settings);
-    //$entity->save();*/
     $entity = $this->drupalCreateNode([
       'type' => $entity_type->id(),
     ] + $settings);
