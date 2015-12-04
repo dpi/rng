@@ -8,7 +8,7 @@
 namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\courier\Service\IdentityChannelManagerInterface;
@@ -59,7 +59,7 @@ class EventMeta implements EventMetaInterface {
   /**
    * Constructs a new EventMeta object.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
@@ -70,7 +70,7 @@ class EventMeta implements EventMetaInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.
    */
-  public function __construct(EntityManager $entity_manager, ConfigFactoryInterface $config_factory, SelectionPluginManagerInterface $selection_plugin_manager, IdentityChannelManagerInterface $identity_channel_manager, EntityInterface $entity) {
+  public function __construct(EntityManagerInterface $entity_manager, ConfigFactoryInterface $config_factory, SelectionPluginManagerInterface $selection_plugin_manager, IdentityChannelManagerInterface $identity_channel_manager, EntityInterface $entity) {
     $this->entityManager = $entity_manager;
     $this->configFactory = $config_factory;
     $this->selectionPluginManager = $selection_plugin_manager;
