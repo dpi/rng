@@ -296,7 +296,7 @@ interface EventMetaInterface {
   public function getIdentityTypes();
 
   /**
-   * Determine if identities can registers.
+   * Determine if identities can register.
    *
    * @param string $entity_type
    *   An identity entity type ID.
