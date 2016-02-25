@@ -295,7 +295,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     $entity_type = \Drupal::entityManager()
       ->getDefinition($this->getEventEntityTypeId());
     if ($entity_type) {
-      if ($entity_type->getBundleEntityType() !== 'bundle') {
+      $bundle_entity_type = $entity_type->getBundleEntityType();
+      if ($bundle_entity_type && $bundle_entity_type !== 'bundle') {
         $bundle = \Drupal::entityManager()
           ->getStorage($entity_type->getBundleEntityType())
           ->load($this->getEventBundle());

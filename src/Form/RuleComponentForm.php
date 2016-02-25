@@ -12,6 +12,7 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Form controller for rng rule components.
@@ -103,6 +104,11 @@ class RuleComponentForm extends ContentEntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
+
+    $event = $this->entity->getRule()->getEvent();
+    // Reset tags for event. Forces re-render of things like tabs.
+    Cache::invalidateTags($event->getCacheTagsToInvalidate());
+
     $this->plugin->submitConfigurationForm($form, $form_state);
   }
 

@@ -95,7 +95,8 @@ class EventTypeListBuilder extends ConfigEntityListBuilder {
     $entity_type = $this->entityManager
       ->getDefinition($entity->getEventEntityTypeId());
     $t_args = ['@entity_type' => $entity_type->getLabel()];
-    if ($entity_type->getBundleEntityType() !== 'bundle') {
+    $bundle_entity_type = $entity_type->getBundleEntityType();
+    if ($bundle_entity_type && $bundle_entity_type !== 'bundle') {
       $bundle = $this->entityManager
         ->getStorage($entity_type->getBundleEntityType())
         ->load($entity->getEventBundle());
