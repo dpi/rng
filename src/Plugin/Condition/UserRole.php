@@ -45,12 +45,12 @@ class UserRole extends CoreUserRole implements RNGConditionInterface {
    * {@inheritdoc}
    */
   public function summary() {
-    if (!$this->configuration['roles']) {
-      return $this->t('Any registered user');
-    }
-
     // Ensure roles in configuration are still existing or valid roles.
     $roles = array_intersect_key($this->getRoles(), $this->configuration['roles']);
+
+    if (!count($roles)) {
+      return $this->t('Any registered user');
+    }
 
     return $this->t(
       empty($this->configuration['negate']) ? 'User is a member of @roles' : 'User is not a member of @roles',
@@ -69,7 +69,7 @@ class UserRole extends CoreUserRole implements RNGConditionInterface {
     // Ensure roles in configuration are still existing or valid roles.
     $roles = array_intersect_key($this->getRoles(), $this->configuration['roles']);
     if (count($roles)) {
-      foreach ($roles as $role) {
+      foreach (array_keys($roles) as $role) {
         $group = $query->andConditionGroup();
         $group->condition('roles', $role, '=');
         $query->condition($group);
