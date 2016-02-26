@@ -69,7 +69,7 @@ class EventTypeAccessDefaultsTest extends RNGTestBase {
     ];
     $this->drupalPostForm($defaults_route, $edit, t('Save'));
 
-    $this->assertRaw(t('Event type access defaults saved. '));
+    $this->assertRaw(t('Event type access defaults saved.'));
     // Update field still unchecked.
     $this->assertNoFieldChecked('edit-actions-operations-user-role-update');
     // Delete field is now checked.
