@@ -10,7 +10,6 @@ namespace Drupal\rng\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\rng\Entity\EventType;
-use Drupal\rng\Entity\RegistrationType;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\rng\Entity\Registration;
 
@@ -18,6 +17,8 @@ use Drupal\rng\Entity\Registration;
  * Sets up page and article content types.
  */
 abstract class RNGTestBase extends WebTestBase {
+
+  use RNGTestTrait;
 
   public static $modules = array('rng');
 
@@ -80,22 +81,6 @@ abstract class RNGTestBase extends WebTestBase {
       'type' => $entity_type->id(),
     ] + $settings);
     return $entity;
-  }
-
-  /**
-   * Create and save a registration type entity.
-   *
-   * @return \Drupal\rng\Entity\RegistrationType
-   *   A registration type entity
-   */
-  function createRegistrationType() {
-    $registration_type = RegistrationType::create([
-      'id' => 'registration_type_a',
-      'label' => 'Registration Type A',
-      'description' => 'Description for registration type a',
-    ]);
-    $registration_type->save();
-    return $registration_type;
   }
 
   /**
