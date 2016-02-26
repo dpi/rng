@@ -7,6 +7,7 @@
 
 namespace Drupal\rng\Form;
 
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Condition\ConditionManager;
@@ -52,14 +53,17 @@ class RuleComponentForm extends ContentEntityForm {
   /**
    * Constructs a new action form.
    *
-   * @param \Drupal\Core\Action\ActionManager $actionManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Action\ActionManager $action_manager
    *   The action manager.
-   * @param \Drupal\Core\Condition\ConditionManager $conditionManager
+   * @param \Drupal\Core\Condition\ConditionManager $condition_manager
    *   The condition manager.
    */
-  public function __construct(ActionManager $actionManager, ConditionManager $conditionManager) {
-    $this->actionManager = $actionManager;
-    $this->conditionManager = $conditionManager;
+  public function __construct(EntityManagerInterface $entity_manager, ActionManager $action_manager, ConditionManager $condition_manager) {
+    parent::__construct($entity_manager);
+    $this->actionManager = $action_manager;
+    $this->conditionManager = $condition_manager;
   }
 
   /**
@@ -67,6 +71,7 @@ class RuleComponentForm extends ContentEntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('entity.manager'),
       $container->get('plugin.manager.action'),
       $container->get('plugin.manager.condition')
     );

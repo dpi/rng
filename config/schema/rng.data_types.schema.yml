@@ -1,0 +1,9 @@
+rng_action.plugin:
+  type: mapping
+  label: 'action'
+  mapping:
+    id:
+      type: string
+      label: 'Plugin ID'
+    configuration:
+      type: action.configuration.[%parent.id]

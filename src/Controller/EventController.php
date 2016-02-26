@@ -116,6 +116,8 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
       ['header' => TRUE, 'rowspan' => 1, 'data' => $this->t('Operations'), 'colspan' => 4],
     ];
 
+    // Add a blank header column if there are edit buttons.
+    // Edit buttons only available on non default rules.
     if (!$event_meta->isDefaultRules($trigger)) {
       $rows[0][] = ['header' => TRUE, 'rowspan' => 2, 'data' => ''];
     }

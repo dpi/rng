@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\rng\Entity\EventTypeRule;
 
 /**
  * Form controller for event config entities.
@@ -195,6 +196,11 @@ class EventTypeForm extends EntityForm {
 
     $status = $event_type->save();
 
+    // Create default rules.
+    if ($status == SAVED_NEW) {
+      $this->createDefaultRules($event_type->getEventEntityTypeId(), $event_type->getEventBundle());
+    }
+
     $message = ($status == SAVED_UPDATED) ? '%label event type updated.' : '%label event type added.';
     $url = $event_type->urlInfo();
     $t_args = ['%label' => $event_type->id(), 'link' => $this->l(t('Edit'), $url)];
@@ -232,6 +238,83 @@ class EventTypeForm extends EntityForm {
     ]);
     $node_type->save();
     return $node_type;
+  }
+
+  /**
+   * Create default rules for an event type.
+   *
+   * @param $entity_type_id
+   *   An entity type ID.
+   * @param $bundle
+   *   A bundle ID.
+   */
+  static function createDefaultRules($entity_type_id, $bundle) {
+    /** @var \Drupal\rng\EventTypeRuleInterface $rule */
+    // User Role
+    $rule = EventTypeRule::create([
+      'trigger' => 'rng_event.register',
+      'entity_type' => $entity_type_id,
+      'bundle' => $bundle,
+      'machine_name' => 'user_role',
+    ]);
+    $rule->setCondition('role', [
+      'id' => 'rng_user_role',
+      'roles' => [],
+    ]);
+    $rule->setAction('registration_operations', [
+      'id' => 'registration_operations',
+      'configuration' => [
+        'operations' => [
+          'create' => TRUE,
+        ],
+      ],
+    ]);
+    $rule->save();
+
+    // Registrant
+    $rule = EventTypeRule::create([
+      'trigger' => 'rng_event.register',
+      'entity_type' => $entity_type_id,
+      'bundle' => $bundle,
+      'machine_name' => 'registrant',
+    ]);
+    $rule->setCondition('identity', [
+      'id' => 'rng_registration_identity',
+    ]);
+    $rule->setAction('registration_operations', [
+      'id' => 'registration_operations',
+      'configuration' => [
+        'operations' => [
+          'view' => TRUE,
+          'update' => TRUE,
+        ],
+      ],
+    ]);
+    $rule->save();
+
+    // Event managers.
+    $rule = EventTypeRule::create([
+      'trigger' => 'rng_event.register',
+      'entity_type' => $entity_type_id,
+      'bundle' => $bundle,
+      'machine_name' => 'event_manager',
+    ]);
+    $rule->setCondition('operation', [
+      'id' => 'rng_event_operation',
+      'operations' => ['manage event' => TRUE],
+    ]);
+    $rule->setAction('registration_operations', [
+      'id' => 'registration_operations',
+      'configuration' => [
+        'operations' => [
+          'create' => TRUE,
+          'view' => TRUE,
+          'update' => TRUE,
+          'delete' => TRUE,
+        ],
+      ],
+    ]);
+    $rule->save();
   }
 
 }

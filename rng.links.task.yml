@@ -2,6 +2,19 @@ rng.local_tasks:
   class: \Drupal\Core\Menu\LocalTaskDefault
   deriver: \Drupal\rng\Plugin\Derivative\LocalTasks
 
+# Event types
+entity.event_type.edit_form:
+  route_name: entity.event_type.edit_form
+  base_route: entity.event_type.edit_form
+  title: 'Edit'
+  weight: 20
+
+entity.event_type.access_defaults:
+  route_name: entity.event_type.access_defaults
+  base_route: entity.event_type.edit_form
+  title: 'Access Defaults'
+  weight: 20
+
 # Registrations
 entity.registration.canonical:
   route_name: entity.registration.canonical

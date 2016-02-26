@@ -270,50 +270,41 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   public function getDefaultRules($trigger = NULL) {
-    $definitions = [];
-    if ($trigger == 'rng_event.register') {
-      // Allow any user to create a registration on the event.
-      $definitions['user_role']['condition']['rng_user_role'] = ['roles' => []];
-      $definitions['user_role']['action']['registration_operations'] = ['operations' => ['create' => TRUE]];
-
-      // Allow registrants to edit their registrations.
-      $definitions['registrant']['condition']['rng_registration_identity'] = [];
-      $definitions['registrant']['action']['registration_operations'] = [
-        'operations' => [
-          'view' => TRUE,
-          'update' => TRUE
-        ]
-      ];
-
-      // Give event managers all rights.
-      $definitions['event_operation']['condition']['rng_event_operation'] = ['operations' => ['manage event' => TRUE]];
-      $definitions['event_operation']['action']['registration_operations'] = [
-        'operations' => [
-          'create' => TRUE,
-          'view' => TRUE,
-          'update' => TRUE,
-          'delete' => TRUE
-        ]
-      ];
-    }
-
     $rules = [];
-    foreach ($definitions as $definition) {
+
+    /** @var \Drupal\rng\EventTypeRuleInterface[] $default_rules */
+    $default_rules = $this
+      ->entityManager
+      ->getStorage('rng_event_type_rule')
+      ->loadByProperties([
+        'entity_type' => $this->getEvent()->getEntityTypeId(),
+        'bundle' => $this->getEvent()->bundle(),
+        'trigger' => $trigger,
+      ]);
+
+    foreach ($default_rules as $default_rule) {
       $rule = Rule::create([
         'event' => array('entity' => $this->getEvent()),
-        'trigger_id' => 'rng_event.register',
+        'trigger_id' => $trigger,
         'status' => TRUE,
       ]);
-      foreach (['condition', 'action'] as $component_type) {
-        if (isset($definition[$component_type])) {
-          foreach ($definition[$component_type] as $plugin_id => $configuration) {
-            $component = RuleComponent::create()
-              ->setType($component_type)
-              ->setPluginId($plugin_id)
-              ->setConfiguration($configuration);
-            $rule->addComponent($component);
-          }
-        }
+
+      foreach ($default_rule->getConditions() as $condition) {
+        $plugin_id = $condition['id'];
+        unset($condition['id']);
+        $component = RuleComponent::create()
+          ->setType('condition')
+          ->setPluginId($plugin_id)
+          ->setConfiguration($condition);
+        $rule->addComponent($component);
+      }
+
+      foreach ($default_rule->getActions() as $action) {
+        $component = RuleComponent::create()
+          ->setType('action')
+          ->setPluginId($action['id'])
+          ->setConfiguration($action['configuration']);
+        $rule->addComponent($component);
       }
 
       $rules[] = $rule;

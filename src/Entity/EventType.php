@@ -26,7 +26,8 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *     "form" = {
  *       "add" = "Drupal\rng\Form\EventTypeForm",
  *       "edit" = "Drupal\rng\Form\EventTypeForm",
- *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm"
+ *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm",
+ *       "event_access_defaults" = "Drupal\rng\Form\EventTypeAccessDefaultsForm",
  *     }
  *   },
  *   admin_permission = "administer event types",
@@ -37,7 +38,8 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *   },
  *   links = {
  *     "edit-form" = "/admin/structure/rng/event_types/manage/{event_type}/edit",
- *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete"
+ *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete",
+ *     "event-access-defaults" = "/admin/structure/rng/event_types/manage/{event_type}/access_defaults",
  *   }
  * )
  */
@@ -308,7 +310,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         $this->addDependency('module', $entity_type->getProvider());
       }
     }
-    return $this->dependencies;
+    return $this;
   }
 
 }

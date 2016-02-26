@@ -143,6 +143,14 @@ entity.event_type.delete_form:
   requirements:
     _permission: 'administer event types'
 
+entity.event_type.access_defaults:
+  path: '/admin/structure/rng/event_types/manage/{event_type}/access_defaults'
+  defaults:
+    _entity_form: 'event_type.event_access_defaults'
+    _title: 'Event type access defaults'
+  requirements:
+    _permission: 'administer event types'
+
 rng.event_type.overview:
   path: '/admin/structure/rng/event_types'
   defaults:
@@ -151,6 +159,23 @@ rng.event_type.overview:
     _title: 'Event types'
   requirements:
     _permission: 'administer event types'
+
+# Event type rules
+rng.rng_event_type_rule:
+  path: '/admin/structure/rng/event_type_rule/{rng_event_type_rule}/{component_type}/{component_id}/edit'
+  defaults:
+    _form: '\Drupal\rng\Form\EventTypeRuleComponentEdit'
+    _title: 'Component edit'
+  requirements:
+    _permission: 'administer event types'
+  options:
+    parameters:
+      rng_event_type_rule:
+        type: 'entity:rng_event_type_rule'
+      component_type:
+        type: 'rng_component_type'
+      component_id:
+        type: 'rng_component_id'
 
 # RNG Configuration
 rng.config:

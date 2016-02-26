@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Form controller to reset event access to defaults.
@@ -148,6 +149,7 @@ class EventAccessResetForm extends ConfirmFormBase {
       $this->eventMeta->addDefaultAccess();
       drupal_set_message(t('Access rules can now be customized using edit operations.'));
     }
+    Cache::invalidateTags($this->event->getCacheTagsToInvalidate());
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

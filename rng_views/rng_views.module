@@ -11,13 +11,21 @@ use Drupal\Core\Form\FormStateInterface;
  * event_type_edit_form
  */
 function rng_views_form_event_type_form_alter(&$form, FormStateInterface &$form_state) {
-  $form['actions']['submit']['#submit'][] = 'rng_views_form_event_type_form_alter_submit';
+  /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
   $form_object = $form_state->getFormObject();
+  // This hook users BASE_ID, so this hook will be called for
+  // EventTypeAccessDefaultsForm.
+  if ($form_object->getOperation() != 'edit') {
+    return;
+  }
+
+  $form['actions']['submit']['#submit'][] = 'rng_views_form_event_type_form_alter_submit';
+
   /** @var \Drupal\rng\Entity\EventType $event_type */
   $event_type = $form_object->getEntity();
   $entity_type = NULL;
   if (!empty($event_type->getEventEntityTypeId())) {
-    $entity_type = \Drupal::entityManager()
+    $entity_type = \Drupal::entityTypeManager()
       ->getDefinition($event_type->getEventEntityTypeId());
   }
 

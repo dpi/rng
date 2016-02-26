@@ -38,3 +38,72 @@ rng.event_type.*.*:
     mirror_operation_to_event_manage:
       type: string
       label: 'Mirrors another operation grant from the event to event manage.'
+
+
+condition.plugin.rng_user_role:
+  type: condition.plugin.user_role
+
+condition.plugin.rng_registration_identity:
+  type: condition.plugin
+
+condition.plugin.rng_event_operation:
+  type: condition.plugin
+  mapping:
+    operations:
+      type: mapping
+      mapping:
+        'manage event':
+          type: boolean
+          label: 'Manage event'
+
+action.configuration.registration_operations:
+  type: mapping
+  label: 'Set registration operation access configuration.'
+  mapping:
+    operations:
+      type: mapping
+      mapping:
+        create:
+          type: boolean
+          label: 'Create'
+        view:
+          type: boolean
+          label: 'View'
+        update:
+          type: boolean
+          label: 'Update'
+        delete:
+          type: boolean
+          label: 'Delete'
+
+rng.rule.*.*.*:
+  type: config_entity
+  label: 'A collection of default rules'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Bundle'
+    machine_name:
+      type: string
+      label: 'Machine name'
+    trigger:
+      type: string
+      label: 'Trigger'
+    conditions:
+      type: sequence
+      label: 'Conditions'
+      sequence:
+        type: condition.plugin.[id]
+        label: 'Condition'
+    actions:
+      type: sequence
+      label: 'Actions'
+      sequence:
+        label: 'Action'
+        type: rng_action.plugin

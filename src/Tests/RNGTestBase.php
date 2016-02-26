@@ -43,6 +43,27 @@ abstract class RNGTestBase extends WebTestBase {
   }
 
   /**
+   * Creates an event type config.
+   *
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
+   *   An entity type.
+   *
+   * @return \Drupal\rng\EventTypeInterface
+   *   An event type config.
+   */
+  function createEventTypeNG($entity_type_id, $bundle) {
+    $event_type = EventType::create([
+      'label' => 'Event Type A',
+      'entity_type' => $entity_type_id,
+      'bundle' => $bundle,
+      'mirror_operation_to_event_manage' => 'update',
+    ]);
+    $event_type->save();
+    \Drupal::service('router.builder')->rebuildIfNeeded();
+    return $event_type;
+  }
+
+  /**
    * Creates an event entity.
    *
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface

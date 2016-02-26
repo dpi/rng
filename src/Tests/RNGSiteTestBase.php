@@ -7,6 +7,8 @@
 
 namespace Drupal\rng\Tests;
 
+use Drupal\rng\Form\EventTypeForm;
+
 /**
  * Sets up page and article content types.
  */
@@ -36,6 +38,7 @@ abstract class RNGSiteTestBase extends RNGTestBase {
     parent::setUp();
     $this->event_bundle = $this->drupalCreateContentType();
     $this->event_type = $this->createEventType($this->event_bundle);
+    EventTypeForm::createDefaultRules('node', $this->event_bundle->id());
     $this->registration_type = $this->createRegistrationType();
   }
 

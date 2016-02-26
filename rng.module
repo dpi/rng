@@ -5,10 +5,12 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\courier\ChannelInterface;
 use Drupal\courier\TemplateCollectionInterface;
 use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\Entity\Registrant;
+use Drupal\rng\EventTypeInterface;
 use Drupal\rng\Exception\InvalidEventException;
 use Drupal\courier\Entity\TemplateCollection;
 use Drupal\rng\RuleComponentInterface;
@@ -31,7 +33,7 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
  */
 function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
   if ($operation == 'manage event') {
-    /** @var \Drupal\rng\EventTypeInterface $event_type */
+    /** @var EventTypeInterface $event_type */
     $event_type = \Drupal::service('rng.event_manager')
       ->eventType($entity->getEntityTypeId(), $entity->bundle());
     if ($event_type && $event_type->getEventManageOperation()) {
@@ -114,6 +116,25 @@ function rng_cron() {
     ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '>')
     ->execute();
   $rule_scheduler_storage->delete($rule_scheduler_storage->loadMultiple($ids));
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function rng_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  if ($entity instanceof EventTypeInterface) {
+    $operations['access_defaults'] = array(
+      'title' => t('Event access defaults'),
+      'url' => Url::fromRoute('entity.event_type.access_defaults', [
+        'event_type' => $entity->id(),
+      ]),
+      'weight' => 20,
+    );
+  }
+
+  return $operations;
 }
 
 /**
