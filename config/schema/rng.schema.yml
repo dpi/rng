@@ -107,3 +107,10 @@ rng.rule.*.*.*:
       sequence:
         label: 'Action'
         type: rng_action.plugin
+
+user.role.*.third_party.rng:
+  type: mapping
+  mapping:
+    condition_rng_role:
+      type: boolean
+      label: 'Expose this rule to RNG role condition plugin'

@@ -193,3 +193,11 @@ rng.config.registrant:
     _title: 'Registrant settings'
   requirements:
     _permission: 'administer rng'
+
+rng.config.plugin.condition:
+  path: '/admin/config/rng/plugin/condition'
+  defaults:
+    _form: '\Drupal\rng\Form\PluginConditionSettingsForm'
+    _title: 'Condition settings'
+  requirements:
+    _permission: 'administer rng'
