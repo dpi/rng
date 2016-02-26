@@ -118,4 +118,16 @@ interface EventManagerInterface {
    */
   function getEventTypes();
 
+  /**
+   * Invalidate cache for events types.
+   */
+  function invalidateEventTypes();
+
+  /**
+   * Invalidate cache for an event type.
+   *
+   * @param \Drupal\rng\EventTypeInterface $event_type
+   *   An event type.
+   */
+  function invalidateEventType(EventTypeInterface $event_type);
 }

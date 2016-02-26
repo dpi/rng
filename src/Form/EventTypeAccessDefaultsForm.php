@@ -15,7 +15,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\rng\RNGConditionInterface;
-use Drupal\Core\Cache\Cache;
 
 /**
  * Form for event type access defaults.
@@ -282,7 +281,7 @@ class EventTypeAccessDefaultsForm extends EntityForm {
     }
 
     drupal_set_message($this->t('Event type access defaults saved.'));
-    Cache::invalidateTags($event_type->getCacheTags());
+    $this->eventManager->invalidateEventType($event_type);
   }
 
   /**

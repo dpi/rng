@@ -15,7 +15,6 @@ use Drupal\rng\EventTypeRuleInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Cache\Cache;
 
 /**
  * Configure event settings.
@@ -167,7 +166,7 @@ class EventTypeRuleComponentEdit extends FormBase {
       $this->eventTypeRule->getEventBundle()
     );
 
-    Cache::invalidateTags($event_type->getCacheTags());
+    $this->eventManager->invalidateEventType($event_type);
   }
 
 }

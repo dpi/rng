@@ -9,6 +9,8 @@ namespace Drupal\rng\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\rng\EventManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Render\Element;
 use Drupal\user\Entity\Role;
 use Drupal\Core\Session\AccountInterface;
@@ -17,6 +19,32 @@ use Drupal\Core\Session\AccountInterface;
  * Configure condition plugin settings.
  */
 class PluginConditionSettingsForm extends FormBase {
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
+   * Constructs a new PluginConditionSettingsForm object.
+   *
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
+   */
+  public function __construct(EventManagerInterface $event_manager) {
+    $this->eventManager = $event_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('rng.event_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -72,6 +100,7 @@ class PluginConditionSettingsForm extends FormBase {
         ->setThirdPartySetting('rng', 'condition_rng_role', (boolean) $checked)
         ->save();
     }
+    $this->eventManager->invalidateEventTypes();
     drupal_set_message(t('Updated condition plugin settings.'));
   }
 

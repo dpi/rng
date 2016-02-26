@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\Exception\InvalidEventException;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Event manager for RNG.
@@ -110,6 +111,26 @@ class EventManager implements EventManagerInterface {
       $entity_type_bundles[$entity->getEventEntityTypeId()][$entity->getEventBundle()] = $entity;
     }
     return $entity_type_bundles;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function invalidateEventTypes() {
+    $event_types = $this->getEventTypes();
+    foreach ($event_types as $i => $bundles) {
+      foreach ($bundles as $b => $event_type) {
+        /** @var \Drupal\rng\EventTypeInterface $event_type */
+        $this->invalidateEventType($event_type);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function invalidateEventType(EventTypeInterface $event_type) {
+    Cache::invalidateTags($event_type->getCacheTags());
   }
 
 }
