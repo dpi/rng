@@ -28,7 +28,7 @@ class EventRuleResetCheck implements AccessInterface {
   protected $eventManager;
 
   /**
-   * Constructs a new EntityIsEventCheck object.
+   * Constructs a new EventRuleResetCheck object.
    *
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
@@ -41,37 +41,26 @@ class EventRuleResetCheck implements AccessInterface {
    * Checks that an entity is an event type.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
+    $access = AccessResult::neutral();
+
     if ($event = $route->getDefault('event')) {
       $event = $route_match->getParameter($event);
       if ($event instanceof EntityInterface) {
         $event_type = $this->eventManager->eventType($event->getEntityTypeId(), $event->bundle());
         if ($event_type) {
-          if ($event_type->getAllowCustomRules()) {
-            return AccessResult::allowed()
-              ->addCacheableDependency($event)
-              ->addCacheableDependency($event_type);
-          }
-
           $event_meta = $this->eventManager->getMeta($event);
+          // Allow custom rules |OR|
           // If not default rules, then allow event manager to reset back.
-          if (!$event_meta->isDefaultRules('rng_event.register')) {
-            return AccessResult::allowed()
-              ->addCacheableDependency($event)
-              ->addCacheableDependency($event_type);
+          if ($event_type->getAllowCustomRules() || !$event_meta->isDefaultRules('rng_event.register')) {
+            $access = AccessResult::allowed();
           }
-
-
-          return AccessResult::neutral()
-            ->addCacheableDependency($event)
-            ->addCacheableDependency($event_type);
+          $access->addCacheableDependency($event_type);
         }
       }
-
-      return AccessResult::neutral()
-        ->addCacheableDependency($event);
+      $access->addCacheableDependency($event);
     }
 
-    return AccessResult::neutral();
+    return $access;
   }
 
 }
