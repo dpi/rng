@@ -88,6 +88,13 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public $mirror_operation_to_event_manage;
 
   /**
+   * Allow event managers to customize default rules.
+   *
+   * @var boolean
+   */
+  public $custom_rules = TRUE;
+
+  /**
    * Fields to add to event bundles.
    *
    * @var array
@@ -143,6 +150,21 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   function setEventManageOperation($permission) {
     $this->mirror_operation_to_event_manage = $permission;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getAllowCustomRules() {
+    return $this->custom_rules;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setAllowCustomRules($allow) {
+    $this->custom_rules = $allow;
     return $this;
   }
 

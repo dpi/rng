@@ -38,6 +38,9 @@ rng.event_type.*.*:
     mirror_operation_to_event_manage:
       type: string
       label: 'Mirrors another operation grant from the event to event manage.'
+    custom_rules:
+      type: boolean
+      label: 'Allow event managers to customise default rules.'
 
 
 condition.plugin.rng_user_role:

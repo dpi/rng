@@ -9,7 +9,6 @@ namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\simpletest\UserCreationTrait;
 use Drupal\rng\EventManagerInterface;
-use Drupal\rng\Entity\EventTypeRule;
 
 /**
  * Tests ability to register for events..

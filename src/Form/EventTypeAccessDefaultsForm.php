@@ -11,10 +11,12 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Condition\ConditionManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\rng\RNGConditionInterface;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Form for event type access defaults.
@@ -43,6 +45,13 @@ class EventTypeAccessDefaultsForm extends EntityForm {
   protected $conditionManager;
 
   /**
+   * Event type rule storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $eventTypeRuleStorage;
+
+  /**
    * The RNG event manager.
    *
    * @var \Drupal\rng\EventManagerInterface
@@ -65,13 +74,16 @@ class EventTypeAccessDefaultsForm extends EntityForm {
    *   The action manager.
    * @param \Drupal\Core\Condition\ConditionManager $conditionManager
    *   The condition manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(RedirectDestinationInterface $redirect_destination, ActionManager $actionManager, ConditionManager $conditionManager, EventManagerInterface $event_manager) {
+  public function __construct(RedirectDestinationInterface $redirect_destination, ActionManager $actionManager, ConditionManager $conditionManager, EntityTypeManagerInterface $entity_type_manager, EventManagerInterface $event_manager) {
     $this->redirectDestination = $redirect_destination;
     $this->actionManager = $actionManager;
     $this->conditionManager = $conditionManager;
+    $this->eventTypeRuleStorage = $entity_type_manager->getStorage('rng_event_type_rule');
     $this->eventManager = $event_manager;
   }
 
@@ -83,6 +95,7 @@ class EventTypeAccessDefaultsForm extends EntityForm {
       $container->get('redirect.destination'),
       $container->get('plugin.manager.action'),
       $container->get('plugin.manager.condition'),
+      $container->get('entity_type.manager'),
       $container->get('rng.event_manager')
     );
   }
@@ -141,13 +154,12 @@ class EventTypeAccessDefaultsForm extends EntityForm {
 
     $i = 0;
 
-    $etm = \Drupal::entityTypeManager();
-    $storage = $etm->getStorage('rng_event_type_rule');
-    $this->rules = $storage->loadByProperties([
-      'entity_type' => $event_type->getEventEntityTypeId(),
-      'bundle' => $event_type->getEventBundle(),
-      'trigger' => $trigger,
-    ]);
+    $this->rules = $this->eventTypeRuleStorage
+      ->loadByProperties([
+        'entity_type' => $event_type->getEventEntityTypeId(),
+        'bundle' => $event_type->getEventBundle(),
+        'trigger' => $trigger,
+      ]);
 
     foreach ($this->rules as $rule_id => $rule) {
       $i++;
@@ -225,7 +237,16 @@ class EventTypeAccessDefaultsForm extends EntityForm {
 
     }
 
-
+    $form['settings'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Settings'),
+    ];
+    $form['settings']['custom_rules'] = [
+      '#title' => $this->t('Allow default rules customization'),
+      '#description' => $this->t('Allow event managers to customize event default rules. Changing this setting does not affect existing rules.'),
+      '#type' => 'checkbox',
+      '#default_value' => $event_type->getAllowCustomRules(),
+    ];
 
     return $form;
   }
@@ -279,6 +300,16 @@ class EventTypeAccessDefaultsForm extends EntityForm {
       ]);
       $rule->save();
     }
+
+    $event_type
+      ->setAllowCustomRules($form_state->getValue('custom_rules'))
+      ->save();
+
+    // Site cache needs to be cleared after enabling this setting as there are
+    // issue regarding caching.
+    // For some reason actions access is not reset if pages are rendered with no
+    // access/viability.
+    Cache::invalidateTags(['rendered']);
 
     drupal_set_message($this->t('Event type access defaults saved.'));
     $this->eventManager->invalidateEventType($event_type);

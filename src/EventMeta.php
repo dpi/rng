@@ -272,6 +272,10 @@ class EventMeta implements EventMetaInterface {
   public function getDefaultRules($trigger = NULL) {
     $rules = [];
 
+    if ($trigger != 'rng_event.register') {
+      return $rules;
+    }
+
     /** @var \Drupal\rng\EventTypeRuleInterface[] $default_rules */
     $default_rules = $this
       ->entityManager

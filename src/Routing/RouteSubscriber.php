@@ -97,7 +97,9 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_title' => 'Reset access to default',
             'event' => $entity_type,
           ),
-          $manage_requirements,
+          $manage_requirements + [
+            '_event_rule_reset' => 'TRUE',
+          ],
           $options
         );
         $collection->add("rng.event.$entity_type.access.reset", $route);

@@ -59,6 +59,25 @@ interface EventTypeInterface extends ConfigEntityInterface {
   function setEventManageOperation($permission);
 
   /**
+   * Whether to allow event managers to customize default rules.
+   *
+   * @return boolean
+   *   Whether event managers are allowed to customize default rules.
+   */
+  function getAllowCustomRules();
+
+  /**
+   * Set whether event managers can customize default rules.
+   *
+   * @param boolean $allow
+   *   Whether event managers are allowed to customize default rules.
+   *
+   * @return $this
+   *   Return this event type for chaining.
+   */
+  function setAllowCustomRules($allow);
+
+  /**
    * Create or clean up courier_context if none exist for an entity type.
    *
    * @param string $entity_type

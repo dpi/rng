@@ -25,6 +25,11 @@ services:
     arguments: ['@rng.event_manager']
     tags:
       - { name: access_check, applies_to: _entity_is_event }
+  access_check.rng.event_rule_reset:
+    class: Drupal\rng\Access\EventRuleResetCheck
+    arguments: ['@rng.event_manager']
+    tags:
+      - { name: access_check, applies_to: _event_rule_reset }
   access_check.rng.event_registrations_allowed:
     class: Drupal\rng\Access\RegistrationAddAccessCheck
     arguments: ['@entity.manager']

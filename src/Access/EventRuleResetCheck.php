@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\Access\EntityIsEventCheck.
+ * Contains \Drupal\rng\Access\EventRuleResetCheck.
  */
 
 namespace Drupal\rng\Access;
@@ -18,7 +18,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Checks that an entity is an event type.
  */
-class EntityIsEventCheck implements AccessInterface {
+class EventRuleResetCheck implements AccessInterface {
 
   /**
    * The RNG event manager.
@@ -46,14 +46,31 @@ class EntityIsEventCheck implements AccessInterface {
       if ($event instanceof EntityInterface) {
         $event_type = $this->eventManager->eventType($event->getEntityTypeId(), $event->bundle());
         if ($event_type) {
-          return AccessResult::allowed()
+          if ($event_type->getAllowCustomRules()) {
+            return AccessResult::allowed()
+              ->addCacheableDependency($event)
+              ->addCacheableDependency($event_type);
+          }
+
+          $event_meta = $this->eventManager->getMeta($event);
+          // If not default rules, then allow event manager to reset back.
+          if (!$event_meta->isDefaultRules('rng_event.register')) {
+            return AccessResult::allowed()
+              ->addCacheableDependency($event)
+              ->addCacheableDependency($event_type);
+          }
+
+
+          return AccessResult::neutral()
             ->addCacheableDependency($event)
             ->addCacheableDependency($event_type);
         }
-        return AccessResult::neutral()
-          ->addCacheableDependency($event);
       }
+
+      return AccessResult::neutral()
+        ->addCacheableDependency($event);
     }
+
     return AccessResult::neutral();
   }
 
