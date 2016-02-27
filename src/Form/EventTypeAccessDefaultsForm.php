@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\rng\RNGConditionInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Url;
 
 /**
  * Form for event type access defaults.
@@ -201,7 +202,7 @@ class EventTypeAccessDefaultsForm extends EntityForm {
           '#type' => 'operations',
           '#links' => ['edit' => [
             'title' => t('Edit'),
-            'url' => \Drupal\Core\Url::fromRoute('rng.rng_event_type_rule', [
+            'url' => Url::fromRoute('rng.rng_event_type_rule.component.edit', [
               'rng_event_type_rule' => $rule->id(),
               'component_type' => 'condition',
               'component_id' => $id,
@@ -321,8 +322,24 @@ class EventTypeAccessDefaultsForm extends EntityForm {
    * Remove delete element since it is confusing on non CRUD forms.
    */
   protected function actions(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\rng\EventTypeInterface $event_type */
+    $event_type = $this->entity;
+
     $actions = parent::actions($form, $form_state);
     unset($actions['delete']);
+
+    $actions['delete-custom-rules'] = array(
+      '#type' => 'link',
+      '#title' => $this->t('Delete all custom rules'),
+      '#attributes' => array(
+        'class' => array('button', 'button--danger'),
+      ),
+    );
+
+    $actions['delete-custom-rules']['#url'] = Url::fromRoute('entity.event_type.access_defaults.delete_all', [
+      'event_type' => $event_type->id(),
+    ]);
+
     return $actions;
   }
 
