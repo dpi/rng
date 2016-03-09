@@ -49,7 +49,8 @@ class UserRNGSelection extends RNGSelectionBase {
       if ($this->ruleGrantsOperation($rule, 'create')) {
         foreach ($rule->getConditions() as $condition_storage) {
           // Do not use condition if it cannot alter query.
-          if (($condition = $condition_storage->createInstance()) instanceof RNGConditionInterface) {
+          $condition = $condition_storage->createInstance();
+          if ($condition instanceof RNGConditionInterface) {
             $condition_count++;
             $condition->alterQuery($query);
           }

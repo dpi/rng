@@ -7,7 +7,7 @@
 
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
-use Drupal\Core\Entity\Plugin\EntityReferenceSelection\SelectionBase;
+use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -20,7 +20,7 @@ use \Drupal\Core\Entity\Query\QueryInterface;
 /**
  * Base RNG selection plugin.
  */
-class RNGSelectionBase extends SelectionBase {
+class RNGSelectionBase extends DefaultSelection {
 
   /**
    * The condition plugin manager.
@@ -40,7 +40,7 @@ class RNGSelectionBase extends SelectionBase {
    *   The condition plugin manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, Connection $connection, EventManagerInterface $event_manager, ConditionManager $condition_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $module_handler, $current_user, $connection);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $module_handler, $current_user);
 
     if (isset($this->configuration['handler_settings']['event_entity_type'], $this->configuration['handler_settings']['event_entity_id'])) {
       $event = $this->entityManager->getStorage($this->configuration['handler_settings']['event_entity_type'])->load($this->configuration['handler_settings']['event_entity_id']);
@@ -97,6 +97,7 @@ class RNGSelectionBase extends SelectionBase {
    */
   protected function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
     $query = parent::buildEntityQuery($match, $match_operator);
+    $query->addTag('rng_register');
     $this->removeDuplicateRegistrants($query);
     return $query;
   }
