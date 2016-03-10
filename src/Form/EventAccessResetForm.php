@@ -13,7 +13,7 @@ use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Cache\Cache;
 
 /**
@@ -129,8 +129,8 @@ class EventAccessResetForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $this->event = clone $route_match->getParameter($event);
+  public function buildForm(array $form, FormStateInterface $form_state, EntityInterface $rng_event = NULL) {
+    $this->event = clone $rng_event;
     $this->eventMeta = $this->eventManager->getMeta($this->event);
     return parent::buildForm($form, $form_state);
   }

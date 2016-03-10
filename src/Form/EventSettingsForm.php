@@ -55,8 +55,8 @@ class EventSettingsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $entity = clone $route_match->getParameter($event);
+  public function buildForm(array $form, FormStateInterface $form_state, $rng_event = NULL) {
+    $entity = clone $rng_event;
     $form_state->set('event', $entity);
 
     $display = entity_get_form_display($entity->getEntityTypeId(), $entity->bundle(), 'rng_event');

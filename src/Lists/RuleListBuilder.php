@@ -72,12 +72,12 @@ class RuleListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    *
-   * @param EntityInterface $event
+   * @param \Drupal\Core\Entity\EntityInterface $rng_event
    *   The event entity to display registrations.
    */
-  public function render(EntityInterface $event = NULL) {
-    if (isset($event)) {
-      $this->event = $event;
+  public function render(EntityInterface $rng_event = NULL) {
+    if (isset($rng_event)) {
+      $this->event = $rng_event;
     }
     drupal_set_message($this->t('This rule list is for advanced users. Take care when committing any actions from this page.'), 'warning');
     $render = parent::render();

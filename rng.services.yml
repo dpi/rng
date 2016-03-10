@@ -20,6 +20,10 @@ services:
     arguments: ['@entity.manager', '@rng.event_manager']
     tags:
       - { name: event_subscriber }
+  rng.route_enhancer:
+    class: Drupal\rng\Routing\Enhancer\RngRouteEnhancer
+    tags:
+      - { name: route_enhancer }
   access_check.rng.entity_is_event:
     class: Drupal\rng\Access\EntityIsEventCheck
     arguments: ['@rng.event_manager']

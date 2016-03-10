@@ -13,7 +13,6 @@ use Drupal\rng\EventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormBase;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rng\Plugin\Condition\CurrentTime;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\RuleInterface;
@@ -100,8 +99,8 @@ class MessageListForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $form['#rng_event'] = $route_match->getParameter($event);
+  public function buildForm(array $form, FormStateInterface $form_state, EntityInterface $rng_event = NULL) {
+    $form['#rng_event'] = $rng_event;
 
     // @todo: move trigger definitions to a discovery service.
     $rng_triggers = [

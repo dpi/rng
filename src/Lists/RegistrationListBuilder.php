@@ -36,7 +36,7 @@ class RegistrationListBuilder extends EntityListBuilder {
   /**
    * The event entity.
    *
-   * @var EntityInterface
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $event;
 
@@ -67,12 +67,12 @@ class RegistrationListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    *
-   * @param EntityInterface $event
+   * @param \Drupal\Core\Entity\EntityInterface $rng_event
    *   The event entity to display registrations.
    */
-  public function render(EntityInterface $event = NULL) {
-    if (isset($event)) {
-      $this->event = $event;
+  public function render(EntityInterface $rng_event = NULL) {
+    if (isset($rng_event)) {
+      $this->event = $rng_event;
     }
     $render = parent::render();
     $render['table']['#empty'] = t('No registrations found for this event.');

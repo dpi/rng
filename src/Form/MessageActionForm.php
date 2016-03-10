@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\rng\EventManagerInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\Entity\RuleComponent;
 use Drupal\rng\Entity\Rule;
 
@@ -79,8 +79,8 @@ class MessageActionForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, RouteMatchInterface $route_match = NULL, $event = NULL) {
-    $event = clone $route_match->getParameter($event);
+  public function buildForm(array $form, FormStateInterface $form_state, EntityInterface $rng_event = NULL) {
+    $event = clone $rng_event;
     $this->actionPlugin->setConfiguration(['active' => FALSE]);
     $form_state->set('event', $event);
 
