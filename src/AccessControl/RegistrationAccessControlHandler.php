@@ -114,12 +114,13 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       if (!$event_meta->countProxyIdentities()) {
         return AccessResult::neutral();
       }
-
-      return AccessResult::allowed();
     }
     catch (InvalidEventException $e) {
       return AccessResult::neutral();
     }
+
+    $result = parent::createAccess($entity_bundle, $account, $context, TRUE)->cachePerPermissions();
+    return $return_as_object ? $result : $result->isAllowed();
   }
 
 }
