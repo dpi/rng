@@ -128,9 +128,8 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public function getRegistrants() {
-    return \Drupal::entityManager()->getStorage('registrant')->loadMultiple(
-      $this->getRegistrantIds()
-    );
+    return \Drupal::entityTypeManager()->getStorage('registrant')
+      ->loadMultiple($this->getRegistrantIds());
   }
 
   /**
@@ -301,7 +300,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
    * {@inheritdoc}
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
-    $registrant_storage = \Drupal::entityManager()->getStorage('registrant');
+    $registrant_storage = \Drupal::entityTypeManager()->getStorage('registrant');
 
     /** @var \Drupal\rng\RegistrationInterface $registration */
     foreach ($entities as $registration) {

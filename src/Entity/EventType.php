@@ -191,7 +191,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
       }
       else {
         if ($operation == 'create') {
-          $entity_type_info = \Drupal::entityManager()
+          $entity_type_info = \Drupal::entityTypeManager()
             ->getDefinition($entity_type);
           $courier_context = CourierContext::create([
             'label' => t('Event (@entity_type): Registration', ['@entity_type' => $entity_type_info->getLabel()]),
@@ -316,12 +316,12 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
-    $entity_type = \Drupal::entityManager()
+    $entity_type = \Drupal::entityTypeManager()
       ->getDefinition($this->getEventEntityTypeId());
     if ($entity_type) {
       $bundle_entity_type = $entity_type->getBundleEntityType();
       if ($bundle_entity_type && $bundle_entity_type !== 'bundle') {
-        $bundle = \Drupal::entityManager()
+        $bundle = \Drupal::entityTypeManager()
           ->getStorage($entity_type->getBundleEntityType())
           ->load($this->getEventBundle());
         if ($bundle) {

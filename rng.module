@@ -159,17 +159,17 @@ function rng_entity_predelete(EntityInterface $entity) {
     $event_meta = $event_manager->getMeta($entity);
 
     // Delete registrations.
-    \Drupal::entityManager()
+    \Drupal::entityTypeManager()
       ->getStorage('registration')
       ->delete($event_meta->getRegistrations());
 
     // Delete groups.
-    \Drupal::entityManager()
+    \Drupal::entityTypeManager()
       ->getStorage('registration_group')
       ->delete($event_meta->getGroups());
 
     // Delete rules.
-    \Drupal::entityManager()
+    \Drupal::entityTypeManager()
       ->getStorage('rng_rule')
       ->delete($event_meta->getRules(NULL, FALSE, NULL));
   }

@@ -9,7 +9,7 @@ namespace Drupal\rng_debug\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Controller for rng_debug.
@@ -19,12 +19,15 @@ class DebugController extends ControllerBase implements ContainerInjectionInterf
   /**
    * Provides a list of rng rules for an event.
    *
-   * @param string $event
-   *   The parameter to find the event entity.
+   * @param \Drupal\Core\Entity\EntityInterface $rng_event
+   *   The RNG event.
+   *
+   * @return array
+   *   A render array.
    */
-  public function listing(RouteMatchInterface $route_match, $event) {
-    $event_entity = $route_match->getParameter($event);
-    return $this->entityManager()->getListBuilder('rng_rule')->render($event_entity);
+  public function listing(EntityInterface $rng_event = NULL) {
+    return $this->entityTypeManager()->getListBuilder('rng_rule')
+      ->render($rng_event);
   }
 
 }

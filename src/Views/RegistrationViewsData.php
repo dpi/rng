@@ -20,8 +20,8 @@ class RegistrationViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $registration_definition = \Drupal::entityManager()->getDefinition('registration');
-    $group_definition = \Drupal::entityManager()->getDefinition('registration_group');
+    $registration_definition = \Drupal::entityTypeManager()->getDefinition('registration');
+    $group_definition = \Drupal::entityTypeManager()->getDefinition('registration_group');
 
     // Add base field reference for groups.
     $t_args = [

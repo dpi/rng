@@ -59,7 +59,7 @@ class EventTypeListBuilder extends ConfigEntityListBuilder {
     $operations = parent::getDefaultOperations($entity);
 
     if ($this->moduleHandler->moduleExists('field_ui')) {
-      $entity_type = \Drupal::entityManager()
+      $entity_type = \Drupal::entityTypeManager()
         ->getDefinition($entity->getEventEntityTypeId());
 
       if ($entity_type->get('field_ui_base_route')) {

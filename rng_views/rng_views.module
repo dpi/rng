@@ -98,7 +98,7 @@ function rng_views_event_registrations(EntityTypeInterface $entity_type) {
   $yaml = Yaml::decode(file_get_contents($base_path . '/extra/event.registrations.yml'));
 
   /** @var View $view */
-  $view = \Drupal::entityManager()
+  $view = \Drupal::entityTypeManager()
     ->getStorage('view')
     ->createFromStorageRecord($yaml);
 

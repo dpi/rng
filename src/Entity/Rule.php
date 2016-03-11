@@ -173,7 +173,7 @@ class Rule extends ContentEntityBase implements RuleInterface {
    * {@inheritdoc}
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
-    $component_storage = \Drupal::entityManager()->getStorage('rng_rule_component');
+    $component_storage = \Drupal::entityTypeManager()->getStorage('rng_rule_component');
 
     /** @var \Drupal\rng\RuleInterface $rule */
     foreach ($entities as $rule) {

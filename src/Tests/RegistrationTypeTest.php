@@ -138,7 +138,7 @@ class RegistrationTypeTest extends RNGSiteTestBase {
    *   Number of references.
    */
   function countEventRegistrationTypeReferences($entity_type, $registration_type) {
-    return \Drupal::entityManager()->getStorage($entity_type)
+    return \Drupal::entityTypeManager()->getStorage($entity_type)
       ->getQuery()
       ->condition(EventManagerInterface::FIELD_REGISTRATION_TYPE, $registration_type)
       ->count()
