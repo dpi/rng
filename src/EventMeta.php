@@ -24,7 +24,7 @@ class EventMeta implements EventMetaInterface {
   /**
    * The entity query factory.
    *
-   * @var EntityInterface
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $entity;
 
