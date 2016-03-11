@@ -87,11 +87,19 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'cache_tags' => $cache_tags,
         );
 
+        $this->derivatives["rng.event.$entity_type.register.type_list"] = [
+          'route_name' => "rng.event.$entity_type.register.type_list",
+          'base_route' => "entity.$entity_type.canonical",
+          'title' => t('Register'),
+          'weight' => 40,
+          'cache_tags' => $cache_tags,
+        ];
+
         $this->derivatives["rng.event.$entity_type.event.settings"] = array(
           'title' => t('Settings'),
           'route_name' => $this->derivatives[$event_default]['route_name'],
           'parent_id' => 'rng.local_tasks:' . $event_default,
-          'weight' => 10,
+          'weight' => -100,
           'cache_tags' => $cache_tags,
         );
 
@@ -99,7 +107,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'title' => t('Access'),
           'route_name' => "rng.event.$entity_type.access",
           'parent_id' => 'rng.local_tasks:' . $event_default,
-          'weight' => 20,
+          'weight' => -80,
           'cache_tags' => $cache_tags,
         );
 
@@ -107,7 +115,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'title' => t('Messages'),
           'route_name' => "rng.event.$entity_type.messages",
           'parent_id' => 'rng.local_tasks:' . $event_default,
-          'weight' => 30,
+          'weight' => 100,
           'cache_tags' => $cache_tags,
         );
 
@@ -115,15 +123,7 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
           'title' => t('Groups'),
           'route_name' => "rng.event.$entity_type.group.list",
           'parent_id' => 'rng.local_tasks:' . $event_default,
-          'weight' => 40,
-          'cache_tags' => $cache_tags,
-        );
-
-        $this->derivatives["rng.event.$entity_type.register.type_list"] = array(
-          'route_name' => "rng.event.$entity_type.register.type_list",
-          'base_route' => "entity.$entity_type.canonical",
-          'title' => t('Register'),
-          'weight' => 40,
+          'weight' => 150,
           'cache_tags' => $cache_tags,
         );
       }
