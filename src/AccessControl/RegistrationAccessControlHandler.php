@@ -86,44 +86,51 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       throw new AccessException('Requires event context.');
     }
 
+    $event = $context['event'];
+    $fail = $return_as_object ? AccessResult::forbidden()->addCacheableDependency($event) : FALSE;
+
     $account = $this->prepareUser($account);
     if ($account->isAnonymous()) {
       return AccessResult::neutral();
     }
 
     try {
-      $event_meta = $this->eventManager->getMeta($context['event']);
+      $event_meta = $this->eventManager->getMeta($event);
 
       // $entity_bundle is omitted for registration type list at
       // $event_path/register
-      if ($entity_bundle && $registration_type = RegistrationType::load($entity_bundle)) {
+      if ($entity_bundle && ($registration_type = RegistrationType::load($entity_bundle))) {
         if (!$event_meta->registrationTypeIsValid($registration_type)) {
-          return AccessResult::neutral();
+          return $fail;
         }
       }
       // There are no registration types configured.
       elseif (!$event_meta->getRegistrationTypeIds()) {
-        return AccessResult::neutral();
+        return $fail;
       }
 
       if (!$event_meta->isAcceptingRegistrations()) {
-        return AccessResult::neutral();
+        return $fail;
       }
 
       if ($event_meta->remainingCapacity() == 0) {
-        return AccessResult::neutral();
+        return $fail;
       }
 
       if (!$event_meta->countProxyIdentities()) {
-        return AccessResult::neutral();
+        return $fail;
       }
+
+      $result = parent::createAccess($entity_bundle, $account, $context, TRUE);
+      if ($result->isForbidden()) {
+        return $return_as_object ? $result : $result->isAllowed();
+      }
+
+      return $return_as_object ? AccessResult::allowed() : TRUE;
     }
     catch (InvalidEventException $e) {
-      return AccessResult::neutral();
+      return $fail;
     }
-
-    $result = parent::createAccess($entity_bundle, $account, $context, TRUE)->cachePerPermissions();
-    return $return_as_object ? $result : $result->isAllowed();
   }
 
 }
