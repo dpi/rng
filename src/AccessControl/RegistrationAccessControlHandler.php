@@ -9,6 +9,7 @@ namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\rng\Entity\RegistrationType;
 use Drupal\rng\RuleGrantsOperationTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -77,7 +78,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\rng\RegistrationTypeInterface|NULL $entity_bundle
+   * @param string $entity_bundle
    *   A registration type. Or NULL if it is a registration type listing.
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array(), $return_as_object = FALSE) {
@@ -95,8 +96,10 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
 
       // $entity_bundle is omitted for registration type list at
       // $event_path/register
-      if ($entity_bundle && !$event_meta->registrationTypeIsValid($entity_bundle)) {
-        return AccessResult::neutral();
+      if ($entity_bundle && $registration_type = RegistrationType::load($entity_bundle)) {
+        if (!$event_meta->registrationTypeIsValid($registration_type)) {
+          return AccessResult::neutral();
+        }
       }
       // There are no registration types configured.
       elseif (!$event_meta->getRegistrationTypeIds()) {
