@@ -126,7 +126,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         return $return_as_object ? $result : $result->isAllowed();
       }
 
-      return $return_as_object ? AccessResult::allowed() : TRUE;
+      return $return_as_object ? AccessResult::allowed()->addCacheableDependency($event) : TRUE;
     }
     catch (InvalidEventException $e) {
       return $fail;
