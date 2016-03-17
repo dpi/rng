@@ -87,7 +87,9 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
     }
 
     $event = $context['event'];
-    $fail = $return_as_object ? AccessResult::forbidden()->addCacheableDependency($event) : FALSE;
+    $fail = $return_as_object ? AccessResult::forbidden()
+      ->addCacheableDependency($event)
+      ->addCacheContexts(['rng_event', 'user']) : FALSE;
 
     $account = $this->prepareUser($account);
     if ($account->isAnonymous()) {
@@ -127,7 +129,9 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         return $return_as_object ? $result : $result->isAllowed();
       }
 
-      return $return_as_object ? AccessResult::allowed()->addCacheableDependency($event) : TRUE;
+      return $return_as_object ? AccessResult::allowed()
+        ->addCacheableDependency($event)
+        ->addCacheContexts(['rng_event', 'user']) : TRUE;
     }
     catch (InvalidEventException $e) {
       return $fail;

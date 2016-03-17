@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rng\ContextProvider\RngEventRouteContext‰.
+ * Contains \Drupal\rng\ContextProvider\RngEventRouteContext.
  */
 
 namespace Drupal\rng\ContextProvider;
@@ -55,7 +55,7 @@ class RngEventRouteContext implements ContextProviderInterface {
    */
   public function getRuntimeContexts(array $unqualified_context_ids) {
     $cacheability = new CacheableMetadata();
-    $cacheability->setCacheContexts(['route']);
+    $cacheability->setCacheContexts(['rng_event']);
 
     $context_definition = new ContextDefinition('entity', NULL, FALSE);
 
@@ -117,10 +117,13 @@ class RngEventRouteContext implements ContextProviderInterface {
    *   An array of event entities in route.
    */
   protected function getEventEntitiesInRoute() {
-    $route = $this->routeMatch->getRouteObject();
-    $parameters = $route->getOption('parameters');
-
     $events = [];
+
+    $route = $this->routeMatch->getRouteObject();
+    if (!$parameters = $route->getOption('parameters')) {
+      return $events;
+    }
+
     foreach ($parameters as $parameter) {
       if (isset($parameter['type']) && strpos($parameter['type'], 'entity:') !== FALSE) {
         $entity_type_id = substr($parameter['type'], strlen('entity:'));
