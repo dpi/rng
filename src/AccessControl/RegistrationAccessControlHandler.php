@@ -91,7 +91,8 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
 
     $account = $this->prepareUser($account);
     if ($account->isAnonymous()) {
-      return AccessResult::neutral();
+      return AccessResult::neutral()
+        ->addCacheContexts(['user.roles:anonymous']);
     }
 
     try {

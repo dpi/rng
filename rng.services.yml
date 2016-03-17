@@ -40,7 +40,12 @@ services:
     tags:
       - { name: access_check, applies_to: _registration_add_access }
   rng.paramconverter.entity_type_rule_component:
-    class: \Drupal\rng\ParamConverter\ComponentTypeConverter
+    class: Drupal\rng\ParamConverter\ComponentTypeConverter
     arguments: ['@entity_type.manager']
     tags:
       - { name: paramconverter }
+  rng.event_route_context:
+    class: Drupal\rng\ContextProvider\RngEventRouteContext
+    arguments: ['@current_route_match', '@rng.event_manager']
+    tags:
+      - { name: 'context_provider' }
