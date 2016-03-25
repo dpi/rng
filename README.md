@@ -1,6 +1,6 @@
 RNG is a Drupal module enabling people to register for events.
 
-Copyright (C) 2015 Daniel Phin (@dpi)
+Copyright (C) 2016 Daniel Phin (@dpi)
 
 [![Build Status](https://travis-ci.org/dpi/rng.svg?branch=8.x-1.x)](https://travis-ci.org/dpi/rng)
 
@@ -59,10 +59,12 @@ __RNG Views sub module__
 
 # Model
 
-    Event ─┬─► Registration(s) ─┬─► Registrant(s) ─► Identity
-           ├────────────────────┴─► Group(s)
-           └─► Rule(s) ─┬─► Action(s)
-                        └─► Condition(s)
+    ┌─ Event Type
+    ├─ Registration Type(s)
+    └─►Event ─┬─► Registration(s) ─┬─► Registrant(s) ─► Identity
+              ├────────────────────┴─► Group(s)
+              └─► Rule(s) ─┬─► Action(s)
+                           └─► Condition(s)
 
 A Registration is a content entity that associated with an Event entity, and 
 maintains relationships to Identities via Registrant entities. Each Registrant
