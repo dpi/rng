@@ -80,7 +80,10 @@ class RngEventRouteContext implements ContextProviderInterface {
    *   The event entity, or NULL.
    */
   protected function getEventInRoute() {
-    $route = $this->routeMatch->getRouteObject();
+    // Will be NULL in CLI.
+    if (!$route = $this->routeMatch->getRouteObject()) {
+      return NULL;
+    }
 
     if ($event_param = $route->getDefault('event')) {
       $event = $this->routeMatch->getParameter($event_param);
@@ -119,17 +122,14 @@ class RngEventRouteContext implements ContextProviderInterface {
   protected function getEventEntitiesInRoute() {
     $events = [];
 
-    $route = $this->routeMatch->getRouteObject();
-    if (!$parameters = $route->getOption('parameters')) {
-      return $events;
-    }
-
-    foreach ($parameters as $parameter) {
-      if (isset($parameter['type']) && strpos($parameter['type'], 'entity:') !== FALSE) {
-        $entity_type_id = substr($parameter['type'], strlen('entity:'));
-        $entity = $this->routeMatch->getParameter($entity_type_id);
-        if ($entity instanceof EntityInterface && $this->eventManager->isEvent($entity)) {
-          $events[] = $entity;
+    if (($route = $this->routeMatch->getRouteObject()) && ($parameters = $route->getOption('parameters'))) {
+      foreach ($parameters as $parameter) {
+        if (isset($parameter['type']) && strpos($parameter['type'], 'entity:') !== FALSE) {
+          $entity_type_id = substr($parameter['type'], strlen('entity:'));
+          $entity = $this->routeMatch->getParameter($entity_type_id);
+          if ($entity instanceof EntityInterface && $this->eventManager->isEvent($entity)) {
+            $events[] = $entity;
+          }
         }
       }
     }
