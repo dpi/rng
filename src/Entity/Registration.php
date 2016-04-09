@@ -228,7 +228,7 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
 
     $fields['event'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Event'))
-      ->setDescription(t('The registration type.'))
+      ->setDescription(t('The event for the registration.'))
       ->setSetting('exclude_entity_types', 'true')
       ->setSetting('entity_type_ids', array('registrant', 'registration'))
       ->setDescription(t('The relationship between this registration and an event.'))
