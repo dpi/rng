@@ -80,7 +80,12 @@ class CurrentTime extends ConditionPluginBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['date'] = $form_state->getValue('date')->format('U');
+    if ($date = $form_state->getValue('date')) {
+      $this->configuration['date'] = $date->format('U');
+    }
+    else {
+      $this->configuration['date'] = NULL;
+    }
   }
 
   /**
