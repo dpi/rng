@@ -383,6 +383,11 @@ class EventMeta implements EventMetaInterface {
     $total = 0;
 
     foreach ($this->getIdentityTypes() as $entity_type_id) {
+      $selection_groups = $this->selectionPluginManager->getSelectionGroups($entity_type_id);
+      if (!isset($selection_groups['rng_register'])) {
+        continue;
+      }
+
       $count = $this
         ->selectionPluginManager
         ->getInstance([
