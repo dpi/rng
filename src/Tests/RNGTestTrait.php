@@ -37,13 +37,17 @@ trait RNGTestTrait {
   /**
    * Creates an event type config.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   An entity type.
+   * @param string $entity_type_id
+   *   An entity type ID
+   * @param string $bundle
+   *   An entity type bundle.
+   * @param array $values
+   *   Optional values for the event type.
    *
    * @return \Drupal\rng\EventTypeInterface
    *   An event type config.
    */
-  protected function createEventType($entity_type_id, $bundle) {
+  protected function createEventType($entity_type_id, $bundle, $values = []) {
     $event_type = EventType::create([
       'label' => 'Event Type A',
       'entity_type' => $entity_type_id,

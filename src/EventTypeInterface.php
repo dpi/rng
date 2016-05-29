@@ -55,6 +55,9 @@ interface EventTypeInterface extends ConfigEntityInterface {
    *
    * @param string $permission
    *   The operation to mirror.
+   *
+   * @return static
+   *   Return this event type for chaining.
    */
   function setEventManageOperation($permission);
 
