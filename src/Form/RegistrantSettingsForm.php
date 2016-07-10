@@ -98,11 +98,14 @@ class RegistrantSettingsForm extends ConfigFormBase {
       $channels = $this->identityChannelManager->getChannelsForIdentityType($identity_type);
       $channels_string = [];
       foreach ($channels as $channel) {
-        $entity_type = $this->entityManager->getDefinition($channel);
-        $channels_string[] = $entity_type->getLabel();
+        if ($channel_entity_type = $this->entityManager->getDefinition($channel, FALSE)) {
+          $channels_string[] = $channel_entity_type->getLabel();
+        }
       }
 
-      $entity_type = $this->entityManager->getDefinition($identity_type);
+      if (!$entity_type = $this->entityManager->getDefinition($identity_type, FALSE)) {
+        continue;
+      }
 
       $form['contactables'][$identity_type] = [
         '#type' => 'checkbox',
