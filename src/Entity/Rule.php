@@ -112,15 +112,11 @@ class Rule extends ContentEntityBase implements RuleInterface {
   }
 
   /**
-   * Add components to the rule.
-   *
-   * Components are not saved until the rule is saved.
-   *
-   * @param \Drupal\rng\RuleComponentInterface $component
-   *   The rule component entity.
+   * {@inheritdoc}
    */
   public function addComponent(RuleComponentInterface $component) {
     $this->components_unsaved[] = $component;
+    return $this;
   }
 
   /**

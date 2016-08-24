@@ -66,6 +66,19 @@ interface RuleInterface extends ContentEntityInterface {
   public function getConditions();
 
   /**
+   * Add components to the rule.
+   *
+   * Components are not saved until the rule is saved.
+   *
+   * @param \Drupal\rng\RuleComponentInterface $component
+   *   The rule component entity.
+   *
+   * @return \Drupal\rng\RuleInterface
+   *   Return this object for chaining.
+   */
+  public function addComponent(RuleComponentInterface $component);
+
+  /**
    * Evaluates all conditions on the rule.
    *
    * @param array $context_values

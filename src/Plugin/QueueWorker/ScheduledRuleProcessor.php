@@ -24,21 +24,33 @@ class ScheduledRuleProcessor extends QueueWorkerBase {
   /**
    * {@inheritdoc}
    *
-   * @param $data
-   *   - rule_component_id: integer: ID of a rule component entity.
+   * @param integer $data['rule_scheduler_id']
+   *   ID of a rule component entity.
    */
   public function processItem($data) {
-    /** @var RuleSchedule $rule_schedule */
-    $rule_schedule = RuleSchedule::load($data['rule_component_id']);
+    if (!isset($data['rule_scheduler_id'])) {
+      return;
+    }
+
+    /** @var \Drupal\rng\EventManagerInterface $event_manager */
+    $event_manager = \Drupal::service('rng.event_manager');
+
+    $rule_schedule = RuleSchedule::load($data['rule_scheduler_id']);
     $rule_schedule->incrementAttempts();
     $rule_schedule->save();
-    if ($component = $rule_schedule->getComponent()) {
-      $rule = $component->getRule();
-      $event_meta = \Drupal::service('rng.event_manager')
-        ->getMeta($rule->getEvent());
-      $event_meta->trigger($rule->getTriggerID(), [
+
+    if (($component = $rule_schedule->getComponent()) && ($rule = $component->getRule())) {
+      $event = $rule->getEvent();
+      $event_meta = $event_manager->getMeta($event);
+      $context = [
+        'event' => $event,
         'registrations' => $event_meta->getRegistrations()
-      ]);
+      ];
+
+      foreach ($rule->getActions() as $action) {
+        $action->execute($context);
+      }
+
       $rule_schedule->delete();
     }
   }

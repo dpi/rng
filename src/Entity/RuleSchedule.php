@@ -57,7 +57,7 @@ class RuleSchedule extends ContentEntityBase implements RuleScheduleInterface {
    * {@inheritdoc}
    */
   public function getInQueue() {
-    $this->get('in_queue')->value;
+    return $this->get('in_queue')->value;
   }
 
   /**
