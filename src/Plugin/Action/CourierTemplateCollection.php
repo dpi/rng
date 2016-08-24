@@ -139,6 +139,13 @@ class CourierTemplateCollection extends ConfigurableActionBase implements Contai
    *     registrations to send the message.
    */
   public function execute($context = NULL) {
+    if (!isset($context['registrations'])) {
+      return;
+    }
+    if (!is_array($context['registrations'])) {
+      return;
+    }
+
     if ($collection_original = $this->getTemplateCollection()) {
       foreach ($context['registrations'] as $registration) {
         $options = [];

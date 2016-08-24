@@ -47,7 +47,7 @@ class RngEventAccessTest extends RNGKernelTestBase {
   protected $eventManager;
 
   /**
-   * The event type
+   * An event type for testing.
    *
    * @var \Drupal\rng\EventTypeInterface
    */

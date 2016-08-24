@@ -18,10 +18,25 @@ abstract class RNGKernelTestBase extends KernelTestBase {
   use RNGTestTrait;
 
   /**
-   * Modules to enable.
+   * {@inheritdoc}
    *
    * @var array
    */
   public static $modules = ['rng', 'user', 'field', 'dynamic_entity_reference', 'unlimited_number', 'courier', 'text'];
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->eventManager = $this->container->get('rng.event_manager');
+  }
 
 }

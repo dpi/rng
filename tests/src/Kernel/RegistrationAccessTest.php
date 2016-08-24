@@ -67,7 +67,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
     $event_meta = $this->createEvent();
     $user1 = $this->drupalCreateUser(['rng register self']);
     $this->setCurrentUser($user1);
-    $this->createRules([], ['create' => TRUE]);
+    $this->createUserRoleRules([], ['create' => TRUE]);
     $this->assertTrue($event_meta->identitiesCanRegister('user', [$user1->id()]));
   }
 
@@ -90,7 +90,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
     $event_meta = $this->createEvent();
     $user1 = $this->drupalCreateUser(['rng register self']);
     $this->setCurrentUser($user1);
-    $this->createRules([], ['create' => TRUE]);
+    $this->createUserRoleRules([], ['create' => TRUE]);
     $this->assertTrue($event_meta->identitiesCanRegister('user', [$user1->id()]));
   }
 
@@ -102,7 +102,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
     $role1 = $this->createRole([]);
     $user1 = $this->drupalCreateUser(['rng register self']);
     $this->setCurrentUser($user1);
-    $this->createRules([$role1 => $role1], ['create' => TRUE]);
+    $this->createUserRoleRules([$role1 => $role1], ['create' => TRUE]);
     $this->assertFalse($event_meta->identitiesCanRegister('user', [$user1->id()]));
   }
 
@@ -115,7 +115,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
     $role1 = $this->createRole([]);
     $user1 = $this->drupalCreateUser();
     $this->setCurrentUser($user1);
-    $this->createRules([$role1 => $role1], ['create' => TRUE]);
+    $this->createUserRoleRules([$role1 => $role1], ['create' => TRUE]);
     $this->assertFalse($event_meta->identitiesCanRegister('user', [$user1->id()]));
   }
 
@@ -126,7 +126,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
     $event_meta = $this->createEvent([
       EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS => 0,
     ]);
-    $this->createRules([], ['create' => TRUE]);
+    $this->createUserRoleRules([], ['create' => TRUE]);
     $user1 = $this->drupalCreateUser(['rng register self']);
     $this->setCurrentUser($user1);
 
@@ -143,7 +143,7 @@ class RegistrationAccessTest extends RNGKernelTestBase {
       EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS => 1,
     ]);
 
-    $this->createRules([], ['create' => TRUE]);
+    $this->createUserRoleRules([], ['create' => TRUE]);
     $user1 = $this->drupalCreateUser(['rng register self']);
     $this->setCurrentUser($user1);
 

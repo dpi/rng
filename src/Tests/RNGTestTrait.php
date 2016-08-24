@@ -108,7 +108,7 @@ trait RNGTestTrait {
    *   An array of operations. Value is boolean whether to grant, key can be
    *   any of 'create', 'view', 'update', 'delete'.
    */
-  protected function createRules($roles = [], $operations = []) {
+  protected function createUserRoleRules($roles = [], $operations = []) {
     $rule = EventTypeRule::create([
       'trigger' => 'rng_event.register',
       'entity_type' => 'entity_test',
