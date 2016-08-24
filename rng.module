@@ -13,6 +13,7 @@ use Drupal\rng\Entity\Registrant;
 use Drupal\rng\EventTypeInterface;
 use Drupal\rng\Exception\InvalidEventException;
 use Drupal\courier\Entity\TemplateCollection;
+use Drupal\rng\RuleInterface;
 use Drupal\rng\RuleComponentInterface;
 use Drupal\rng\Plugin\Action\CourierTemplateCollection;
 use Drupal\Core\Render\Element;
@@ -135,6 +136,35 @@ function rng_entity_operation(EntityInterface $entity) {
   }
 
   return $operations;
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function rng_entity_update(EntityInterface $entity) {
+  if ($entity instanceof RuleInterface && isset($entity->original)) {
+    /** @var \Drupal\rng\RuleInterface $original */
+    $original = $entity->original;
+
+    // Don't continue if rule status didn't change.
+    if ($entity->isActive() == $original->isActive()) {
+      return;
+    }
+
+    foreach ($entity->getConditions() as $condition) {
+      if ($condition->getPluginId() == 'rng_rule_scheduler') {
+        // Create, update, or delete the associated rule scheduler entity if the
+        // rule status has changed.
+
+        /** @var \Drupal\rng\Plugin\Condition\RuleScheduler $plugin */
+        $plugin = $condition->createInstance();
+        $plugin->updateRuleSchedulerEntity();
+        $plugin_configuration = $plugin->getConfiguration();
+        $condition->setConfiguration($plugin_configuration);
+        $condition->save();
+      }
+    }
+  }
 }
 
 /**

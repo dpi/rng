@@ -11,7 +11,9 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\rng\RuleInterface;
 use Drupal\rng\Entity\RuleSchedule;
+use Drupal\rng\Entity\RuleComponent;
 use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
@@ -81,6 +83,8 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
 
   /**
    * Gets the rule scheduler entity.
+   *
+   * @return \Drupal\rng\RuleScheduleInterface
    */
   public function getRuleScheduler() {
     if (isset($this->configuration['rng_rule_scheduler'])) {
@@ -95,6 +99,15 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['date']['#description'] = t('Rule will trigger once on this date.');
+
+    $rule_scheduler = $this->getRuleScheduler();
+    if ($rule_scheduler) {
+      if ($rule_scheduler->getInQueue()) {
+        drupal_set_message($this->t('This message is queued for execution.'));
+        $form['date']['#disabled'] = TRUE;
+      }
+    }
+
     unset($form['negate']);
     return $form;
   }
@@ -105,20 +118,42 @@ class RuleScheduler extends CurrentTime implements ContainerFactoryPluginInterfa
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['negate'] = FALSE;
+    $this->updateRuleSchedulerEntity();
+  }
 
-    // Create new scheduler if rule_component is provided.
-    if ($this->getRuleComponentId() && !$this->getRuleScheduler()) {
-      $rule_scheduler = RuleSchedule::create([
-        'component' => $this->getRuleComponentId(),
-      ]);
-      $rule_scheduler->save();
-      $this->configuration['rng_rule_scheduler'] = $rule_scheduler->id();
+  /**
+   * Create, update, or delete the associated rule scheduler entity.
+   *
+   * Depending on if it needs to exist.
+   */
+  public function updateRuleSchedulerEntity() {
+    $rule_scheduler = $this->getRuleScheduler();
+    $rule_component_id = $this->getRuleComponentId();
+    $rule_component = $rule_component_id ? RuleComponent::load($rule_component_id) : NULL;
+    $rule = $rule_component ? $rule_component->getRule() : NULL;
+    $rule_active = $rule instanceof RuleInterface ? $rule->isActive() : FALSE;
+
+    if ($rule_active) {
+      if (!$rule_scheduler) {
+        // Create the scheduler entity if it doesn't exist.
+        $rule_scheduler = RuleSchedule::create([
+          'component' => $this->getRuleComponentId(),
+        ]);
+        $rule_scheduler->save();
+        $this->configuration['rng_rule_scheduler'] = $rule_scheduler->id();
+      }
+
+      // Mirror the date into the scheduler.
+      if ($rule_scheduler) {
+        $rule_scheduler->setDate($this->configuration['date']);
+        $rule_scheduler->save();
+      }
     }
-
-    // Mirror the date into the scheduler.
-    if ($rule_scheduler = $this->getRuleScheduler()) {
-      $rule_scheduler->setDate($this->configuration['date']);
-      $rule_scheduler->save();
+    else {
+      // Delete the rule scheduler if it is not in the queue already.
+      if ($rule_scheduler && !$rule_scheduler->getInQueue()) {
+        $rule_scheduler->delete();
+      }
     }
   }
 

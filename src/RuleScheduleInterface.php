@@ -42,6 +42,14 @@ interface RuleScheduleInterface extends ContentEntityInterface {
   public function setDate($date);
 
   /**
+   * Get if rule schedule is in queue.
+   *
+   * @return boolean $in_queue
+   *   Whether the rule is in the queue for execution.
+   */
+  public function getInQueue();
+
+  /**
    * Set if the rule schedule is added to the queue.
    *
    * @param bool $in_queue
