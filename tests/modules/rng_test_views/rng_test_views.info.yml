@@ -1,0 +1,7 @@
+name: 'RNG test views'
+type: module
+description: 'Provides views for RNG Views tests.'
+dependencies:
+  - rng
+  - views
+core: '8.x'
