@@ -1,0 +1,10 @@
+views.field.rng_event_register:
+  type: views_field
+  label: 'Event register link'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'
+    registration_type:
+      type: string
+      label: 'An optional registration type'
