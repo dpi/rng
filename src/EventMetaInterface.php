@@ -303,8 +303,8 @@ interface EventMetaInterface {
    * @param int[] $entity_ids
    *   An array of identity entity IDs.
    *
-   * @return boolean
-   *   Whether the identities can register.
+   * @return integer[]
+   *   An array of ID's of the identities that can register.
    */
   public function identitiesCanRegister($entity_type, array $entity_ids);
 
