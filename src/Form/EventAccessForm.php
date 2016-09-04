@@ -259,28 +259,25 @@ class EventAccessForm extends FormBase {
             $cell['#markup'] = $this->t('<em>N/A</em>');
           }
           else {
-            $enabled = !empty($config['operations'][$op]);
-            if ($access_edit_operations) {
-              $cell['component_id'] = [
-                '#type' => 'value',
-                '#value' => $action_storage->id(),
-              ];
+            $cell['component_id'] = [
+              '#type' => 'value',
+              '#value' => $action_storage->id(),
+            ];
 
-              $cell['operation'] = [
-                '#type' => 'value',
-                '#value' => $op,
-              ];
+            $cell['operation'] = [
+              '#type' => 'value',
+              '#value' => $op,
+            ];
 
-              $cell['enabled'] = [
-                '#type' => 'checkbox',
-                '#title' => $operation,
-                '#title_display' => 'invisible',
-                '#default_value' => $enabled,
-              ];
-            }
-            else {
-              $cell['#plain_text'] = $enabled ? $operation : '-';
-            }
+            $cell['enabled'] = [
+              '#type' => 'checkbox',
+              '#title' => $this->t('Allow registrant to @operation registrations if all conditions pass on this rule.', [
+                '@operation' => $op,
+              ]),
+              '#title_display' => 'invisible',
+              '#default_value' => !empty($config['operations'][$op]),
+              '#disabled' => !$access_edit_operations,
+            ];
           }
 
           $row['operation_' . $op] = $cell;
