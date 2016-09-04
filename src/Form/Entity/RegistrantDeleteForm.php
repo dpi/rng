@@ -14,7 +14,7 @@ class RegistrantDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete this registrant?');
+    return $this->t('Are you sure you want to delete this registrant?');
   }
 
   /**

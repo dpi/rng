@@ -39,6 +39,25 @@ entity.registration.registrants:
   title: 'Identities'
   weight: 15
 
+# Registrant
+entity.registrant.canonical:
+  route_name: entity.registrant.canonical
+  base_route: entity.registrant.canonical
+  title: 'View'
+  weight: 0
+
+entity.registrant.edit:
+  route_name: entity.registrant.edit_form
+  base_route: entity.registrant.canonical
+  title: 'Edit'
+  weight: 10
+
+entity.registrant.delete:
+  route_name: entity.registrant.delete_form
+  base_route: entity.registrant.canonical
+  title: 'Delete'
+  weight: 20
+
 # Actions
 entity.rng_rule_component.edit:
   route_name: entity.rng_rule_component.edit_form

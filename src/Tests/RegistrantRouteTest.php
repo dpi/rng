@@ -55,6 +55,7 @@ class RegistrantRouteTest extends RNGTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->drupalPlaceBlock('page_title_block');
     $this->drupalPlaceBlock('system_breadcrumb_block');
     $this->eventType = $this->createEventTypeNG('entity_test', 'entity_test');
     $this->registrationType = $this->createRegistrationType();
@@ -92,14 +93,55 @@ class RegistrantRouteTest extends RNGTestBase {
     ]);
     $form_display->save();
 
-    $this->registrant->{$field_name} = $this->randomString();
+    $display = entity_get_display('registrant', 'registrant', 'default');
+    $display->setComponent($field_name, [
+      'type' => 'text_default',
+      'weight' => 1,
+    ]);
+    $display->save();
+
+    $this->registrant->{$field_name} = $this->randomMachineName();
     $this->registrant->save();
 
     $this->registrantTestField = $field_name;
   }
 
   /**
-   * Test access registrant form.
+   * Test access registrant canonical route.
+   */
+  function testRegistrantCanonicalRoute() {
+    $admin = $this->drupalCreateUser(['administer rng']);
+    $this->drupalLogin($admin);
+
+    $this->drupalGet(Url::fromRoute('entity.registrant.canonical', [
+      'registrant' => $this->registrant->id(),
+    ]));
+    $this->assertResponse(200);
+
+    $test_field_value = $this->registrant->{$this->registrantTestField}->value;
+    $this->assertRaw($test_field_value);
+
+    // Breadcrumb.
+    $this->assertLink(t('Home'));
+    $this->assertLink($this->registrant->getRegistration()->getEvent()->label());
+    $this->assertLink($this->registrant->getRegistration()->label());
+  }
+
+  /**
+   * Test access registrant canonical route.
+   */
+  function testRegistrantCanonicalNoAccess() {
+    $admin = $this->drupalCreateUser();
+    $this->drupalLogin($admin);
+
+    $this->drupalGet(Url::fromRoute('entity.registrant.canonical', [
+      'registrant' => $this->registrant->id(),
+    ]));
+    $this->assertResponse(403);
+  }
+
+  /**
+   * Test access edit registrant form.
    */
   function testRegistrantEditRoute() {
     $admin = $this->drupalCreateUser(['administer rng']);
@@ -119,13 +161,46 @@ class RegistrantRouteTest extends RNGTestBase {
   }
 
   /**
-   * Test access registrant form with no permission.
+   * Test access edit registrant form with no permission.
    */
   function testRegistrantEditRouteNoAccess() {
     $admin = $this->drupalCreateUser();
     $this->drupalLogin($admin);
 
     $this->drupalGet(Url::fromRoute('entity.registrant.edit_form', [
+      'registrant' => $this->registrant->id(),
+    ]));
+    $this->assertResponse(403);
+  }
+
+  /**
+   * Test access registrant delete form.
+   */
+  function testRegistrantDeleteRoute() {
+    $admin = $this->drupalCreateUser(['administer rng']);
+    $this->drupalLogin($admin);
+
+    $this->drupalGet(Url::fromRoute('entity.registrant.delete_form', [
+      'registrant' => $this->registrant->id(),
+    ]));
+    $this->assertResponse(200);
+    $this->assertText(t('Are you sure you want to delete this registrant?'));
+
+    // Breadcrumb.
+    $this->assertLink(t('Home'));
+    $this->assertLink($this->registrant->getRegistration()->getEvent()->label());
+    $this->assertLink($this->registrant->getRegistration()->label());
+    $this->assertLink($this->registrant->label());
+  }
+
+  /**
+   * Test access delete registrant form with no permission.
+   */
+  function testRegistrantDeleteRouteNoAccess() {
+    $admin = $this->drupalCreateUser();
+    $this->drupalLogin($admin);
+
+    $this->drupalGet(Url::fromRoute('entity.registrant.delete_form', [
       'registrant' => $this->registrant->id(),
     ]));
     $this->assertResponse(403);
