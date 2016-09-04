@@ -79,11 +79,11 @@ class RouteSubscriber extends RouteSubscriberBase {
         // Access.
         $route = new Route(
           $canonical_path . '/event/access',
-          array(
-            '_controller' => '\Drupal\rng\Controller\EventController::listing_access',
+          [
+            '_form' => '\Drupal\rng\Form\EventAccessForm',
             '_title' => 'Access',
             'event' => $entity_type,
-          ),
+          ],
           $manage_requirements,
           $options
         );
