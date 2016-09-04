@@ -101,8 +101,9 @@ class EventAccessForm extends FormBase {
     $destination = $this->redirectDestination->getAsArray();
     $event_meta = $this->eventManager->getMeta($event);
     $trigger = 'rng_event.register';
+
+    // Allow editing operations on non default rules.
     $access_edit_operations = !$event_meta->isDefaultRules($trigger);
-    $form = [];
 
     $form['description'] = [
       '#prefix' => '<p>',
@@ -129,6 +130,7 @@ class EventAccessForm extends FormBase {
       '#wrapper_attributes' => [
         'header' => TRUE,
         'rowspan' => 2,
+        'colspan' => $access_edit_operations ? 2 : 1,
       ],
       '#plain_text' => $this->t('Component'),
     ];
@@ -147,18 +149,6 @@ class EventAccessForm extends FormBase {
       ],
       '#plain_text' => $this->t('Operations'),
     ];
-
-    // Add a blank header column if there are edit buttons.
-    // Edit buttons only available on non default rules.
-    if ($access_edit_operations) {
-      $form['table']['header_one'][] = [
-        '#wrapper_attributes' => [
-          'header' => TRUE,
-          'rowspan' => 2,
-        ],
-        '#plain_text' => $this->t('Edit'),
-      ];
-    }
 
     $operations = ['create' => $this->t('Create'), 'view' => $this->t('View'), 'update' => $this->t('Update'), 'delete' => $this->t('Delete')];
     foreach ($operations as $operation) {
@@ -202,6 +192,19 @@ class EventAccessForm extends FormBase {
           ],
           '#plain_text' => $this->t('Condition #@condition', ['@condition' => $k]),
         ];
+
+        if ($access_edit_operations) {
+          $row['condition_operations']['#wrapper_attributes']['header'] = TRUE;
+          $row['condition_operations']['data'] = ['#type' => 'operations'];
+          if ($condition_storage->access('edit')) {
+            $row['condition_operations']['data']['#links']['edit'] = [
+              'title' => t('Edit'),
+              'url' => $condition_storage->toUrl('edit-form'),
+              'query' => $destination,
+            ];
+          }
+        }
+
         $condition = $condition_storage->createInstance();
         $condition_context += array_keys($condition->getContextDefinitions());
         $scope_all = (!in_array('registration', $condition_context) || in_array('event', $condition_context));
@@ -219,17 +222,6 @@ class EventAccessForm extends FormBase {
           '#markup' => $condition->summary(),
         ];
 
-        if ($access_edit_operations) {
-          $row['condition_operations']['data'] = ['#type' => 'operations'];
-          if ($condition_storage->access('edit')) {
-            $row['condition_operations']['data']['#links']['edit'] = [
-              'title' => t('Edit'),
-              'url' => $condition_storage->toUrl('edit-form'),
-              'query' => $destination,
-            ];
-          }
-        }
-
         $form['table'][] = $row;
 
         $row = [];
@@ -244,12 +236,15 @@ class EventAccessForm extends FormBase {
           '#wrapper_attributes' => [
             'header' => TRUE,
             'rowspan' => $scope_all ? 2 : 1,
+            'colspan' => $access_edit_operations ? 2 : 1,
           ],
           '#plain_text' => $this->t('Grants operations'),
         ];
 
         // Scope: warn user actions apply to all registrations.
-        $row[]['#plain_text'] = $scope_all ? $this->t('All registrations.') : $this->t('Single registration');
+        $row[] = [
+          '#plain_text' => $scope_all ? $this->t('All registrations.') : $this->t('Single registration'),
+        ];
 
         // Operations granted.
         $config = $action_storage->getConfiguration();
@@ -291,16 +286,12 @@ class EventAccessForm extends FormBase {
           $row['operation_' . $op] = $cell;
         }
 
-        if ($access_edit_operations) {
-          $row[] = [];
-        }
-
         $form['table'][] = $row;
 
         if ($scope_all) {
           $form['table'][][] = [
             '#wrapper_attributes' => [
-              'colspan' => 6,
+              'colspan' => 5,
             ],
             '#markup' => $this->t('<strong>Warning:</strong> selecting view, update, or delete grants access to any registration on this event.'),
           ];
