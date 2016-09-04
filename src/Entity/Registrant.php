@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\RegistrantInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\rng\RegistrationInterface;
 
 /**
  * Defines the registrant entity class.
@@ -22,7 +23,15 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "views_data" = "Drupal\rng\Views\RegistrantViewsData",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder"
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "route_provider" = {
+ *       "html" = "Drupal\rng\Routing\RegistrantRouteProvider",
+ *     },
+ *     "form" = {
+ *       "default" = "Drupal\rng\Form\Entity\RegistrantForm",
+ *       "edit" = "Drupal\rng\Form\Entity\RegistrantForm",
+ *       "delete" = "Drupal\rng\Form\Entity\RegistrantDeleteForm",
+ *     },
  *   },
  *   admin_permission = "administer rng",
  *   base_table = "registrant",
@@ -30,12 +39,30 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "id" = "id",
  *     "uuid" = "uuid"
  *   },
+ *   field_ui_base_route = "rng.config.registrant",
  *   links = {
+ *     "canonical" = "/registrant/{registrant}",
+ *     "edit-form" = "/registrant/{registrant}/edit",
+ *     "delete-form" = "/registrant/{registrant}/delete"
  *   },
- *   field_ui_base_route = "rng.config.registrant"
  * )
  */
 class Registrant extends ContentEntityBase implements RegistrantInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRegistration() {
+    return $this->get('registration')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRegistration(RegistrationInterface $registration) {
+    $this->set('registration', ['entity' => $registration]);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -86,6 +113,13 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       ->condition('identity__target_type', $identity->getEntityTypeId(), '=')
       ->condition('identity__target_id', $identity->id(), '=')
       ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function label() {
+    return $this->id() ? t('Registrant @id', ['@id' => $this->id()]) : t('New registrant');
   }
 
   /**

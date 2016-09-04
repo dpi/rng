@@ -15,6 +15,25 @@ use Drupal\Core\Entity\EntityInterface;
 interface RegistrantInterface extends ContentEntityInterface {
 
   /**
+   * Get associated registration.
+   *
+   * @return \Drupal\rng\RegistrationInterface|NULL
+   *   The parent registration, or NULL if it does not exist.
+   */
+  public function getRegistration();
+
+  /**
+   * Set associated registration.
+   *
+   * @param \Drupal\rng\RegistrationInterface $registration
+   *   The new associated registration.
+   *
+   * @return \Drupal\rng\RegistrantInterface
+   *   Returns registrant for chaining.
+   */
+  public function setRegistration(RegistrationInterface $registration);
+
+  /**
    * Get associated identity.
    *
    * @return \Drupal\Core\Entity\EntityInterface|NULL
