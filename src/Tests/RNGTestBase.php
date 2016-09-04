@@ -23,6 +23,21 @@ abstract class RNGTestBase extends WebTestBase {
   public static $modules = array('rng');
 
   /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->eventManager = $this->container->get('rng.event_manager');
+  }
+
+  /**
    * Creates an event type config.
    *
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
