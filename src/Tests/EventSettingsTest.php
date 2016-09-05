@@ -37,6 +37,8 @@ class EventSettingsTest extends RNGSiteTestBase {
     $event_types[0] = $this->event_type;
     $event_types[1] = $this->createEventType($bundle[2]);
 
+    \Drupal::service('router.builder')->rebuildIfNeeded();
+
     $account = $this->drupalCreateUser([
       'edit own ' . $bundle[0]->id() . ' content',
       'edit own ' . $bundle[1]->id() . ' content',
