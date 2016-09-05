@@ -48,7 +48,7 @@ trait RNGTestTrait {
    *   An event type config.
    */
   protected function createEventType($entity_type_id, $bundle, $values = []) {
-    $event_type = EventType::create([
+    $event_type = EventType::create($values + [
       'label' => 'Event Type A',
       'entity_type' => $entity_type_id,
       'bundle' => $bundle,
