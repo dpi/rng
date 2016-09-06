@@ -1,6 +1,6 @@
 name: RNG
 type: module
-description: 'Allows people to associate with an event.'
+description: 'Provides ability to create and manage events and registrations.'
 package: RNG
 core: 8.x
 dependencies:
