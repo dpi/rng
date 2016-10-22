@@ -1,0 +1,52 @@
+.registrants-element {}
+
+.registrants-element .for_arity legend {
+  float: left;
+  /* browsers cannot change block to inline */
+}
+.registrants-element .for_arity legend:after {
+  content: " ";
+}
+.registrants-element .for_arity .form-item {
+  display: inline;
+  margin: 0 0 0 1em;
+}
+
+.registrants-element .for_arity .fieldset-wrapper,
+.registrants-element .for_arity .form-radios {
+  display: inline-block;
+}
+.registrants-element .for_arity div.form-type-radio {
+  display: inline-block;
+}
+.registrants-element .for_arity .form-radios .ajax-progress {
+  float: right;
+}
+.registrants-element .entities > .details-wrapper {
+  display: flex;
+}
+/* need fieldset selector since you cannot define different attributes for the
+   container and each child radio */
+.registrants-element fieldset.person-type {
+  white-space: nowrap;
+  width: 200px;
+}
+.registrants-element fieldset.person-type label {
+}
+.registrants-element fieldset.person-type div.form-type-radio {
+  position: relative;
+}
+.registrants-element fieldset.person-type div.form-type-radio .ajax-progress {
+  position: absolute;
+  right: 0;
+}
+.registrants-element fieldset.person-type div.form-type-radio .ajax-throbber {
+}
+.registrants-element .person-container {
+  width: 100%;
+  padding-left: 2em;
+  border-left: 1px solid #ccc;
+}
+.registrants-element .existing-container input.form-autocomplete {
+  width: 100%;
+}
