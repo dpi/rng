@@ -3,3 +3,9 @@ rng.admin:
   css:
     theme:
       css/rng.admin.css: {}
+
+rng.elements.registrants:
+  version: 0
+  css:
+    theme:
+      css/rng.elements.registrants.css: {}
