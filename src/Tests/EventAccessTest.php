@@ -47,7 +47,7 @@ class EventAccessTest extends RNGTestBase {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $this->event_type = $this->createEventTypeNG('entity_test', 'entity_test');
+    $this->event_type = $this->createEventType('entity_test', 'entity_test');
     $this->registration_type = $this->createRegistrationType();
     $this->eventManager = \Drupal::service('rng.event_manager');
   }

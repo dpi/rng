@@ -18,7 +18,9 @@ use Drupal\rng\Entity\Registration;
  */
 abstract class RNGTestBase extends WebTestBase {
 
-  use RNGTestTrait;
+  use RNGTestTrait {
+    RNGTestTrait::createEventType as traitCreateEventType;
+  }
 
   public static $modules = array('rng');
 
@@ -38,43 +40,10 @@ abstract class RNGTestBase extends WebTestBase {
   }
 
   /**
-   * Creates an event type config.
-   *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   An entity type.
-   *
-   * @return \Drupal\rng\EventTypeInterface
-   *   An event type config.
+   * {@inheritdoc}
    */
-  function createEventType(ConfigEntityInterface $entity_type) {
-    $event_type = EventType::create([
-      'label' => 'Event Type A',
-      'entity_type' => $entity_type->getEntityType()->getBundleOf(),
-      'bundle' => $entity_type->id(),
-      'mirror_operation_to_event_manage' => 'update',
-    ]);
-    $event_type->save();
-    \Drupal::service('router.builder')->rebuildIfNeeded();
-    return $event_type;
-  }
-
-  /**
-   * Creates an event type config.
-   *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   An entity type.
-   *
-   * @return \Drupal\rng\EventTypeInterface
-   *   An event type config.
-   */
-  function createEventTypeNG($entity_type_id, $bundle) {
-    $event_type = EventType::create([
-      'label' => 'Event Type A',
-      'entity_type' => $entity_type_id,
-      'bundle' => $bundle,
-      'mirror_operation_to_event_manage' => 'update',
-    ]);
-    $event_type->save();
+  function createEventType($entity_type_id, $bundle, $values = []) {
+    $event_type = $this->traitCreateEventType($entity_type_id, $bundle, $values);
     \Drupal::service('router.builder')->rebuildIfNeeded();
     return $event_type;
   }

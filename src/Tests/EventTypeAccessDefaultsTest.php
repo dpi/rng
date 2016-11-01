@@ -38,7 +38,8 @@ class EventTypeAccessDefaultsTest extends RNGTestBase {
    */
   function testAccessDefaults() {
     $edit = [
-      'bundle' => 'entity_test.entity_test'
+      'bundle' => 'entity_test.entity_test',
+      'registrants[registrant_type]' => 'registrant',
     ];
     $this->drupalPostForm(Url::fromRoute('entity.event_type.add'), $edit, t('Save'));
 

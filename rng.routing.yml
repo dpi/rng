@@ -198,7 +198,7 @@ rng.config:
   requirements:
     _permission: 'access administration pages'
 
-rng.config.registrant:
+rng.config.settings:
   path: '/admin/config/rng/settings'
   defaults:
     _form: '\Drupal\rng\Form\RngSettingsForm'

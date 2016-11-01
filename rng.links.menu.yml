@@ -22,11 +22,11 @@ rng.event.overview:
   description: 'Manage which entity bundles are designated as events.'
   route_name: rng.event_type.overview
 
-rng.config.registrant:
+rng.config.settings:
   title: 'Registrant settings'
   parent: rng.config
   description: 'Manage registrant settings.'
-  route_name: rng.config.registrant
+  route_name: rng.config.settings
 
 rng.config.plugin.condition:
   title: 'Condition settings'
