@@ -12,9 +12,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\rng\RngConfigurationInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\rng\Entity\EventTypeRule;
+use Drupal\rng\Entity\RegistrantType;
 
 /**
  * Form controller for event config entities.
@@ -36,6 +38,13 @@ class EventTypeForm extends EntityForm {
   protected $moduleHandler;
 
   /**
+   * The RNG configuration service.
+   *
+   * @var \Drupal\rng\RngConfigurationInterface
+   */
+  protected $rngConfiguration;
+
+  /**
    * The RNG event manager.
    *
    * @var \Drupal\rng\EventManagerInterface
@@ -49,12 +58,15 @@ class EventTypeForm extends EntityForm {
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
+   * @param \Drupal\rng\RngConfigurationInterface $rng_configuration
+   *   The RNG configuration service.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, EventManagerInterface $event_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, RngConfigurationInterface $rng_configuration, EventManagerInterface $event_manager) {
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
+    $this->rngConfiguration = $rng_configuration;
     $this->eventManager = $event_manager;
   }
 
@@ -65,6 +77,7 @@ class EventTypeForm extends EntityForm {
     return new static(
       $container->get('entity.manager'),
       $container->get('module_handler'),
+      $container->get('rng.configuration'),
       $container->get('rng.event_manager')
     );
   }
@@ -154,6 +167,86 @@ class EventTypeForm extends EntityForm {
       '#default_value' => (boolean) (($event_type->getEventManageOperation() !== NULL) ? $event_type->getEventManageOperation() : TRUE),
     );
 
+    $registrant_types = [];
+    foreach (RegistrantType::loadMultiple() as $registrant_type) {
+      /** @var \Drupal\rng\RegistrantTypeInterface $registrant_type */
+      $registrant_types[$registrant_type->id()] = $registrant_type->label();
+    }
+
+    $form['registrants'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Registrants'),
+      '#tree' => TRUE,
+    ];
+
+    // Default registrant type.
+    $form['registrants']['registrant_type'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Default registrant type'),
+      '#description' => $this->t('Registrant type used for new registrants associated with this event type.'),
+      '#required' => TRUE,
+      '#options' => $registrant_types,
+      '#default_value' => $event_type->getDefaultRegistrantType(),
+    ];
+
+    $form['registrants']['registrants'] = [
+      '#type' => 'table',
+      '#header' => [
+        [
+          'data' => $this->t('Person type'),
+        ],
+        [
+          'data' => $this->t('Permit inline creation of entities'),
+          'class' => ['checkbox'],
+        ],
+        [
+          'data' => $this->t('Permit referencing existing entities'),
+          'class' => ['checkbox'],
+        ],
+      ],
+      '#empty' => $this->t('There are no people types available.'),
+    ];
+
+    foreach ($this->rngConfiguration->getIdentityTypes() as $entity_type_id) {
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+      $bundles = $this->entityManager->getBundleInfo($entity_type_id);
+      foreach ($bundles as $bundle => $info) {
+        $t_args = [
+          '@bundle' => $info['label'],
+          '@entity_type' => $entity_type->getLabel(),
+        ];
+
+        $row = [];
+        $row['people_type']['#markup'] = $this->t('@bundle (@entity_type)', $t_args);
+
+        $row['create'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Permit inline creation of @bundle entities', $t_args),
+          '#title_display' => 'invisible',
+          '#default_value' => $event_type->canIdentityTypeCreate($entity_type_id, $bundle),
+          '#wrapper_attributes' => [
+            'class' => ['checkbox'],
+          ],
+        ];
+
+        $row['existing'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Permit referencing existing @bundle entities', $t_args),
+          '#title_display' => 'invisible',
+          '#default_value' => $event_type->canIdentityTypeReference($entity_type_id, $bundle),
+          '#wrapper_attributes' => [
+            'class' => ['checkbox'],
+          ],
+        ];
+
+        $row_key = "$entity_type_id:$bundle";
+        $form['registrants']['registrants'][$row_key] = $row;
+      }
+    }
+
+    // Blacklist user creation. It does not work because it is special.
+    $form['registrants']['registrants']['user:user']['create']['#access'] = FALSE;
+
     return $form;
   }
 
@@ -190,6 +283,13 @@ class EventTypeForm extends EntityForm {
       }
     }
 
+    foreach ($form_state->getValue(['registrants', 'registrants']) as $row_key => $row) {
+      list($entity_type, $bundle) = explode(':', $row_key);
+      $event_type->setIdentityTypeCreate($entity_type, $bundle, !empty($row['create']));
+      $event_type->setIdentityTypeReference($entity_type, $bundle, !empty($row['existing']));
+    }
+
+    $event_type->setDefaultRegistrantType($form_state->getValue(['registrants', 'registrant_type']));
     // Set to the access operation for event.
     $op = $form_state->getValue('mirror_update') ? 'update' : '';
     $event_type->setEventManageOperation($op);
@@ -207,8 +307,6 @@ class EventTypeForm extends EntityForm {
 
     drupal_set_message($this->t($message, $t_args));
     $this->logger('rng')->notice($message, $t_args);
-
-    $form_state->setRedirect('rng.event_type.overview');
   }
 
   /**

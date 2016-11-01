@@ -54,6 +54,8 @@ trait RNGTestTrait {
       'bundle' => $bundle,
       'mirror_operation_to_event_manage' => 'update',
     ]);
+    $event_type->setIdentityTypeReference('user', 'user', TRUE);
+    $event_type->setDefaultRegistrantType('registrant');
     $event_type->save();
     return $event_type;
   }

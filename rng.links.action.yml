@@ -8,6 +8,12 @@ rng.registration_type.add:
   appears_on:
     - rng.registration_type.overview
 
+entity.registrant_type.add:
+  route_name: entity.registrant_type.add_form
+  title: 'Add registrant type'
+  appears_on:
+    - entity.registrant_type.collection
+
 rng.event_type.add:
   route_name: entity.event_type.add
   title: 'Add event type'

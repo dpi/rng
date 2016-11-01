@@ -7,3 +7,13 @@ rng_action.plugin:
       label: 'Plugin ID'
     configuration:
       type: action.configuration.[%parent.id]
+
+rng_event_type_identity:
+  type: mapping
+  mapping:
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Bundle'

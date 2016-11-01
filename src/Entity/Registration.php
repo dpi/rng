@@ -284,10 +284,17 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
+    /** @var \Drupal\rng\RegistrantFactory $registrant_factory */
+    $registrant_factory = \Drupal::service('rng.registrant.factory');
+
     foreach ($this->identities_unsaved as $k => $identity) {
-      $registrant = Registrant::create(['registration' => $this])
-        ->setIdentity($identity);
-      $registrant->save();
+      $registrant = $registrant_factory->createRegistrant([
+        'event' => $this->getEvent(),
+      ]);
+      $registrant
+        ->setRegistration($this)
+        ->setIdentity($identity)
+        ->save();
       unset($this->identities_unsaved[$k]);
     }
 

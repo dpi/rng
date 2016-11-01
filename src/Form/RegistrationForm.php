@@ -1,19 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\RegistrationForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
 use Drupal\rng\EventManagerInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Form controller for registrations.
@@ -24,13 +18,6 @@ class RegistrationForm extends ContentEntityForm {
    * @var \Drupal\rng\RegistrationInterface
    */
   protected $entity;
-
-  /**
-   * The selection plugin manager.
-   *
-   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager
-   */
-  protected $selectionManager;
 
   /**
    * The RNG event manager.
@@ -44,14 +31,11 @@ class RegistrationForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager $selection_manager
-   *   The selection plugin manager.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, SelectionPluginManager $selection_manager, EventManagerInterface $event_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, EventManagerInterface $event_manager) {
     parent::__construct($entity_manager);
-    $this->selectionManager = $selection_manager;
     $this->eventManager = $event_manager;
   }
 
@@ -61,7 +45,6 @@ class RegistrationForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
-      $container->get('plugin.manager.entity_reference_selection'),
       $container->get('rng.event_manager')
     );
   }
@@ -70,144 +53,126 @@ class RegistrationForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    $current_user = $this->currentUser();
+    /** @var \Drupal\rng\RegistrationInterface $registration */
     $registration = $this->getEntity();
+    $current_user = $this->currentUser();
+
     $event = $registration->getEvent();
+    $event_meta = $this->eventManager->getMeta($event);
+
+    $form = parent::form($form, $form_state);
 
     if (!$registration->isNew()) {
-      $form['#title'] = $this->t('Edit Registration',
-        array(
-          '%event_label' => $event->label(),
-          '%event_id' => $event->id(),
-          '%registration_id' => $registration->id(),
-        )
-      );
+      $form['#title'] = $this->t('Edit Registration', [
+        '%event_label' => $event->label(),
+        '%event_id' => $event->id(),
+        '%registration_id' => $registration->id(),
+      ]);
     }
 
-    $form = parent::form($form, $form_state, $registration);
-
+    $registrants = [];
     if ($registration->isNew()) {
-      $form['identity_information'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Identity'),
-        '#description' => $this->t('Select an identity to associate with this registration.'),
-        '#open' => TRUE,
-      ];
-      $form['identity_information']['identity'] = [
-        '#type' => 'radios',
-        '#options' => NULL,
-        '#title' => $this->t('Identity'),
-        '#required' => TRUE,
-      ];
+      /** @var \Drupal\rng\RegistrantFactory $registrant_factory */
+      $registrant_factory = \Drupal::service('rng.registrant.factory');
 
-      $self = FALSE;
-      $event_meta = $this->eventManager->getMeta($event);
-      // Create a register radio option for current user.
-      // list of entity reference field types, ordered by radio default priority.
-      $entity_types = $event_meta->getIdentityTypes();
+      $count = $event_meta->identitiesCanRegister('user', [$current_user->id()]);
+      if (count($count) > 0) {
+        $registrant = $registrant_factory->createRegistrant([
+          'event' => $event,
+        ]);
 
-      // Radio order is alphabetical. (ex: self).
-      $sorted = $entity_types;
-      ksort($sorted);
-      foreach ($sorted as $entity_type_id) {
-        $options = [
-          'target_type' => $entity_type_id,
-          'handler' => 'rng_register',
-          'handler_settings' => ['event_entity_type' => $event->getEntityTypeId(), 'event_entity_id' => $event->id()],
-        ];
+        $current_user = User::load($current_user->id());
+        $registrant->setIdentity($current_user);
 
-        /* @var $selection \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
-        $selection = $this->selectionManager->getInstance($options);
-        $count = $selection->countReferenceableEntities();
-
-        if ($entity_type_id == 'user') {
-          // If duplicate registrants is allowed || user is not already a registrant.
-          if ($event_meta->identitiesCanRegister('user', [$current_user->id()])) {
-            $self = TRUE;
-            $count--;
-          }
-        }
-
-        if ($count > 0) {
-          $entity_type = $this->entityManager->getDefinition($entity_type_id);
-
-          $form['identity_information']['identity'][$entity_type_id] = [
-            '#prefix' => '<div class="form-item container-inline">',
-            '#suffix' => '</div>'
-          ];
-          $form['identity_information']['identity'][$entity_type_id]['radio'] = [
-            '#type' => 'radio',
-            '#title' => $entity_type->getLabel(),
-            '#return_value' => "$entity_type_id:*",
-            '#parents' => array('identity'),
-            '#default_value' => '',
-          ];
-          $form['identity_information']['identity'][$entity_type_id]['autocomplete'] = [
-            '#type' => 'entity_autocomplete',
-            '#title' => $entity_type->getLabel(),
-            '#title_display' => 'invisible',
-            '#target_type' => $entity_type_id,
-            '#selection_handler' => 'rng_register',
-            '#selection_settings' => [
-              'event_entity_type' => $event->getEntityTypeId(),
-              'event_entity_id' => $event->id(),
-            ],
-            '#tags' => FALSE,
-            '#parents' => array('entity', $entity_type_id),
-          ];
-        }
+        $registrants[] = $registrant;
       }
-
-      if ($self) {
-        $form['identity_information']['identity']['self'] = [
-          '#type' => 'radio',
-          '#title' => t('My account: %username', array('%username' => $current_user->getUsername())),
-          '#return_value' => 'user:' . $current_user->id(),
-          '#parents' => array('identity'),
-          '#default_value' => TRUE,
-          '#weight' => -100,
-        ];
-      }
-      else {
-        // Self will always be default, if it exists.
-        // Otherwise apply default based on $entity_types array order.
-        foreach ($entity_types as $entity_type_id) {
-          // Not all $entity_types are created, depends if there are any
-          // referenceable entities.
-          if (isset($form['identity_information']['identity'][$entity_type_id])) {
-            $form['identity_information']['identity'][$entity_type_id]['radio']['#default_value'] = TRUE;
-            break;
-          }
-        }
-      }
-
-      $form['identity_information']['redirect_identities'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Add additional identities after saving.'),
-        '#default_value' => FALSE,
-        // @todo: Hide option until user has ability to add more identities.
-        '#access' => FALSE,
-      ];
     }
     else {
-      $form['revision_information'] = array(
+      $registrants = $registration->getRegistrants();
+    }
+
+    $form['registrants_before'] = [
+      '#type' => 'value',
+      '#value' => $registrants,
+    ];
+
+    $form['people'] = [
+      '#type' => 'details',
+      '#title' => $this->t('People'),
+      '#description' => $this->t('Select people to associate with this registration.'),
+      '#open' => TRUE,
+      '#tree' => TRUE,
+    ];
+
+    $form['people']['registrants'] = [
+      '#type' => 'registrants',
+      '#event' => $event,
+      '#default_value' => $registrants,
+      '#allow_creation' => $event_meta->getCreatableIdentityTypes(),
+      '#allow_reference' => $event_meta->getIdentityTypes(),
+    ];
+
+    if (!$registration->isNew()) {
+      $form['revision_information'] = [
         '#type' => 'details',
         '#title' => $this->t('Revisions'),
         '#optional' => TRUE,
         '#open' => $current_user->hasPermission('administer rng'),
-      );
-      $form['revision'] = array(
+        '#weight' => 20,
+      ];
+      $form['revision'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Create new revision'),
         '#description' => $this->t('Revisions record changes between saves.'),
         '#default_value' => FALSE,
         '#access' => $current_user->hasPermission('administer rng'),
         '#group' => 'revision_information',
-      );
+      ];
     }
 
     return $form;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\rng\RegistrationInterface $registration */
+    $registration = parent::validateForm($form, $form_state);
+
+    /** @var \Drupal\rng\RegistrantInterface[] $registrants_before */
+    $registrants_before = $form_state->getValue('registrants_before');
+    /** @var \Drupal\rng\RegistrantInterface[] $registrants_after */
+    $registrants_after = $form_state->getValue(['people', 'registrants']);
+
+    // Registrants.
+    $registrants_after_ids = [];
+    foreach ($registrants_after as $registrant) {
+      if (!$registrant->isNew()) {
+        $registrants_after_ids[] = $registrant->id();
+      }
+    }
+
+    // Delete old registrants if they are not needed.
+    $registrants_delete = [];
+    foreach ($registrants_before as $i => $registrant) {
+      if (!$registrant->isNew())  {
+        if (!in_array($registrant->id(), $registrants_after_ids)) {
+          $registrants_delete[] = $registrant;
+        }
+      }
+    }
+
+    if (count($registrants_after) == 0) {
+      $form_state->setError($form['people']['registrants'], $this->t('There must be at least one registrant.'));
+    }
+
+    $form_state->set('registrants_after', $registrants_after);
+    $form_state->set('registrants_delete', $registrants_delete);
+
+    return $registration;
+  }
+
 
   /**
    * {@inheritdoc}
@@ -221,39 +186,35 @@ class RegistrationForm extends ContentEntityForm {
       '%id' => $registration->id(),
     ];
 
-    if ($registration->isNew()) {
-      // Add registrant.
-      list($entity_type, $entity_id) = explode(':', $form_state->getValue('identity'));
-      if ($entity_id == '*') {
-        $references = $form_state->getValue('entity');
-        if (is_numeric($references[$entity_type])) {
-          $entity_id = $references[$entity_type];
-        }
-      }
-
-      if ($identity = entity_load($entity_type, $entity_id)) {
-        $registration->addIdentity($identity);
-      }
-    }
-    else {
+    if (!$registration->isNew()) {
       $registration->setNewRevision(!$form_state->isValueEmpty('revision'));
     }
 
     if ($registration->save() == SAVED_NEW) {
-      drupal_set_message(t('Registration has been created.', $t_args));
+      drupal_set_message($this->t('Registration has been created.', $t_args));
     }
     else {
-      drupal_set_message(t('Registration was updated.', $t_args));
+      drupal_set_message($this->t('Registration was updated.', $t_args));
     }
 
-    if ($registration->id()) {
-      if ($registration->access('view')) {
-        $route_name = $form_state->getValue('redirect_identities') ? 'entity.registration.registrants' : 'entity.registration.canonical';
-        $form_state->setRedirect($route_name, array('registration' => $registration->id()));
-      }
-      else {
-        $form_state->setRedirect('<front>');
-      }
+    /** @var \Drupal\rng\RegistrantInterface[] $registrants */
+    $registrants = $form_state->get('registrants_after');
+    foreach ($registrants as $registrant) {
+      $registrant->setRegistration($registration);
+      $registrant->save();
+    }
+
+    /** @var \Drupal\rng\RegistrantInterface[] $registrants_delete */
+    $registrants_delete = $form_state->get('registrants_delete');
+    foreach ($registrants_delete as $registrant) {
+      $registrant->delete();
+    }
+
+    if ($registration->access('view')) {
+      $form_state->setRedirectUrl($registration->toUrl());
+    }
+    else {
+      $form_state->setRedirect('<front>');
     }
   }
 

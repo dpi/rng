@@ -95,6 +95,20 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public $custom_rules = TRUE;
 
   /**
+   * Registrant type for new registrants associated with this event type.
+   *
+   * @var string
+   */
+  protected $default_registrant;
+
+  /**
+   * Types of people types allowed to be associated with this event type.
+   *
+   * @var array
+   */
+  protected $people_types = [];
+
+  /**
    * Fields to add to event bundles.
    *
    * @var array
@@ -165,6 +179,109 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   function setAllowCustomRules($allow) {
     $this->custom_rules = $allow;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getDefaultRegistrantType() {
+    return $this->default_registrant;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canIdentityTypeCreate($entity_type, $bundle) {
+    return $this->getIdentityTypeKey('create', $entity_type, $bundle) !== FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentityTypeCreate($entity_type, $bundle, $enabled) {
+    return $this->setIdentityType('create', $entity_type, $bundle, $enabled);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canIdentityTypeReference($entity_type, $bundle) {
+    return $this->getIdentityTypeKey('existing', $entity_type, $bundle) !== FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentityTypeReference($entity_type, $bundle, $enabled) {
+    return $this->setIdentityType('existing', $entity_type, $bundle, $enabled);
+  }
+
+  /**
+   * Set whether an identity type can be created or referenced.
+   *
+   * @param string $op
+   *   The operation.
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   * @param boolean $enabled
+   *   Whether the identity type can be created or referenced.
+   *
+   * @return $this
+   *   Return this event type for chaining.
+   */
+  protected function setIdentityType($op, $entity_type, $bundle, $enabled) {
+    // Find the key for the pair if it exists.
+    $key = $this->getIdentityTypeKey($op, $entity_type, $bundle);
+
+    // Delete if it exists.
+    if (!$enabled && $key !== FALSE) {
+      unset($this->people_types[$op][$key]);
+    }
+
+    // Create if it doesn't exist.
+    if ($enabled && $key === FALSE) {
+      $this->people_types[$op][] = [
+        'entity_type' => $entity_type,
+        'bundle' => $bundle,
+      ];
+    }
+
+    return $this;
+  }
+
+  /**
+   * Get the array key of the people type.
+   *
+   * @param string $op
+   *   The operation.
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   *
+   * @return integer|FALSE
+   *   The array key, or FALSE if it does not exist..
+   */
+  protected function getIdentityTypeKey($op, $entity_type, $bundle) {
+    if (isset($this->people_types[$op])) {
+      $pairs = $this->people_types[$op];
+      foreach ($pairs as $k => $pair) {
+        if ($pair['entity_type'] == $entity_type && $pair['bundle'] == $bundle) {
+          return $k;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setDefaultRegistrantType($registrant_type_id) {
+    $this->default_registrant = $registrant_type_id;
     return $this;
   }
 
@@ -316,6 +433,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
+
+    // Event entity type/bundle.
     $entity_type = \Drupal::entityTypeManager()
       ->getDefinition($this->getEventEntityTypeId());
     if ($entity_type) {
@@ -332,6 +451,16 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         $this->addDependency('module', $entity_type->getProvider());
       }
     }
+
+    // Default registrant type.
+    $registrant_type_id = $this->getDefaultRegistrantType();
+    if ($registrant_type_id) {
+      $registrant_type = RegistrantType::load($registrant_type_id);
+      if ($registrant_type) {
+        $this->addDependency('config', $registrant_type->getConfigDependencyName());
+      }
+    }
+
     return $this;
   }
 

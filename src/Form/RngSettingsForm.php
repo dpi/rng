@@ -1,31 +1,25 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\RegistrantSettingsForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\courier\Service\IdentityChannelManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 
 /**
- * Configure registrant settings.
+ * Configure primary RNG settings.
  */
-class RegistrantSettingsForm extends ConfigFormBase {
+class RngSettingsForm extends ConfigFormBase {
 
   /**
    * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * The identity channel manager.
@@ -39,14 +33,14 @@ class RegistrantSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\courier\Service\IdentityChannelManagerInterface $identity_channel_manager
    *   The identity channel manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, IdentityChannelManagerInterface $identity_channel_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, IdentityChannelManagerInterface $identity_channel_manager) {
     parent::__construct($config_factory);
-    $this->entityManager = $entity_manager;
+    $this->entityTypeManager = $entity_type_manager;
     $this->identityChannelManager = $identity_channel_manager;
   }
 
@@ -56,7 +50,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('plugin.manager.identity_channel')
     );
   }
@@ -65,7 +59,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'rng_registrant_settings';
+    return 'rng_settings';
   }
 
   /**
@@ -88,8 +82,8 @@ class RegistrantSettingsForm extends ConfigFormBase {
 
     $form['contactables'] = [
       '#type' => 'details',
-      '#title' => $this->t('Identity types'),
-      '#description' => $this->t('Enable identity types who can register for events.'),
+      '#title' => $this->t('People types'),
+      '#description' => $this->t('Enable people types who can register for events.'),
       '#open' => TRUE,
       '#tree' => TRUE,
     ];
@@ -98,12 +92,12 @@ class RegistrantSettingsForm extends ConfigFormBase {
       $channels = $this->identityChannelManager->getChannelsForIdentityType($identity_type);
       $channels_string = [];
       foreach ($channels as $channel) {
-        if ($channel_entity_type = $this->entityManager->getDefinition($channel, FALSE)) {
+        if ($channel_entity_type = $this->entityTypeManager->getDefinition($channel, FALSE)) {
           $channels_string[] = $channel_entity_type->getLabel();
         }
       }
 
-      if (!$entity_type = $this->entityManager->getDefinition($identity_type, FALSE)) {
+      if (!$entity_type = $this->entityTypeManager->getDefinition($identity_type, FALSE)) {
         continue;
       }
 
@@ -139,7 +133,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $config->set('identity_types', $identity_types);
     $config->save();
 
-    drupal_set_message(t('Registrant settings updated.'));
+    drupal_set_message(t('RNG settings updated.'));
   }
 
 }

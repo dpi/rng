@@ -82,12 +82,9 @@ function rng_entity_access(EntityInterface $entity, $operation, AccountInterface
  */
 function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if ($form_id == 'user_admin_permissions') {
-    // Disable registrations for anonymous users.
-    foreach ($form['permissions'] as $permission_id => &$permission) {
-      if (strstr($permission_id, 'rng register')) {
-        $permission['anonymous']['#disabled'] = TRUE;
-      }
-    }
+    // Anonymous 'user' cannot register himself because it is a fake user.
+    $form['permissions']['rng register self'][AccountInterface::ANONYMOUS_ROLE]['#disabled'] = TRUE;
+    $form['permissions']['rng register self'][AccountInterface::ANONYMOUS_ROLE]['#access'] = FALSE;
   }
 }
 

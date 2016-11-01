@@ -81,6 +81,77 @@ interface EventTypeInterface extends ConfigEntityInterface {
   function setAllowCustomRules($allow);
 
   /**
+   * Registrant type for new registrants associated with this event type.
+   *
+   * @return string
+   *   The Registrant type used for new registrants associated with this event
+   *   type.
+   */
+  function getDefaultRegistrantType();
+
+  /**
+   * Whether a identity type can be created.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   *
+   * @return boolean
+   *   Whether a identity type can be created.
+   */
+  public function canIdentityTypeCreate($entity_type, $bundle);
+
+  /**
+   * Set whether an identity type can be created.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   * @param boolean $enabled
+   *   Whether the identity type can be created.
+   */
+  public function setIdentityTypeCreate($entity_type, $bundle, $enabled);
+
+  /**
+   * Whether an existing identity type can be referenced.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   *
+   * @return boolean
+   *   Whether an existing identity type can be referenced.
+   */
+  public function canIdentityTypeReference($entity_type, $bundle);
+
+  /**
+   * Set whether existing identity type can be referenced.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   * @param boolean $enabled
+   *   Whether existing identity type can be referenced.
+   */
+  public function setIdentityTypeReference($entity_type, $bundle, $enabled);
+
+  /**
+   * Set registrant type for new registrants associated with this event type.
+   *
+   * @param string $registrant_type_id
+   *   The Registrant type used for new registrants associated with this event
+   *   type.
+   *
+   * @return $this
+   *   Return this event type for chaining.
+   */
+  function setDefaultRegistrantType($registrant_type_id);
+
+  /**
    * Create or clean up courier_context if none exist for an entity type.
    *
    * @param string $entity_type
