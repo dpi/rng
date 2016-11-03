@@ -574,11 +574,18 @@ class Registrants extends FormElement {
   public static function validateRegisterable(&$element, FormStateInterface $form_state, &$complete_form) {
     /** @var \Drupal\rng\RegistrantInterface[] $registrants */
     $registrants = $element['#value'];
+    $whitelisted = static::getWhitelistExisting($element, $form_state);
 
     $identities = [];
     foreach ($registrants as $registrant) {
       $identity = $registrant->getIdentity();
-      $identities[$identity->getEntityTypeId()][$identity->id()] = $identity->label();
+      $entity_type = $identity->getEntityTypeId();
+      $id = $identity->id();
+      // Check if identity can skip existing revalidation. This needs to be done
+      // when the identity was created by this element.
+      if (!isset($whitelisted[$entity_type][$id])) {
+        $identities[$entity_type][$id] = $identity->label();
+      }
     }
 
     /** @var \Drupal\rng\EventManagerInterface $event_manager */
@@ -868,6 +875,7 @@ class Registrants extends FormElement {
     $form_state->setValue($element['#parents'], $value);
     $display->extractFormValues($new_person, $subform_new_entity, $form_state);
     $new_person->save();
+    static::addWhitelistExisting($element, $form_state, $new_person);
 
     $registrant = static::buildRegistrant($element, $form_state);
     static::clearPeopleFormInput($element, $form_state);
@@ -1010,11 +1018,46 @@ class Registrants extends FormElement {
    *   An associative array containing the form structure of the element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\rng\RegistrantInterface[]
+   * @param \Drupal\rng\RegistrantInterface[] $registrants
    *   An array of registrants.
    */
   public static function setRegistrants(array $element, FormStateInterface $form_state, array $registrants) {
     $form_state->set(array_merge($element['#parents'], ['registrants']), $registrants);
+  }
+
+  /**
+   * Gets identities which should skip the existing validation check.
+   *
+   * @param array $element
+   *   An associative array containing the form structure of the element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   An array of identities to skip existing check.
+   */
+  public static function getWhitelistExisting(array $element, FormStateInterface $form_state) {
+    return $form_state->get(array_merge($element['#parents'], ['whitelist_existing'])) ?: [];
+  }
+
+  /**
+   * Whitelist an existing identity from re-validation.
+   *
+   * Identities created by this element should avoid the existing check of
+   * EventMetaInterface::identitiesCanRegister in case the event type does not
+   * permit usage of the 'existing' subform.
+   *
+   * @param array $element
+   *   An associative array containing the form structure of the element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param \Drupal\Core\Entity\EntityInterface $identity
+   *   An identity to whitelist from re-validation
+   */
+  public static function addWhitelistExisting(array $element, FormStateInterface $form_state, EntityInterface $identity) {
+    $whitelisted = static::getWhitelistExisting($element, $form_state);
+    $whitelisted[$identity->getEntityTypeId()][$identity->id()] = $identity->id();
+    $form_state->set(array_merge($element['#parents'], ['whitelist_existing']), $whitelisted);
   }
 
   /**
