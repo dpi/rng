@@ -150,10 +150,12 @@ function rng_update_8003() {
     }
   }
 
-  // Set default registrant for event types to the new bundle entity.
   $config_names = $config_factory->listAll('rng.event_type.');
   foreach ($config_names as $name) {
     $config = $config_factory->getEditable($name);
+
+    // Set default registrant for event types to the new bundle entity created
+    // in 8002. 8002 + 8003 happen simultaneously.
     $config->set('default_registrant', $default_registrant_type_id);
 
     // Permit referencing existing entities for all enabled identity types.
