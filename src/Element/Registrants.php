@@ -195,6 +195,7 @@ class Registrants extends FormElement {
         '#submit' => [
           [static::class, 'submitArityChange'],
         ],
+        '#disabled' => count($people) > 1,
       ];
     }
 
@@ -260,8 +261,8 @@ class Registrants extends FormElement {
       '#options' => $for_bundles,
       '#access' => $change_it,
       '#ajax' => [
-        'callback' => [static::class, 'ajaxElementEntitiesSubform'],
-        'wrapper' => $ajax_wrapper_id_entities,
+        'callback' => [static::class, 'ajaxElementRoot'],
+        'wrapper' => $ajax_wrapper_id_root,
         'progress' => [
           'type' => 'throbber',
           'message' => NULL,
@@ -489,8 +490,8 @@ class Registrants extends FormElement {
             '#type' => 'submit',
             '#value' => t('Create new @label', ['@label' => $bundle_info['label']]),
             '#ajax' => [
-              'callback' => [static::class, 'ajaxElementEntitiesSubform'],
-              'wrapper' => $ajax_wrapper_id_entities,
+              'callback' => [static::class, 'ajaxElementRoot'],
+              'wrapper' => $ajax_wrapper_id_root,
             ],
             '#validate' => [
               [static::class, 'decoyValidator'],
@@ -626,24 +627,6 @@ class Registrants extends FormElement {
   public static function ajaxElementRoot(array $form, FormStateInterface $form_state) {
     return static::findElement($form, $form_state);
   }
-
-  /**
-   * Ajax callback to return the entities sub-form.
-   *
-   * @param array $form
-   *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   The entities sub-form.
-   */
-  public static function ajaxElementEntitiesSubform(array $form, FormStateInterface $form_state) {
-    $form_state->setRebuild();
-    $element = static::findElement($form, $form_state);
-    return $element['entities'];
-  }
-
 
   /**
    * Validate adding myself sub-form.
