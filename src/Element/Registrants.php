@@ -9,6 +9,7 @@ use Drupal\Core\Render\Element\FormElement;
 use Drupal\user\Entity\User;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\RegistrantInterface;
+use Drupal\rng\RegistrantsElementUtility as RegistrantsElement;
 
 /**
  * Provides a form element for a registrant and person association.
@@ -87,6 +88,8 @@ class Registrants extends FormElement {
       throw new \InvalidArgumentException('Element cannot create or reference any entities.');
     }
 
+    $utility = new RegistrantsElement($element, $form_state);
+
     /** @var \Drupal\rng\RegistrantFactory $registrant_factory */
     $registrant_factory = \Drupal::service('rng.registrant.factory');
     /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info */
@@ -110,10 +113,10 @@ class Registrants extends FormElement {
     $values = NestedArray::getValue($form_state->getUserInput(), $parents);
     $for_bundle = isset($values['entities']['for_bundle']) ? $values['entities']['for_bundle'] : NULL;
 
-    $arity_is_multiple = static::getArity($element, $form_state) === 'multiple';
+    $arity_is_multiple = $utility->getArity() === 'multiple';
     $arity_is_single = !$arity_is_multiple;
-    $change_it = static::getChangeIt($element, $form_state);
-    $entity_create_form = static::getShowCreateEntitySubform($element, $form_state);
+    $change_it = $utility->getChangeIt();
+    $entity_create_form = $utility->getShowCreateEntitySubform();
 
     if (!$change_it) {
       $element['for']['#tree'] = TRUE;
@@ -254,7 +257,7 @@ class Registrants extends FormElement {
       ],
     ];
 
-    $for_bundles = static::peopleTypeOptions($element, $form_state);
+    $for_bundles = $utility->peopleTypeOptions();
     $element['entities']['for_bundle'] = [
       '#type' => 'radios',
       '#title' => t('Person type'),
@@ -355,7 +358,7 @@ class Registrants extends FormElement {
           '#attributes' => [
             'class' => ['existing-container'],
           ],
-          '#access' => $allow_reference && static::countReferenceableEntities($event, $person_entity_type_id) > 0,
+          '#access' => $allow_reference && $utility->countReferenceableEntities($event, $person_entity_type_id) > 0,
         ];
         $person_subform['existing']['existing_autocomplete'] = [
           '#type' => 'entity_autocomplete',
@@ -545,12 +548,14 @@ class Registrants extends FormElement {
    * Generic validator for the element.
    */
   public static function validateIdentityElement(&$element, FormStateInterface $form_state, &$complete_form) {
+    $utility = new RegistrantsElement($element, $form_state);
+
     $registrants = $element['#value'];
 
-    $arity_is_single = static::getArity($element, $form_state) === 'single';
+    $arity_is_single = $utility->getArity() === 'single';
     if ($arity_is_single) {
       $registrants = array_slice($registrants, 0, 1);
-      $change_it = static::getChangeIt($element, $form_state);
+      $change_it = $utility->getChangeIt();
       if ($change_it) {
         // Ensure if the change it is TRUE and single form is open then throw
         // error.
@@ -573,9 +578,11 @@ class Registrants extends FormElement {
    * it is also stored in the state of another registration.
    */
   public static function validateRegisterable(&$element, FormStateInterface $form_state, &$complete_form) {
+    $utility = new RegistrantsElement($element, $form_state);
+
     /** @var \Drupal\rng\RegistrantInterface[] $registrants */
     $registrants = $element['#value'];
-    $whitelisted = static::getWhitelistExisting($element, $form_state);
+    $whitelisted = $utility->getWhitelistExisting();
 
     $identities = [];
     foreach ($registrants as $registrant) {
@@ -625,7 +632,7 @@ class Registrants extends FormElement {
    *   The entire element sub-form.
    */
   public static function ajaxElementRoot(array $form, FormStateInterface $form_state) {
-    return static::findElement($form, $form_state);
+    return RegistrantsElement::findElement($form, $form_state);
   }
 
   /**
@@ -637,9 +644,9 @@ class Registrants extends FormElement {
    *   The current state of the form.
    */
   public static function validateMyself(array &$form, FormStateInterface $form_state) {
-    $element = static::findElement($form, $form_state);
-
-    static::buildRegistrant($element, $form_state, TRUE);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
+    $utility->buildRegistrant(TRUE);
   }
 
   /**
@@ -651,9 +658,10 @@ class Registrants extends FormElement {
    *   The current state of the form.
    */
   public static function validateExisting(array &$form, FormStateInterface $form_state) {
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
-    static::buildRegistrant($element, $form_state, TRUE);
+    $utility->buildRegistrant(TRUE);
 
     $autocomplete_tree = array_merge($element['#parents'], ['entities', 'person', 'existing', 'existing_autocomplete']);
 
@@ -662,11 +670,11 @@ class Registrants extends FormElement {
     $existing_value = NestedArray::getValue($form_state->getTemporaryValue('_registrants_values'), $autocomplete_tree);
 
     if (!empty($existing_value)) {
-      $new_arity = static::getArity($element, $form_state);
+      $new_arity = $utility->getArity();
       if ($new_arity === 'multiple') {
         $identity = \Drupal::entityTypeManager()->getStorage($existing_entity_type)
           ->load($existing_value);
-        if (static::identityExists($element, $form_state, $identity)) {
+        if ($utility->identityExists($identity)) {
           $form_state->setError(NestedArray::getValue($form, $autocomplete_tree), t('Person is already on this registration.'));
         }
       }
@@ -685,9 +693,10 @@ class Registrants extends FormElement {
    *   The current state of the form.
    */
   public static function validateCreate(array &$form, FormStateInterface $form_state) {
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
-    static::buildRegistrant($element, $form_state, TRUE);
+    $utility->buildRegistrant(TRUE);
 
     $new_person_tree = array_merge($element['#parents'], ['entities', 'person', 'new_person', 'newentityform']);
     $subform_newentity = NestedArray::getValue($form, $new_person_tree);
@@ -723,14 +732,15 @@ class Registrants extends FormElement {
   public static function submitChangeDefault(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
 
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
-    static::setChangeIt($form, $form_state, TRUE);
+    $utility->setChangeIt(TRUE);
 
-    $new_arity = static::getArity($element, $form_state);
+    $new_arity = $utility->getArity();
     if ($new_arity === 'single') {
-      static::clearPeopleFormInput($element, $form_state);
-      static::setForBundleAsFirstRegistrant($element, $form_state);
+      $utility->clearPeopleFormInput();
+      $utility->setForBundleAsFirstRegistrant();
     }
   }
 
@@ -744,21 +754,22 @@ class Registrants extends FormElement {
   public static function submitArityChange(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
     $trigger = $form_state->getTriggeringElement();
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
     /** @var \Drupal\rng\RegistrantInterface[] $people */
     $people = $element['#value'];
 
     $new_arity = $trigger['#value'];
-    static::setArity($element, $form_state, $new_arity);
+    $utility->setArity($new_arity);
 
     if ((count($people) > 0)) {
       if ($new_arity === 'single') {
-        static::clearPeopleFormInput($element, $form_state);
-        static::setForBundleAsFirstRegistrant($element, $form_state);
+        $utility->clearPeopleFormInput();
+        $utility->setForBundleAsFirstRegistrant();
       }
       else {
-        static::clearPeopleFormInput($element, $form_state);
+        $utility->clearPeopleFormInput();
         $parents = array_merge($element['#parents'], ['entities', 'for_bundle']);
         NestedArray::unsetValue($form_state->getUserInput(), $parents);
       }
@@ -776,10 +787,11 @@ class Registrants extends FormElement {
   public static function submitMyself(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
 
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
-    $registrant = static::buildRegistrant($element, $form_state);
-    static::clearPeopleFormInput($element, $form_state);
+    $registrant = $utility->buildRegistrant();
+    $utility->clearPeopleFormInput();
 
     $current_user = \Drupal::currentUser();
     if ($current_user->isAuthenticated()) {
@@ -787,13 +799,13 @@ class Registrants extends FormElement {
       $registrant->setIdentity($person);
     }
 
-    $arity = static::getArity($element, $form_state);
+    $arity = $utility->getArity();
     if ($arity === 'single') {
-      static::replaceFirstRegistrant($form, $form_state, $registrant);
-      static::setChangeIt($form, $form_state, FALSE);
+      $utility->replaceFirstRegistrant($registrant);
+      $utility->setChangeIt(FALSE);
     }
     else {
-      static::addRegistrant($form, $form_state, $registrant);
+      $utility->addRegistrant($registrant);
     }
   }
 
@@ -808,10 +820,11 @@ class Registrants extends FormElement {
   public static function submitExisting(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
 
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
-    $registrant = static::buildRegistrant($element, $form_state);
-    static::clearPeopleFormInput($element, $form_state);
+    $registrant = $utility->buildRegistrant();
+    $utility->clearPeopleFormInput();
 
     $autocomplete_tree = array_merge($element['#parents'], ['entities', 'person', 'existing', 'existing_autocomplete']);
     $existing_value = NestedArray::getValue($form_state->getTemporaryValue('_registrants_values'), $autocomplete_tree);
@@ -822,13 +835,13 @@ class Registrants extends FormElement {
       ->load($existing_value);
     $registrant->setIdentity($person);
 
-    $arity = static::getArity($element, $form_state);
+    $arity = $utility->getArity();
     if ($arity === 'single') {
-      static::replaceFirstRegistrant($form, $form_state, $registrant);
-      static::setChangeIt($form, $form_state, FALSE);
+      $utility->replaceFirstRegistrant($registrant);
+      $utility->setChangeIt(FALSE);
     }
     else {
-      static::addRegistrant($form, $form_state, $registrant);
+      $utility->addRegistrant($registrant);
     }
   }
 
@@ -843,7 +856,8 @@ class Registrants extends FormElement {
   public static function submitCreate(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
 
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
 
     // New entity
     $new_entity_tree = array_merge($element['#parents'], ['entities', 'person', 'new_person', 'newentityform']);
@@ -858,22 +872,22 @@ class Registrants extends FormElement {
     $form_state->setValue($element['#parents'], $value);
     $display->extractFormValues($new_person, $subform_new_entity, $form_state);
     $new_person->save();
-    static::addWhitelistExisting($element, $form_state, $new_person);
+    $utility->addWhitelistExisting($new_person);
 
-    $registrant = static::buildRegistrant($element, $form_state);
-    static::clearPeopleFormInput($element, $form_state);
+    $registrant = $utility->buildRegistrant();
+    $utility->clearPeopleFormInput();
 
     $registrant->setIdentity($new_person);
 
-    $arity = static::getArity($element, $form_state);
+    $arity = $utility->getArity();
     if ($arity === 'single') {
-      static::replaceFirstRegistrant($form, $form_state, $registrant);
-      static::setChangeIt($form, $form_state, FALSE);
-      static::setShowCreateEntitySubform($form, $form_state, FALSE);
+      $utility->replaceFirstRegistrant($registrant);
+      $utility->setChangeIt(FALSE);
+      $utility->setShowCreateEntitySubform(FALSE);
     }
     else {
-      static::addRegistrant($form, $form_state, $registrant);
-      static::setShowCreateEntitySubform($form, $form_state, FALSE);
+      $utility->addRegistrant($registrant);
+      $utility->setShowCreateEntitySubform(FALSE);
     }
   }
 
@@ -888,7 +902,10 @@ class Registrants extends FormElement {
   public static function submitToggleCreateEntity(array $form, FormStateInterface $form_state) {
     $trigger = $form_state->getTriggeringElement();
     $form_state->setRebuild();
-    static::setShowCreateEntitySubform($form, $form_state, $trigger['#toggle_create_entity']);
+
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
+    $utility->setShowCreateEntitySubform($trigger['#toggle_create_entity']);
   }
 
   /**
@@ -902,437 +919,15 @@ class Registrants extends FormElement {
   public static function submitRemovePerson(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
 
-    $element = static::findElement($form, $form_state);
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
+
     $trigger = $form_state->getTriggeringElement();
     $row = $trigger['#identity_element_registrant_row'];
 
-    $registrants = static::getRegistrants($element, $form_state);
+    $registrants = $utility->getRegistrants();
     unset($registrants[$row]);
-    static::setRegistrants($element, $form_state, $registrants);
-  }
-
-  /**
-   * Traverses the triggering element tree until this element is found.
-   *
-   * @param array $form
-   *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array|NULL
-   *   The element, or NULL if the element is not found.
-   */
-  protected static function findElement(array $form, FormStateInterface $form_state) {
-    return static::findElementWithProperties($form, $form_state, ['#identity_element_root' => TRUE]);
-  }
-
-  /**
-   * Traverses the triggering element tree until an element is found.
-   *
-   * Traverses parents tree from the triggering element to find the element
-   * with the passed in properties.
-   *
-   * @param array $form
-   *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param array $element_properties
-   *   Traverse up until finding an element with the properties with these keys
-   *   and values.
-   *
-   * @return array|NULL
-   *   The requested element, or NULL if the element is not found.
-   */
-  protected static function findElementWithProperties(array $form, FormStateInterface $form_state, array $element_properties) {
-    $trigger = $form_state->getTriggeringElement();
-    $parents = $trigger['#parents'];
-
-    // In case $form is the element itself.
-    $element = $form;
-
-    while (!isset($element) || array_diff_assoc($element_properties, $element)) {
-      $element = NestedArray::getValue($form, $parents);
-      if (array_pop($parents) === NULL) {
-        return NULL;
-      }
-    }
-    return $element;
-  }
-
-  public static function addRegistrant(array $form, FormStateInterface $form_state, RegistrantInterface $registrant) {
-    $element = static::findElement($form, $form_state);
-    $registrants = static::getRegistrants($element, $form_state);
-    $registrants[] = $registrant;
-    static::setRegistrants($element, $form_state, $registrants);
-  }
-
-  public static function replaceFirstRegistrant(array $form, FormStateInterface $form_state, RegistrantInterface $registrant) {
-    $element = static::findElement($form, $form_state);
-
-    $registrants = static::getRegistrants($element, $form_state);
-
-    // Get first key, or use 0 if there is none.
-    $key = key($registrants);
-    $key = ($key !== NULL) ? $key : 0;
-    $registrants[$key] = $registrant;
-
-    static::setRegistrants($element, $form_state, $registrants);
-  }
-
-  /**
-   * Gets registrant from form state.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return \Drupal\rng\RegistrantInterface[]
-   *   An array of registrants.
-   */
-  public static function getRegistrants(array $element, FormStateInterface $form_state) {
-    return $form_state->get(array_merge($element['#parents'], ['registrants'])) ?: $element['#value'];
-  }
-
-  /**
-   * Sets registrants in form state.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param \Drupal\rng\RegistrantInterface[] $registrants
-   *   An array of registrants.
-   */
-  public static function setRegistrants(array $element, FormStateInterface $form_state, array $registrants) {
-    $form_state->set(array_merge($element['#parents'], ['registrants']), $registrants);
-  }
-
-  /**
-   * Gets identities which should skip the existing validation check.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   An array of identities to skip existing check.
-   */
-  public static function getWhitelistExisting(array $element, FormStateInterface $form_state) {
-    return $form_state->get(array_merge($element['#parents'], ['whitelist_existing'])) ?: [];
-  }
-
-  /**
-   * Whitelist an existing identity from re-validation.
-   *
-   * Identities created by this element should avoid the existing check of
-   * EventMetaInterface::identitiesCanRegister in case the event type does not
-   * permit usage of the 'existing' subform.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param \Drupal\Core\Entity\EntityInterface $identity
-   *   An identity to whitelist from re-validation
-   */
-  public static function addWhitelistExisting(array $element, FormStateInterface $form_state, EntityInterface $identity) {
-    $whitelisted = static::getWhitelistExisting($element, $form_state);
-    $whitelisted[$identity->getEntityTypeId()][$identity->id()] = $identity->id();
-    $form_state->set(array_merge($element['#parents'], ['whitelist_existing']), $whitelisted);
-  }
-
-  /**
-   * Get form state for change_it.
-   *
-   * @param array $form
-   *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return boolean
-   *   The current value for change_it.
-   */
-  public static function getChangeIt(array $form, FormStateInterface $form_state) {
-    $element = static::findElement($form, $form_state);
-    return (bool) $form_state->get(array_merge($element['#parents'], ['change_it']));
-  }
-
-  /**
-   * Set form state for change_it.
-   *
-   * @param array $form
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param $value
-   */
-  public static function setChangeIt(array $form, FormStateInterface $form_state, $value) {
-    $element = static::findElement($form, $form_state);
-    $form_state->set(array_merge($element['#parents'], ['change_it']), $value);
-  }
-
-  /**
-   * Get form state for for_arity.
-   */
-  public static function getArity(array $element, FormStateInterface $form_state) {
-    $arity = $form_state->get(array_merge($element['#parents'], ['for_arity']));
-    if ($arity === NULL) {
-      $values = NestedArray::getValue($form_state->getUserInput(), $element['#parents']);
-      if (isset($values['for_arity'])) {
-        $arity = $values['for_arity'];
-      }
-      else {
-        $registrants = $element['#value'];
-        $arity = (count($registrants) > 1) ? 'multiple' : 'single';
-      }
-    }
-
-    return $arity;
-  }
-
-  /**
-   * Set form state for for_arity.
-   *
-   * Arity needs to persist in case the user has multiple registrants, then
-   * selects 'Single', then selects 'Change' again.
-   *
-   */
-  public static function setArity(array $element, FormStateInterface $form_state, $arity) {
-    $form_state->set(array_merge($element['#parents'], ['for_arity']), $arity);
-  }
-
-  /**
-   * Get form state for opening the create-an-entity sub-form.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return boolean
-   *   Wther the create-an-entity sub-form is open.
-   */
-  public static function getShowCreateEntitySubform(array $element, FormStateInterface $form_state) {
-    return (bool) $form_state->get(array_merge($element['#parents'], ['show_entity_create_form']));
-  }
-
-  /**
-   * Set form state for opening the create-an-entity sub-form.
-   *
-   * @param array $form
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param $value
-   */
-  public static function setShowCreateEntitySubform(array $form, FormStateInterface $form_state, $value) {
-    $element = static::findElement($form, $form_state);
-    $form_state->set(array_merge($element['#parents'], ['show_entity_create_form']), $value);
-  }
-
-  /**
-   * Clear user input from people sub-forms.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function clearPeopleFormInput($element, FormStateInterface $form_state) {
-    $autocomplete_tree = array_merge($element['#parents'], ['entities', 'person', 'existing','existing_autocomplete']);
-    NestedArray::unsetValue($form_state->getUserInput(), $autocomplete_tree);
-
-    $registrant_tree = array_merge($element['#parents'], ['entities', 'person', 'registrant']);
-    NestedArray::unsetValue($form_state->getUserInput(), $registrant_tree);
-
-    $new_entity_tree = array_merge($element['#parents'], ['entities', 'person', 'new_person', 'newentityform']);
-    NestedArray::unsetValue($form_state->getUserInput(), $new_entity_tree);
-  }
-
-  /**
-   * Copies form values to registrant entity properties
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param bool $validate
-   *   Optionally validate the form.
-   *
-   * @return \Drupal\rng\RegistrantInterface
-   * A registrant entity with updated properties.
-   */
-  public static function buildRegistrant($element, FormStateInterface &$form_state, $validate = FALSE) {
-    $value = $form_state->getTemporaryValue(array_merge(['_registrants_values'], $element['#parents']));
-    $form_state->setValue($element['#parents'], $value);
-
-    $registrant = $form_state->get('registrant__entity');
-    $display = $form_state->get('registrant__form_display');
-
-    $registrant_tree = ['entities', 'person', 'registrant'];
-    $subform_registrant = NestedArray::getValue($element, $registrant_tree);
-    $display->extractFormValues($registrant, $subform_registrant, $form_state);
-
-    if ($validate) {
-      $display->validateFormValues($registrant, $subform_registrant, $form_state);
-    }
-
-    return $registrant;
-  }
-
-  /**
-   * Load first registrant into form inputs.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function setForBundleAsFirstRegistrant($element, FormStateInterface $form_state) {
-    /** @var \Drupal\rng\RegistrantInterface[] $registrants */
-    $registrants = $element['#value'];
-
-    $registrant = reset($registrants);
-    if ($registrant) {
-      $identity = $registrant->getIdentity();
-      $entity_type = $identity->getEntityTypeId();
-      $bundle = $identity->bundle();
-      $new_value = "$entity_type:$bundle";
-
-      $for_bundle_tree = array_merge($element['#parents'], ['entities', 'for_bundle']);
-      NestedArray::setValue($form_state->getUserInput(), $for_bundle_tree, $new_value);
-    }
-  }
-
-  /**
-   * Determine if an identity is already used.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param \Drupal\Core\Entity\EntityInterface $identity
-   *   An identity to check.
-   *
-   * @return boolean
-   *   Whether the identity is already used.
-   */
-  public static function identityExists($element, $form_state, EntityInterface $identity) {
-    $registrants = static::getRegistrants($element, $form_state);
-    foreach ($registrants as $registrant) {
-      if (($registrant->getIdentity()->id() == $identity->id()) && ($registrant->getIdentity()->getEntityTypeId() == $identity->getEntityTypeId())) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
-   * Count referenceable identities for an event.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $event
-   *   The event entity.
-   * @param string $entity_type_id
-   *   The identity entity type ID.
-   * @param array $bundles
-   *   (optional) Identity bundles.
-   *
-   * @return int
-   *   The count of referencable entities.
-   */
-  public static function countReferenceableEntities(EntityInterface $event, $entity_type_id, $bundles = []) {
-    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager */
-    $selection_manager = \Drupal::service('plugin.manager.entity_reference_selection');
-
-    $options = [
-      'target_type' => $entity_type_id,
-      'handler' => 'rng_register',
-      'handler_settings' => [
-        'event_entity_type' => $event->getEntityTypeId(),
-        'event_entity_id' => $event->id(),
-      ],
-    ];
-
-    if (!empty($bundles)) {
-      $options['handler_settings']['target_bundles'] = $bundles;
-    }
-
-    /* @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $selection */
-    $selection = $selection_manager->getInstance($options);
-    return $selection->countReferenceableEntities();
-  }
-
-  /**
-   * Generate available people type options suitable for radios element.
-   *
-   * @param array $element
-   *   An associative array containing the form structure of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   Options suitable for a radios element.
-   */
-  public static function peopleTypeOptions($element, $form_state) {
-    /** @var \Drupal\rng\EventManagerInterface $event_manager */
-    $event_manager = \Drupal::service('rng.event_manager');
-    /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info */
-    $bundle_info = \Drupal::service('entity_type.bundle.info');
-
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $current_user = \Drupal::currentUser();
-
-    $event = $element['#event'];
-    $event_meta = $event_manager->getMeta($event);
-
-    $for_bundles = [];
-
-    // Create.
-    foreach ($element['#allow_creation'] as $entity_type_id => $bundles) {
-      $entity_type = $entity_type_manager->getDefinition($entity_type_id);
-      $info = $bundle_info->getBundleInfo($entity_type_id);
-      foreach ($bundles as $bundle) {
-        $access_control = $entity_type_manager->getAccessControlHandler($entity_type_id);
-        $create_bundle = ($entity_type->getBundleEntityType() !== NULL) ? $bundle : NULL;
-        if ($access_control->createAccess($create_bundle)) {
-          $for_bundle_key = $entity_type_id . ':' . $bundle;
-          $for_bundles[$for_bundle_key] = $info[$bundle]['label'];
-        }
-      }
-    }
-
-    // Existing.
-    foreach ($element['#allow_reference'] as $entity_type_id => $bundles) {
-      $entity_type = $entity_type_manager->getDefinition($entity_type_id);
-      $info = $bundle_info->getBundleInfo($entity_type_id);
-      foreach ($bundles as $bundle) {
-        $for_bundle_key = $entity_type_id . ':' . $bundle;
-        if (isset($for_bundles[$for_bundle_key])) {
-          // Skip if there an option already exists for 'create'.
-          continue;
-        }
-
-        $counting_bundle = ($entity_type->getBundleEntityType() !== NULL) ? [$bundle] : [];
-        $existing_count = static::countReferenceableEntities($event, $entity_type_id, $counting_bundle);
-
-        // Add myself special option.
-        if ($entity_type_id === 'user' && $current_user->isAuthenticated()) {
-          $identity = User::load($current_user->id());
-          if (!static::identityExists($element, $form_state, $identity)) {
-            if ($event_meta->identitiesCanRegister('user', [$current_user->id()])) {
-              $existing_count--;
-              $for_bundles['myself:'] = t('Myself');
-            }
-          }
-        }
-
-        if ($existing_count > 0) {
-          $for_bundles[$for_bundle_key] = $info[$bundle]['label'];
-        }
-      }
-    }
-
-    return $for_bundles;
+    $utility->setRegistrants($registrants);
   }
 
 }
