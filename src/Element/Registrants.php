@@ -415,8 +415,7 @@ class Registrants extends FormElement {
         // New entity
         $create = FALSE;
         if (isset($element['#allow_creation'][$person_entity_type_id])) {
-          $create = $entity_type_manager->getAccessControlHandler($person_entity_type_id)
-            ->createAccess();
+          $create = RegistrantsElement::entityCreateAccess($person_entity_type_id, $person_bundle);
         }
         $person_subform['new_person'] = [
           '#type' => 'details',

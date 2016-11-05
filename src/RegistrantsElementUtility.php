@@ -350,12 +350,9 @@ class RegistrantsElementUtility {
 
     // Create.
     foreach ($this->element['#allow_creation'] as $entity_type_id => $bundles) {
-      $entity_type = $entity_type_manager->getDefinition($entity_type_id);
       $info = $bundle_info->getBundleInfo($entity_type_id);
       foreach ($bundles as $bundle) {
-        $access_control = $entity_type_manager->getAccessControlHandler($entity_type_id);
-        $create_bundle = ($entity_type->getBundleEntityType() !== NULL) ? $bundle : NULL;
-        if ($access_control->createAccess($create_bundle)) {
+        if ($this->entityCreateAccess($entity_type_id, $bundle)) {
           $for_bundle_key = $entity_type_id . ':' . $bundle;
           $for_bundles[$for_bundle_key] = $info[$bundle]['label'];
         }
@@ -394,6 +391,28 @@ class RegistrantsElementUtility {
     }
 
     return $for_bundles;
+  }
+
+  /**
+   * Determine whether the current user can create new entities.
+   *
+   * @param string $entity_type_id
+   *   A entity type ID.
+   * @param string $bundle
+   *   An entity bundle
+   *
+   * @return boolean
+   *   Whether the current user can create new entities.
+   */
+  public static function entityCreateAccess($entity_type_id, $bundle) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    $access_control = $entity_type_manager->getAccessControlHandler($entity_type_id);
+
+    // If entity type has bundles
+    $entity_bundle = ($entity_type->getBundleEntityType() !== NULL) ? $bundle : NULL;
+
+    return $access_control->createAccess($entity_bundle);
   }
 
 }
