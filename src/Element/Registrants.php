@@ -7,8 +7,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
 use Drupal\user\Entity\User;
-use Drupal\rng\Entity\Registrant;
-use Drupal\rng\RegistrantInterface;
 use Drupal\rng\RegistrantsElementUtility as RegistrantsElement;
 
 /**

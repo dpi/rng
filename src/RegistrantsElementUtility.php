@@ -5,10 +5,7 @@ namespace Drupal\rng;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\FormElement;
 use Drupal\user\Entity\User;
-use Drupal\rng\Entity\Registrant;
-use Drupal\rng\RegistrantInterface;
 
 class RegistrantsElementUtility {
 
@@ -153,7 +150,7 @@ class RegistrantsElementUtility {
    *   The current value for change_it.
    */
   public function getChangeIt() {
-    return (bool) $this->formState->get(array_merge($this->element['#parents'], ['change_it']));
+    return $this->formState->get(array_merge($this->element['#parents'], ['change_it'])) ?: FALSE;
   }
 
   /**
