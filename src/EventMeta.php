@@ -228,8 +228,8 @@ class EventMeta implements EventMetaInterface {
   public function getRegistrantsMinimum() {
     if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM})) {
       $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM};
-      $minimum = (int) $field->value;
-      if (is_numeric($minimum) && $minimum >= 0) {
+      $minimum = $field->value;
+      if ($minimum !== '' && is_numeric($minimum) && $minimum >= 0) {
         return $minimum;
       }
     }
@@ -242,8 +242,8 @@ class EventMeta implements EventMetaInterface {
   public function getRegistrantsMaximum() {
     if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM})) {
       $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM};
-      $maximum = (int) $field->value;
-      if (is_numeric($maximum) && $maximum >= 0) {
+      $maximum = $field->value;
+      if ($maximum !== '' && is_numeric($maximum) && $maximum >= 0) {
         return $maximum;
       }
     }
