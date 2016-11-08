@@ -28,6 +28,7 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *       "edit" = "Drupal\rng\Form\EventTypeForm",
  *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm",
  *       "event_access_defaults" = "Drupal\rng\Form\EventTypeAccessDefaultsForm",
+ *       "field_mapping" = "Drupal\rng\Form\EventTypeFieldMappingForm",
  *     }
  *   },
  *   admin_permission = "administer event types",
@@ -40,6 +41,7 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *     "edit-form" = "/admin/structure/rng/event_types/manage/{event_type}/edit",
  *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete",
  *     "event-access-defaults" = "/admin/structure/rng/event_types/manage/{event_type}/access_defaults",
+ *     "field-mapping" = "/admin/structure/rng/event_types/manage/{event_type}/field_mapping",
  *   }
  * )
  */
@@ -120,6 +122,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     EventManagerInterface::FIELD_CAPACITY,
     EventManagerInterface::FIELD_EMAIL_REPLY_TO,
     EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
+    EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM,
+    EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM,
   ];
 
   /**
@@ -373,6 +377,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         EventManagerInterface::FIELD_EMAIL_REPLY_TO,
         EventManagerInterface::FIELD_REGISTRATION_TYPE,
         EventManagerInterface::FIELD_REGISTRATION_GROUPS,
+        EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM,
+        EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM,
       ];
 
       module_load_include('inc', 'rng', 'rng.field.defaults');

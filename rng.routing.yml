@@ -151,6 +151,14 @@ entity.event_type.access_defaults:
   requirements:
     _permission: 'administer event types'
 
+entity.event_type.field_mapping:
+  path: '/admin/structure/rng/event_types/manage/{event_type}/field_mapping'
+  defaults:
+    _entity_form: 'event_type.field_mapping'
+    _title: 'Field mapping'
+  requirements:
+    _permission: 'administer event types'
+
 entity.event_type.access_defaults.delete_all:
   path: '/admin/structure/rng/event_types/manage/{event_type}/access_defaults/delete'
   defaults:

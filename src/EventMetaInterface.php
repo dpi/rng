@@ -138,9 +138,25 @@ interface EventMetaInterface {
    * This value will not be negative if there are excessive registrations.
    *
    * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
-   *   Number of new registrations allowed (>0 0), or unlimited.
+   *   Number of new registrations allowed (>= 0), or unlimited.
    */
   public function remainingCapacity();
+
+  /**
+   * Get minimum number of registrants allowed per registration.
+   *
+   * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
+   *   Minimum number of registrants allowed (>= 0), or unlimited.
+   */
+  public function getRegistrantsMinimum();
+
+  /**
+   * Get maximum number of registrants allowed per registration.
+   *
+   * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
+   *   Maximum number of registrants allowed (>= 0), or unlimited.
+   */
+  public function getRegistrantsMaximum();
 
   /**
    * Get groups that should be added to all new registrations.

@@ -9,6 +9,16 @@ entity.event_type.edit_form:
   title: 'Edit'
   weight: -100
 
+entity.event_type.edit_form_sub:
+  route_name: entity.event_type.edit_form
+  title: 'Edit'
+  parent_id: entity.event_type.edit_form
+
+entity.event_type.field_mapping:
+  route_name: entity.event_type.field_mapping
+  title: 'Field Mapping'
+  parent_id: entity.event_type.edit_form
+
 entity.event_type.access_defaults:
   route_name: entity.event_type.access_defaults
   base_route: entity.event_type.edit_form

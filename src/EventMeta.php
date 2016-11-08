@@ -225,6 +225,34 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRegistrantsMinimum() {
+    if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM})) {
+      $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM};
+      $minimum = (int) $field->value;
+      if (is_numeric($minimum) && $minimum >= 0) {
+        return $minimum;
+      }
+    }
+    return EventMetaInterface::CAPACITY_UNLIMITED;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRegistrantsMaximum() {
+    if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM})) {
+      $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM};
+      $maximum = (int) $field->value;
+      if (is_numeric($maximum) && $maximum >= 0) {
+        return $maximum;
+      }
+    }
+    return EventMetaInterface::CAPACITY_UNLIMITED;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   function getDefaultGroups() {
     $groups = [];
     foreach ($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_GROUPS} as $group) {
