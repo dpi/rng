@@ -8,6 +8,7 @@ use Drupal\rng\EventManagerInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\rng\EventMetaInterface;
 
 /**
  * Form controller for registrations.
@@ -104,12 +105,16 @@ class RegistrationForm extends ContentEntityForm {
       '#tree' => TRUE,
     ];
 
+    $min = $event_meta->getRegistrantsMinimum();
+    $max = $event_meta->getRegistrantsMaximum();
     $form['people']['registrants'] = [
       '#type' => 'registrants',
       '#event' => $event,
       '#default_value' => $registrants,
       '#allow_creation' => $event_meta->getCreatableIdentityTypes(),
       '#allow_reference' => $event_meta->getIdentityTypes(),
+      '#registrants_minimum' => ($min !== EventMetaInterface::CAPACITY_UNLIMITED) ? $min : NULL,
+      '#registrants_maximum' => ($max !== EventMetaInterface::CAPACITY_UNLIMITED) ? $max : NULL,
     ];
 
     if (!$registration->isNew()) {

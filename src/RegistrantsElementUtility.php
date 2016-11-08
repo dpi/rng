@@ -173,8 +173,21 @@ class RegistrantsElementUtility {
         $arity = $values['for_arity'];
       }
       else {
-        $registrants = $this->element['#value'];
-        $arity = (count($registrants) > 1) ? 'multiple' : 'single';
+        // Default.
+        $minimum = $this->element['#registrants_minimum'];
+        $maximum = $this->element['#registrants_maximum'];
+
+        $count = count($this->element['#value']);
+
+        if ($minimum && $minimum > 1) {
+          $arity = 'multiple';
+        }
+        else if ($maximum && $maximum == 1) {
+          $arity = 'single';
+        }
+        else {
+          $arity = ($count > 1) ? 'multiple' : 'single';
+        }
       }
     }
 

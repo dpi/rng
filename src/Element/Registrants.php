@@ -40,6 +40,7 @@ class Registrants extends FormElement {
       '#element_validate' => [
         [$class, 'validateIdentityElement'],
         [$class, 'validateRegisterable'],
+        [$class, 'validateRegistrantCount'],
       ],
       '#pre_render' => array(
         array($class, 'preRenderRegistrants'),
@@ -57,7 +58,9 @@ class Registrants extends FormElement {
       // Allow referencing existing entity types + bundles:
       //   Array of bundles keyed by entity type.
       '#allow_reference' => [],
-      // Allow multiple registrants.
+      // Minimum number of registrants (integer), or NULL for no minimum.
+      '#registrants_minimum' => NULL,
+      // Maximum number of registrants (integer), or NULL for no maximum.
       '#registrants_maximum' => NULL,
     ];
   }
@@ -163,12 +166,18 @@ class Registrants extends FormElement {
       'multiple' => t('Multiple people'),
     ];
 
-    $max_access = !isset($element['#registrants_maximum']) || ($element['#registrants_maximum'] > 1);
+    $for_arity_any_arity = TRUE;
+    $minimum = $element['#registrants_minimum'];
+    $maximum = $element['#registrants_maximum'];
+    if (($minimum && $minimum > 1) || ($maximum && $maximum == 1)) {
+      $for_arity_any_arity = FALSE;
+    }
+
     $element['for_arity'] = [
       '#type' => 'radios',
       '#title' => t('This registration is for'),
       '#options' => NULL,
-      '#access' => $change_it && $max_access,
+      '#access' => $for_arity_any_arity && $change_it,
       '#attributes' => [
         'class' => ['for_arity'],
       ],
@@ -604,6 +613,33 @@ class Registrants extends FormElement {
       foreach (array_diff_key($identities[$entity_type], $registerable) as $id => $label) {
         $form_state->setError($element, t('%name cannot register for this event.', [
           '%name' => $label,
+        ]));
+      }
+    }
+  }
+
+  /**
+   * Validate whether there are sufficient quantity of registrants.
+   */
+  public static function validateRegistrantCount(&$element, FormStateInterface $form_state, &$complete_form) {
+    /** @var \Drupal\rng\RegistrantInterface[] $registrants */
+    $registrants = $element['#value'];
+    $count = count($registrants);
+
+    if (isset($element['#registrants_minimum'])) {
+      $minimum = $element['#registrants_minimum'];
+      if ($count < $minimum) {
+        $form_state->setError($element, t('There are not enough registrants on this registration. There must be at least @minimum registrants.', [
+          '@minimum' => $minimum,
+        ]));
+      }
+    }
+
+    if (isset($element['#registrants_maximum'])) {
+      $maximum = $element['#registrants_maximum'];
+      if ($count > $maximum) {
+        $form_state->setError($element, t('There are too many registrants on this registration. There must be at most @maximum registrants.', [
+          '@maximum' => $maximum,
         ]));
       }
     }

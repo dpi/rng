@@ -37,7 +37,7 @@ class RngEventTypeMappingFormTest extends RNGTestBase {
   /**
    * Test default state of the mapping form with a fresh event type.
    */
-  function XtestMappingForm() {
+  function testMappingForm() {
     $this->drupalGet($this->eventType->toUrl('field-mapping'));
     $this->removeWhiteSpace();
     $this->assertRaw('<td>Registration type</td><td>Select which registration types are valid for this event.</td><td>Exists</td>');
