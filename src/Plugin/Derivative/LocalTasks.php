@@ -28,6 +28,13 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
   protected $entityManager;
 
   /**
+   * The route provider.
+   *
+   * @var \Drupal\Core\Routing\RouteProviderInterface
+   */
+  protected $routeProvider;
+
+  /**
    * The RNG event manager.
    *
    * @var \Drupal\rng\EventManagerInterface
@@ -90,6 +97,14 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
         $this->derivatives["rng.event.$entity_type.register.type_list"] = [
           'route_name' => "rng.event.$entity_type.register.type_list",
           'base_route' => "entity.$entity_type.canonical",
+          'title' => t('Register', [], ['context' => 'rng']),
+          'weight' => 40,
+          'cache_tags' => $cache_tags,
+        ];
+
+        $this->derivatives["rng.event.$entity_type.register"] = [
+          'route_name' => "rng.event.$entity_type.register",
+          'parent_id' => 'rng.local_tasks:' . "rng.event.$entity_type.register.type_list",
           'title' => t('Register', [], ['context' => 'rng']),
           'weight' => 40,
           'cache_tags' => $cache_tags,
