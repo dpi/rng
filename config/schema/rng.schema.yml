@@ -59,19 +59,10 @@ rng.event_type.*.*:
       type: string
       label: 'Registrant type for new registrants associated with this event type.'
     people_types:
-      type: mapping
+      type: sequence
       label: 'Types of people types allowed to be associated with this event type.'
-      mapping:
-        create:
-          type: sequence
-          label: 'Identity entities which can be created.'
-          sequence:
-            type: rng_event_type_identity
-        existing:
-          type: sequence
-          label: 'Pre-existing identity entities which can be referenced.'
-          sequence:
-            type: rng_event_type_identity
+      sequence:
+        type: rng_event_type_people_type
 
 condition.plugin.rng_user_role:
   type: condition.plugin.user_role

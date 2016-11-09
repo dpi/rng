@@ -197,87 +197,69 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    * {@inheritdoc}
    */
   public function canIdentityTypeCreate($entity_type, $bundle) {
-    return $this->getIdentityTypeKey('create', $entity_type, $bundle) !== FALSE;
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    return !empty($this->people_types[$key]['create']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function setIdentityTypeCreate($entity_type, $bundle, $enabled) {
-    return $this->setIdentityType('create', $entity_type, $bundle, $enabled);
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    $this->people_types[$key]['create'] = $enabled;
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
   public function canIdentityTypeReference($entity_type, $bundle) {
-    return $this->getIdentityTypeKey('existing', $entity_type, $bundle) !== FALSE;
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    return !empty($this->people_types[$key]['existing']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function setIdentityTypeReference($entity_type, $bundle, $enabled) {
-    return $this->setIdentityType('existing', $entity_type, $bundle, $enabled);
-  }
-
-  /**
-   * Set whether an identity type can be created or referenced.
-   *
-   * @param string $op
-   *   The operation.
-   * @param string $entity_type
-   *   The identity entity type ID.
-   * @param string $bundle
-   *   The identity bundle.
-   * @param boolean $enabled
-   *   Whether the identity type can be created or referenced.
-   *
-   * @return $this
-   *   Return this event type for chaining.
-   */
-  protected function setIdentityType($op, $entity_type, $bundle, $enabled) {
-    // Find the key for the pair if it exists.
-    $key = $this->getIdentityTypeKey($op, $entity_type, $bundle);
-
-    // Delete if it exists.
-    if (!$enabled && $key !== FALSE) {
-      unset($this->people_types[$op][$key]);
-    }
-
-    // Create if it doesn't exist.
-    if ($enabled && $key === FALSE) {
-      $this->people_types[$op][] = [
-        'entity_type' => $entity_type,
-        'bundle' => $bundle,
-      ];
-    }
-
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    $this->people_types[$key]['existing'] = $enabled;
     return $this;
   }
 
   /**
    * Get the array key of the people type.
    *
-   * @param string $op
-   *   The operation.
    * @param string $entity_type
    *   The identity entity type ID.
    * @param string $bundle
    *   The identity bundle.
+   * @param boolean $create_key
+   *   Will initialise the array key.
    *
-   * @return integer|FALSE
-   *   The array key, or FALSE if it does not exist..
+   * @return int|FALSE
+   *   The array key, or FALSE if it does not exist.
    */
-  protected function getIdentityTypeKey($op, $entity_type, $bundle) {
-    if (isset($this->people_types[$op])) {
-      $pairs = $this->people_types[$op];
+  protected function getIdentityTypeKey($entity_type, $bundle, $create_key = TRUE) {
+    if (isset($this->people_types)) {
+      $pairs = $this->people_types;
       foreach ($pairs as $k => $pair) {
         if ($pair['entity_type'] == $entity_type && $pair['bundle'] == $bundle) {
           return $k;
         }
       }
     }
+
+    if ($create_key) {
+      // Create if it doesn't exist.
+      $next_key = count($this->people_types) + 1;
+      $this->people_types[$next_key] = [
+        'entity_type' => $entity_type,
+        'bundle' => $bundle,
+      ];
+      return $next_key;
+    }
+
     return FALSE;
   }
 

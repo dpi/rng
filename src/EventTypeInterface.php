@@ -111,6 +111,9 @@ interface EventTypeInterface extends ConfigEntityInterface {
    *   The identity bundle.
    * @param boolean $enabled
    *   Whether the identity type can be created.
+   *
+   * @return $this
+   *   Return this event type for chaining.
    */
   public function setIdentityTypeCreate($entity_type, $bundle, $enabled);
 
@@ -136,6 +139,9 @@ interface EventTypeInterface extends ConfigEntityInterface {
    *   The identity bundle.
    * @param boolean $enabled
    *   Whether existing identity type can be referenced.
+   *
+   * @return $this
+   *   Return this event type for chaining.
    */
   public function setIdentityTypeReference($entity_type, $bundle, $enabled);
 
