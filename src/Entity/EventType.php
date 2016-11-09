@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\courier\Entity\CourierContext;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Entity\Entity\EntityFormMode;
+use Drupal\rng\RegistrantTypeInterface;
 
 /**
  * Defines the event type entity.
@@ -480,6 +481,25 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     }
 
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onDependencyRemoval(array $dependencies) {
+    $changed = parent::onDependencyRemoval($dependencies);
+
+    foreach ($dependencies['config'] as $entity) {
+      if ($entity instanceof RegistrantTypeInterface) {
+        // Registrant type is being deleted.
+        if ($entity->id() === $this->getDefaultRegistrantType()) {
+          $this->setDefaultRegistrantType(NULL);
+          $changed = TRUE;
+        }
+      }
+    }
+
+    return $changed;
   }
 
 }

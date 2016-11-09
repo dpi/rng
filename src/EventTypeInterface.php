@@ -83,7 +83,7 @@ interface EventTypeInterface extends ConfigEntityInterface {
   /**
    * Registrant type for new registrants associated with this event type.
    *
-   * @return string
+   * @return string|NULL
    *   The Registrant type used for new registrants associated with this event
    *   type.
    */
@@ -184,7 +184,7 @@ interface EventTypeInterface extends ConfigEntityInterface {
   /**
    * Set registrant type for new registrants associated with this event type.
    *
-   * @param string $registrant_type_id
+   * @param string|NULL $registrant_type_id
    *   The Registrant type used for new registrants associated with this event
    *   type.
    *
