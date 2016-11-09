@@ -57,10 +57,15 @@ class RouteSubscriber extends RouteSubscriberBase {
           '_entity_access' => $entity_type . '.manage event',
           '_entity_is_event' => 'TRUE',
         ];
+
         $options = [];
         // Option will invoke EntityConverter ParamConverter to upcast the
         // entity in $canonical_path.
         $options['parameters'][$entity_type]['type'] = 'entity:' . $entity_type;
+        $options_register = $options;
+
+        // Register tabs are not administrative.
+        $options['_admin_route'] = 'TRUE';
 
         // Manage Event.
         $route = new Route(
@@ -167,12 +172,11 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_registration_add_access' => 'TRUE',
           ),
-          $options
+          $options_register
         );
         $collection->add("rng.event.$entity_type.register.type_list", $route);
 
         // Register w/ Registration Type.
-        $options_register = $options;
         $options_register['parameters']['registration_type']['type'] = 'entity:registration_type';
         $route = new Route(
           $canonical_path . '/register/{registration_type}',
