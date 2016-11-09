@@ -23,3 +23,6 @@ rng_event_type_people_type:
     existing:
       type: boolean
       label: 'Whether pre-existing identity entities can be referenced.'
+    entity_form_mode:
+      type: string
+      label: 'Form display mode used when the entity is created inline.'

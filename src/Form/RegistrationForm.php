@@ -105,6 +105,7 @@ class RegistrationForm extends ContentEntityForm {
       '#tree' => TRUE,
     ];
 
+    $event_type = $event_meta->getEventType();
     $min = $event_meta->getRegistrantsMinimum();
     $max = $event_meta->getRegistrantsMaximum();
     $form['people']['registrants'] = [
@@ -115,6 +116,7 @@ class RegistrationForm extends ContentEntityForm {
       '#allow_reference' => $event_meta->getIdentityTypes(),
       '#registrants_minimum' => ($min !== EventMetaInterface::CAPACITY_UNLIMITED) ? $min : NULL,
       '#registrants_maximum' => ($max !== EventMetaInterface::CAPACITY_UNLIMITED) ? $max : NULL,
+      '#form_modes' => $event_type->getIdentityTypeEntityFormModes(),
     ];
 
     if (!$registration->isNew()) {

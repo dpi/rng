@@ -118,6 +118,42 @@ interface EventTypeInterface extends ConfigEntityInterface {
   public function setIdentityTypeCreate($entity_type, $bundle, $enabled);
 
   /**
+   * Get the form display mode used when the identity is created inline.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   *
+   * @return string
+   *   The form display mode used when the identity is created inline.
+   */
+  public function getIdentityTypeEntityFormMode($entity_type, $bundle);
+
+  /**
+   * Get the form display modes for creating identities inline.
+   *
+   * @return array
+   *   An array keyed as follows: [entity_type][bundle] = form_mode.
+   */
+  public function getIdentityTypeEntityFormModes();
+
+  /**
+   * Set the form display mode used when the identity is created inline.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   * @param string $form_mode
+   *   The form mode ID.
+   *
+   * @return $this
+   *   Return this event type for chaining.
+   */
+  public function setIdentityTypeEntityFormMode($entity_type, $bundle, $form_mode);
+
+  /**
    * Whether an existing identity type can be referenced.
    *
    * @param string $entity_type

@@ -62,6 +62,9 @@ class Registrants extends FormElement {
       '#registrants_minimum' => NULL,
       // Maximum number of registrants (integer), or NULL for no maximum.
       '#registrants_maximum' => NULL,
+      // Get form display modes used when creating entities inline.
+      // An array in the format: [entity_type][bundle] = form_mode_id
+      '#form_modes' => [],
     ];
   }
 
@@ -448,7 +451,12 @@ class Registrants extends FormElement {
           }
           $new_person = $entity_storage->create($new_person_options);
 
-          $display = entity_get_form_display($person_entity_type_id, $person_bundle, 'default');
+          $form_mode = 'default';
+          if (isset($element['#form_modes'][$person_entity_type_id][$person_bundle])) {
+            $form_mode = $element['#form_modes'][$person_entity_type_id][$person_bundle];
+          }
+
+          $display = entity_get_form_display($person_entity_type_id, $person_bundle, $form_mode);
           $display->buildForm($new_person, $person_subform['new_person']['newentityform'], $form_state);
           $form_state->set('newentity__form_display', $display);
           $form_state->set('newentity__entity', $new_person);

@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\rng\RngConfigurationInterface;
 use Drupal\rng\EventManagerInterface;
 use Drupal\node\Entity\NodeType;
@@ -38,6 +39,13 @@ class EventTypeForm extends EntityForm {
   protected $moduleHandler;
 
   /**
+   * The entity display repository.
+   *
+   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   */
+  protected $entityDisplayRepository;
+
+  /**
    * The RNG configuration service.
    *
    * @var \Drupal\rng\RngConfigurationInterface
@@ -58,14 +66,17 @@ class EventTypeForm extends EntityForm {
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   *   The entity display repository.
    * @param \Drupal\rng\RngConfigurationInterface $rng_configuration
    *   The RNG configuration service.
    * @param \Drupal\rng\EventManagerInterface $event_manager
    *   The RNG event manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, RngConfigurationInterface $rng_configuration, EventManagerInterface $event_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, EntityDisplayRepositoryInterface $entity_display_repository, RngConfigurationInterface $rng_configuration, EventManagerInterface $event_manager) {
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
+    $this->entityDisplayRepository = $entity_display_repository;
     $this->rngConfiguration = $rng_configuration;
     $this->eventManager = $event_manager;
   }
@@ -77,6 +88,7 @@ class EventTypeForm extends EntityForm {
     return new static(
       $container->get('entity.manager'),
       $container->get('module_handler'),
+      $container->get('entity_display.repository'),
       $container->get('rng.configuration'),
       $container->get('rng.event_manager')
     );
@@ -200,6 +212,9 @@ class EventTypeForm extends EntityForm {
           'class' => ['checkbox'],
         ],
         [
+          'data' => $this->t('Form display mode'),
+        ],
+        [
           'data' => $this->t('Permit referencing existing entities'),
           'class' => ['checkbox'],
         ],
@@ -227,6 +242,14 @@ class EventTypeForm extends EntityForm {
           '#wrapper_attributes' => [
             'class' => ['checkbox'],
           ],
+        ];
+
+        $row['entity_form_mode'] = [
+          '#type' => 'select',
+          '#title' => $this->t('Form display mode used when the entity is created inline.', $t_args),
+          '#title_display' => 'invisible',
+          '#default_value' => $event_type->getIdentityTypeEntityFormMode($entity_type_id, $bundle),
+          '#options' => $this->entityDisplayRepository->getFormModeOptionsByBundle($entity_type_id, $bundle),
         ];
 
         $row['existing'] = [
@@ -287,6 +310,7 @@ class EventTypeForm extends EntityForm {
       list($entity_type, $bundle) = explode(':', $row_key);
       $event_type->setIdentityTypeCreate($entity_type, $bundle, !empty($row['create']));
       $event_type->setIdentityTypeReference($entity_type, $bundle, !empty($row['existing']));
+      $event_type->setIdentityTypeEntityFormMode($entity_type, $bundle, $row['entity_form_mode']);
     }
 
     $event_type->setDefaultRegistrantType($form_state->getValue(['registrants', 'registrant_type']));
