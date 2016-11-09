@@ -24,6 +24,12 @@ entity.event_type.access_defaults:
   base_route: entity.event_type.edit_form
   title: 'Access Defaults'
 
+# Registration type
+entity.registration_type.edit_form:
+  title: 'Edit'
+  route_name: entity.registration_type.edit_form
+  base_route: entity.registration_type.edit_form
+
 # Registrations
 entity.registration.canonical:
   route_name: entity.registration.canonical
@@ -48,6 +54,12 @@ entity.registration.registrants:
   base_route: entity.registration.canonical
   title: 'Identities'
   weight: 15
+
+# Registrant type
+entity.registrant_type.edit_form:
+  title: 'Edit'
+  route_name: entity.registrant_type.edit_form
+  base_route: entity.registrant_type.edit_form
 
 # Registrant
 entity.registrant.canonical:
