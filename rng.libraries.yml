@@ -1,11 +1,13 @@
 rng.admin:
   version: 0
   css:
-    theme:
+    layout:
       css/rng.admin.css: {}
 
 rng.elements.registrants:
   version: 0
   css:
+    layout:
+      css/elements/registrants.layout.css: {}
     theme:
-      css/rng.elements.registrants.css: {}
+      css/elements/registrants.theme.css: {}

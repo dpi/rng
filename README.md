@@ -79,3 +79,11 @@ Please see the project websites for instructions:
  *  https://www.drupal.org/project/rng
  *  https://github.com/dpi/rng
  *  http://dpi.id.au/rng-quick-start/
+
+# Building
+
+## SASS
+
+```sh
+sass --watch sass:css --style expanded
+```
