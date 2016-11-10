@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventAccessTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\Core\Url;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\EventType.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;

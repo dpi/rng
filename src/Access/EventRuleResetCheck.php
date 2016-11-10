@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Access\EventRuleResetCheck.
- */
-
 namespace Drupal\rng\Access;
 
 use Drupal\Core\Access\AccessResult;

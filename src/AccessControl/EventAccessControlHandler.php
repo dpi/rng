@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\AccessControl\EventAccessControlHandler.
- */
-
 namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Access\RegistrationAddAccessCheck.
- */
-
 namespace Drupal\rng\Access;
 
 use Drupal\Core\Routing\Access\AccessInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\RegistrationType.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;

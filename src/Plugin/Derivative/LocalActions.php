@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @file
- * @fie
- * Contains \Drupal\rng\Plugin\Derivative\LocalActions.
- */
-
 namespace Drupal\rng\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Menu\LocalAction\ResetAccessRules.
- */
-
 namespace Drupal\rng\Plugin\Menu\LocalAction;
 
 use Drupal\Core\Menu\LocalActionDefault;

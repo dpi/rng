@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\rng\Tests\RngTestTrait.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Entity\RegistrationType;

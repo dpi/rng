@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\EventManager.
- */
-
 namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;

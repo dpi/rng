@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\Rule.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;

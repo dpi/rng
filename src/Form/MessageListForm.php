@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\MessageListForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Routing\RedirectDestinationInterface;

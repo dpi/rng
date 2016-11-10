@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\Registration.
- */
-
 namespace Drupal\rng\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\rng\RegistrationInterface;

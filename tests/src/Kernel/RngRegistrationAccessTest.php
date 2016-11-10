@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rng\Kernel\RegistrationAccessTest.
- */
-
 namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\simpletest\UserCreationTrait;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\EntityReferenceSelection\UserRNGSelection.
- */
-
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
 use Drupal\rng\RuleGrantsOperationTrait;

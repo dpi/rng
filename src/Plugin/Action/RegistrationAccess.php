@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Action\RegistrationAccess.
- */
-
 namespace Drupal\rng\Plugin\Action;
 
 use Drupal\Core\Action\ConfigurableActionBase;

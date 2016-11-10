@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Validation\Constraint\RegistrationGroupSibling.
- */
-
 namespace Drupal\rng\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;

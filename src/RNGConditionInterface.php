@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\RNGConditionInterface.
- */
-
 namespace Drupal\rng;
 
 /**

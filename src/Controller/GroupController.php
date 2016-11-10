@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Controller\GroupController.
- */
-
 namespace Drupal\rng\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Cache\Context\RngEventCacheContext
- */
-
 namespace Drupal\rng\Cache\Context;
 
 use Drupal\Core\Plugin\Context\ContextProviderInterface;

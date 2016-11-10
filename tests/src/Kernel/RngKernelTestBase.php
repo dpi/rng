@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rng\Kernel\RngKernelTestBase.
- */
-
 namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;

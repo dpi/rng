@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\EntityReferenceSelection\GroupSiblings.
- */
-
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\SelectionBase;

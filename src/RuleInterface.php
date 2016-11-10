@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\RuleInterface.
- */
-
 namespace Drupal\rng;
 
 use Drupal\Core\Entity\ContentEntityInterface;

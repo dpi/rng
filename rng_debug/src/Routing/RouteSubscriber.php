@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng_debug\Routing\RouteSubscriber.
- */
-
 namespace Drupal\rng_debug\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;

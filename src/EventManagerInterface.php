@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rng\EventManagerInterface.
- */
-
 namespace Drupal\rng;
 
 use Drupal\Core\Entity\EntityInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventTypeTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Entity\EventType;

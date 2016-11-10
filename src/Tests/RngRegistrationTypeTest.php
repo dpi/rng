@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\RegistrationTypeTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\Core\Url;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\EntityReferenceSelection\RegistrationGroupSelection.
- */
-
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\SelectionBase;

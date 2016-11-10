@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\EventMeta.
- */
-
 namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;

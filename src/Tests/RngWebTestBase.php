@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\rng\Tests\RngWebTestBase.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\simpletest\WebTestBase;

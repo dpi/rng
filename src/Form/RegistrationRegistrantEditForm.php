@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\RegistrationRegistrantEditForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;

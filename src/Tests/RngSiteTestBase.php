@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\rng\Tests\RngSiteTestBase.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Form\EventTypeForm;

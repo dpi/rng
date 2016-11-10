@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Views\RegistrantViewsData.
- */
-
 namespace Drupal\rng\Views;
 
 use Drupal\views\EntityViewsData;

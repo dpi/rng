@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Permissions.
- */
-
 namespace Drupal\rng;
 
 use Drupal\Core\Routing\UrlGeneratorTrait;

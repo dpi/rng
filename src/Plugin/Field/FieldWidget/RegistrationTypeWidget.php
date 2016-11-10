@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Field\FieldWidget\RegistrationTypeWidget.
- */
-
 namespace Drupal\rng\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsButtonsWidget;
