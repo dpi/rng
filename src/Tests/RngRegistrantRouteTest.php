@@ -15,7 +15,7 @@ use Drupal\rng\Entity\Registration;
  *
  * @group rng
  */
-class RegistrantRouteTest extends RNGTestBase {
+class RngRegistrantRouteTest extends RngWebTestBase {
 
   /**
    * @inheritdoc

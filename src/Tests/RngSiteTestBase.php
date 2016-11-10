@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\rng\Tests\RNGSiteTestBase.
+ * Definition of Drupal\rng\Tests\RngSiteTestBase.
  */
 
 namespace Drupal\rng\Tests;
@@ -12,7 +12,7 @@ use Drupal\rng\Form\EventTypeForm;
 /**
  * Sets up page and article content types.
  */
-abstract class RNGSiteTestBase extends RNGTestBase {
+abstract class RngSiteTestBase extends RngWebTestBase {
 
   public static $modules = array('rng', 'node');
 

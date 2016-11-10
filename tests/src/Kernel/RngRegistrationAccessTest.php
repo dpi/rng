@@ -15,7 +15,7 @@ use Drupal\rng\EventManagerInterface;
  *
  * @group rng
  */
-class RegistrationAccessTest extends RNGKernelTestBase {
+class RngRegistrationAccessTest extends RngKernelTestBase {
 
   use UserCreationTrait {
     createUser as drupalCreateUser;

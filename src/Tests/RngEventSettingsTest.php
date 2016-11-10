@@ -7,7 +7,7 @@ namespace Drupal\rng\Tests;
  *
  * @group rng
  */
-class RngEventSettingsTest extends RNGSiteTestBase {
+class RngEventSettingsTest extends RngSiteTestBase {
 
   public static $modules = ['block'];
 

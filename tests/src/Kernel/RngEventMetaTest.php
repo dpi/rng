@@ -13,7 +13,7 @@ use Drupal\field\Entity\FieldConfig;
  * @group rng
  * @coversDefaultClass \Drupal\rng\EventMeta
  */
-class RngEventMetaTest extends RNGKernelTestBase {
+class RngEventMetaTest extends RngKernelTestBase {
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\rng\Tests\RNGTestBase.
+ * Definition of Drupal\rng\Tests\RngWebTestBase.
  */
 
 namespace Drupal\rng\Tests;
@@ -16,10 +16,10 @@ use Drupal\rng\Entity\Registration;
 /**
  * Sets up page and article content types.
  */
-abstract class RNGTestBase extends WebTestBase {
+abstract class RngWebTestBase extends WebTestBase {
 
-  use RNGTestTrait {
-    RNGTestTrait::createEventType as traitCreateEventType;
+  use RngTestTrait {
+    RngTestTrait::createEventType as traitCreateEventType;
   }
 
   public static $modules = array('rng');

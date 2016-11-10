@@ -12,7 +12,7 @@ use Drupal\simpletest\UserCreationTrait;
  *
  * @group rng
  */
-class RngEventAccessTest extends RNGKernelTestBase {
+class RngEventAccessTest extends RngKernelTestBase {
 
   /**
    * Modules to enable.

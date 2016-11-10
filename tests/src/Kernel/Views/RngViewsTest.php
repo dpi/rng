@@ -3,7 +3,7 @@
 namespace Drupal\Tests\rng\Kernel\Views;
 
 use Drupal\Core\Link;
-use Drupal\rng\Tests\RNGTestTrait;
+use Drupal\rng\Tests\RngTestTrait;
 use Drupal\simpletest\UserCreationTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -16,7 +16,7 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
  */
 class RngViewsTest extends ViewsKernelTestBase {
 
-  use RNGTestTrait;
+  use RngTestTrait;
   use UserCreationTrait {
     createUser as drupalCreateUser;
   }

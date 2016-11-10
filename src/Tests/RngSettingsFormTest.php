@@ -9,7 +9,7 @@ use Drupal\Core\Url;
  *
  * @group rng
  */
-class RngSettingsFormTest extends RNGTestBase {
+class RngSettingsFormTest extends RngWebTestBase {
 
   /**
    * Test settings form menu link.

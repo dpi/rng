@@ -10,7 +10,7 @@ use Drupal\rng\EventManagerInterface;
  *
  * @group rng
  */
-class RngEventTypeMappingFormTest extends RNGTestBase {
+class RngEventTypeMappingFormTest extends RngWebTestBase {
 
   /**
    * {@inheritdoc}

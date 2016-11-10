@@ -13,7 +13,7 @@ use Drupal\rng\Entity\Registration;
  * @group rng
  * @coversDefaultClass \Drupal\rng\Entity\Registration
  */
-class RngRegistrationEntityTest extends RNGKernelTestBase {
+class RngRegistrationEntityTest extends RngKernelTestBase {
 
   use UserCreationTrait {
     createUser as drupalCreateUser;

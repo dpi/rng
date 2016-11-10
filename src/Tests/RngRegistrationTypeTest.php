@@ -17,7 +17,7 @@ use Drupal\rng\EventManagerInterface;
  *
  * @group rng
  */
-class RegistrationTypeTest extends RNGSiteTestBase {
+class RngRegistrationTypeTest extends RngSiteTestBase {
 
   public static $modules = ['block'];
 

@@ -17,7 +17,7 @@ use Drupal\Core\Url;
  *
  * @group rng
  */
-class EventTypeTest extends RNGTestBase {
+class RngEventTypeTest extends RngWebTestBase {
 
   public static $modules = ['node', 'field_ui', 'block'];
 

@@ -19,7 +19,7 @@ use Drupal\rng\Entity\EventTypeRule;
  *
  * @group rng
  */
-class EventAccessTest extends RNGTestBase {
+class RngEventAccessTest extends RngWebTestBase {
 
   public static $modules = ['block', 'entity_test'];
 

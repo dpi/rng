@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\rng\Tests\RNGTestTrait.
+ * Definition of Drupal\rng\Tests\RngTestTrait.
  */
 
 namespace Drupal\rng\Tests;
@@ -16,7 +16,7 @@ use Drupal\rng\Entity\Registration;
 use Drupal\rng\EventManagerInterface;
 use Drupal\rng\Entity\EventTypeRule;
 
-trait RNGTestTrait {
+trait RngTestTrait {
 
   /**
    * Create and save a registration type entity.
