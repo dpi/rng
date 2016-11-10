@@ -140,8 +140,8 @@ interface EventMetaInterface {
   /**
    * Get minimum number of registrants allowed per registration.
    *
-   * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
-   *   Minimum number of registrants allowed (>= 0), or unlimited.
+   * @return integer
+   *   Minimum number of registrants allowed (>= 0)
    */
   public function getRegistrantsMinimum();
 

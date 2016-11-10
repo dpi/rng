@@ -64,7 +64,7 @@ class RngEventMetaTest extends RngKernelTestBase {
 
     $event = EntityTest::create();
     $event_meta = $this->eventManager->getMeta($event);
-    $this->assertSame($this->unlimited, $event_meta->getRegistrantsMinimum(), 'Minimum registrants is unlimited when no field exists.');
+    $this->assertSame(1, $event_meta->getRegistrantsMinimum(), 'Minimum registrants is "1" when no field exists.');
   }
 
   /**

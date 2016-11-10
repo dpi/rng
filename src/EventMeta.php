@@ -228,7 +228,7 @@ class EventMeta implements EventMetaInterface {
         return $minimum;
       }
     }
-    return EventMetaInterface::CAPACITY_UNLIMITED;
+    return 1;
   }
 
   /**
