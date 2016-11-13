@@ -105,6 +105,9 @@ function rng_update_8002() {
   $type = $entity_manager->getDefinition('registrant_type');
   $update_manager->installEntityType($type);
 
+  // Clear config cache so new registrant type saves.
+  \Drupal::service('config.typed')->clearCachedDefinitions();
+
   // Install 'type' field.
   $field_definition = \Drupal\Core\Field\BaseFieldDefinition::create('entity_reference')
     ->setLabel('Registrant type')
@@ -116,7 +119,7 @@ function rng_update_8002() {
   $default_registrant_type_id = 'registrant';
   $registrant_type = \Drupal\rng\Entity\RegistrantType::create([
     'id' => $default_registrant_type_id,
-    'label' => t('Registrant'),
+    'label' => 'Registrant',
   ]);
   $registrant_type->save();
 
