@@ -96,11 +96,13 @@ function rng_update_8001() {
  * Convert registrant entity to one with bundles
  */
 function rng_update_8002() {
+  $entity_manager = \Drupal::entityTypeManager();
   $config_factory = \Drupal::configFactory();
   $update_manager = \Drupal::entityDefinitionUpdateManager();
 
   // Install 'registrant_type' config entity.
-  $type = \Drupal::entityTypeManager()->getDefinition('registrant_type');
+  $entity_manager->clearCachedDefinitions();
+  $type = $entity_manager->getDefinition('registrant_type');
   $update_manager->installEntityType($type);
 
   // Install 'type' field.
