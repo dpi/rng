@@ -140,14 +140,17 @@ function rng_update_8003() {
   $default_registrant_type_id = 'registrant';
 
   // Generate default people types allowing all enabled identity types.
-  $people_types_existing = [];
+  $people_types = [];
   $identity_types = $config_factory->get('rng.settings')->get('identity_types') ?: [];
   foreach ($identity_types as $entity_type) {
     $bundles = $bundle_info->getBundleInfo($entity_type);
     foreach (array_keys($bundles) as $bundle) {
-      $people_types_existing[] = [
+      $people_types[] = [
         'entity_type' => $entity_type,
         'bundle' => $bundle,
+        'existing' => 1,
+        'create' => 0,
+        'entity_form_mode' => 'default',
       ];
     }
   }
@@ -161,8 +164,9 @@ function rng_update_8003() {
     $config->set('default_registrant', $default_registrant_type_id);
 
     // Permit referencing existing entities for all enabled identity types.
-    $config->set('people_types.existing', $people_types_existing);
+    $config->set('people_types', $people_types);
 
+    // Add a dependency on the registrant type used for 'default_registrant'.
     $id = 'rng.registrant_type.' . $default_registrant_type_id;
     $config_dependencies = $config->get('dependencies.config') ?: [];
     if (!in_array($id, $config_dependencies)) {
