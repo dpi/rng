@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rng\EventManagerInterface.
- */
-
 namespace Drupal\rng;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -59,6 +54,20 @@ interface EventManagerInterface {
    * registrations. An empty value reverts to the site default.
    */
   const FIELD_ALLOW_DUPLICATE_REGISTRANTS = 'rng_registrants_duplicate';
+
+  /**
+   * ID of an `integer` field attached to an event bundle.
+   *
+   * The minimum number of registrants per registration associated.
+   */
+  const FIELD_REGISTRATION_REGISTRANTS_MINIMUM = 'rng_registrants_minimum';
+
+  /**
+   * ID of an `integer` field attached to an event bundle.
+   *
+   * The maximum number of registrants per registration associated.
+   */
+  const FIELD_REGISTRATION_REGISTRANTS_MAXIMUM = 'rng_registrants_maximum';
 
   /**
    * Get the meta instance for an event.

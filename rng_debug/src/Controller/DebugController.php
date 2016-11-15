@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng_debug\Controller\DebugController.
- */
-
 namespace Drupal\rng_debug\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

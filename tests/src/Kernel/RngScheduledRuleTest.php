@@ -11,7 +11,7 @@ use Drupal\rng\Entity\RuleSchedule;
  *
  * @group rng
  */
-class RngScheduledRuleTest extends RNGKernelTestBase {
+class RngScheduledRuleTest extends RngKernelTestBase {
 
   /**
    * {@inheritdoc}

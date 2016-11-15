@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng_debug\Plugin\Derivative\LocalTasks.
- */
-
 namespace Drupal\rng_debug\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;

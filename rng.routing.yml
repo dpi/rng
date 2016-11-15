@@ -151,6 +151,14 @@ entity.event_type.access_defaults:
   requirements:
     _permission: 'administer event types'
 
+entity.event_type.field_mapping:
+  path: '/admin/structure/rng/event_types/manage/{event_type}/field_mapping'
+  defaults:
+    _entity_form: 'event_type.field_mapping'
+    _title: 'Field mapping'
+  requirements:
+    _permission: 'administer event types'
+
 entity.event_type.access_defaults.delete_all:
   path: '/admin/structure/rng/event_types/manage/{event_type}/access_defaults/delete'
   defaults:
@@ -198,11 +206,11 @@ rng.config:
   requirements:
     _permission: 'access administration pages'
 
-rng.config.registrant:
-  path: '/admin/config/rng/registrant'
+rng.config.settings:
+  path: '/admin/config/rng/settings'
   defaults:
-    _form: '\Drupal\rng\Form\RegistrantSettingsForm'
-    _title: 'Registrant settings'
+    _form: '\Drupal\rng\Form\RngSettingsForm'
+    _title: 'RNG settings'
   requirements:
     _permission: 'administer rng'
 

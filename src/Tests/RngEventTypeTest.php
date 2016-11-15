@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventTypeTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Entity\EventType;
@@ -17,7 +12,7 @@ use Drupal\Core\Url;
  *
  * @group rng
  */
-class EventTypeTest extends RNGTestBase {
+class RngEventTypeTest extends RngWebTestBase {
 
   public static $modules = ['node', 'field_ui', 'block'];
 
@@ -39,7 +34,7 @@ class EventTypeTest extends RNGTestBase {
 
     // Create and delete the testing event type.
     $event_bundle = $this->drupalCreateContentType();
-    $event_type = $this->createEventType($event_bundle);
+    $event_type = $this->createEventType('node', $event_bundle->id());
     $this->drupalGet('admin/structure/rng/event_types/manage/' . $event_type->id() . '/edit');
     $event_type->delete();
     $event_bundle->delete();
@@ -62,7 +57,9 @@ class EventTypeTest extends RNGTestBase {
 
     // Add.
     $t_args = ['%label' => 'node.event'];
-    $edit = [];
+    $edit = [
+      'registrants[registrant_type]' => 'registrant',
+    ];
     $this->drupalPostForm('admin/structure/rng/event_types/add', $edit, t('Save'));
 
     /** @var \Drupal\node\NodeTypeInterface $node_type */
@@ -80,7 +77,7 @@ class EventTypeTest extends RNGTestBase {
     $this->assertTrue(CourierContext::load('rng_registration_node'), 'Courier context entity created for this event type\' entity type.');
 
     // Event type list.
-    $this->assertUrl('admin/structure/rng/event_types', [], 'Browser was redirected to event type list.');
+    $this->drupalGet('admin/structure/rng/event_types');
     $this->assertRaw('<td>Content: event</td>', 'Event Type shows in list');
     $options = ['node_type' => 'event'];
     $this->assertLinkByHref(Url::fromRoute("entity.node.field_ui_fields", $options)->toString());

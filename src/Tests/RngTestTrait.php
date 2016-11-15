@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\rng\Tests\RNGTestTrait.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\rng\Entity\RegistrationType;
@@ -16,7 +11,7 @@ use Drupal\rng\Entity\Registration;
 use Drupal\rng\EventManagerInterface;
 use Drupal\rng\Entity\EventTypeRule;
 
-trait RNGTestTrait {
+trait RngTestTrait {
 
   /**
    * Create and save a registration type entity.
@@ -54,6 +49,8 @@ trait RNGTestTrait {
       'bundle' => $bundle,
       'mirror_operation_to_event_manage' => 'update',
     ]);
+    $event_type->setIdentityTypeReference('user', 'user', TRUE);
+    $event_type->setDefaultRegistrantType('registrant');
     $event_type->save();
     return $event_type;
   }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\EventMetaInterface.
- */
-
 namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,6 +35,14 @@ interface EventMetaInterface {
    *   The event entity.
    */
   public function getEvent();
+
+  /**
+   * Get the event type for the event.
+   *
+   * @return \Drupal\rng\EventTypeInterface
+   *   The event type for the event.
+   */
+  public function getEventType();
 
   /**
    * Checks if this event is accepting new registrations.
@@ -130,9 +133,25 @@ interface EventMetaInterface {
    * This value will not be negative if there are excessive registrations.
    *
    * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
-   *   Number of new registrations allowed (>0 0), or unlimited.
+   *   Number of new registrations allowed (>= 0), or unlimited.
    */
   public function remainingCapacity();
+
+  /**
+   * Get minimum number of registrants allowed per registration.
+   *
+   * @return integer
+   *   Minimum number of registrants allowed (>= 0)
+   */
+  public function getRegistrantsMinimum();
+
+  /**
+   * Get maximum number of registrants allowed per registration.
+   *
+   * @return integer|EventMetaInterface::CAPACITY_UNLIMITED
+   *   Maximum number of registrants allowed (>= 0), or unlimited.
+   */
+  public function getRegistrantsMaximum();
 
   /**
    * Get groups that should be added to all new registrations.
@@ -279,21 +298,50 @@ interface EventMetaInterface {
   public function getRegistrants($entity_type_id = NULL);
 
   /**
-   * Count number of identities the current user has proxy register access
-   * including himself.
+   * Determine if the current user has proxy register access.
+   *
+   * Includes whether the current user can create an identity.
+   *
+   * @return boolean
+   *   Whether the current user can create an identity or reference at least one
+   *   identity.
+   */
+  public function canRegisterProxyIdentities();
+
+  /**
+   * Count number of identities the current user has proxy register access.
+   *
+   * This number includes the current user. It also only considers existing
+   * identities, it does not include the ability to 'create' new identities.
    *
    * @return integer
    *   Number of identities.
    */
-  function countProxyIdentities();
+  public function countProxyIdentities();
 
   /**
-   * Get identity entity types valid for this event.
+   * Get identity types which can be referenced for this event.
    *
-   * @return string[]
-   *   Array of entity types IDs.
+   * The types returned are guaranteed to exist in the system. Invalid
+   * configuration such as no-longer existing bundles or entity types are
+   * filtered out.
+   *
+   * @return array
+   *   Array of bundles keyed by entity type.
    */
   public function getIdentityTypes();
+
+  /**
+   * Get identity types which can be created for this event.
+   *
+   * The types returned are guaranteed to exist in the system. Invalid
+   * configuration such as no-longer existing bundles or entity types are
+   * filtered out.
+   *
+   * @return array
+   *   Array of bundles keyed by entity type.
+   */
+  public function getCreatableIdentityTypes();
 
   /**
    * Determine if identities can register.

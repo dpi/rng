@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Lists\RegistrationListBuilder.
- */
-
 namespace Drupal\rng\Lists;
 
 use Drupal\Core\Entity\EntityListBuilder;

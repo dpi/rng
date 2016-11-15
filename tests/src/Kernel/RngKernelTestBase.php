@@ -1,21 +1,16 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rng\Kernel\RNGKernelTestBase.
- */
-
 namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\rng\Tests\RNGTestTrait;
+use Drupal\rng\Tests\RngTestTrait;
 
 /**
  * Base class for RNG unit tests.
  */
-abstract class RNGKernelTestBase extends KernelTestBase {
+abstract class RngKernelTestBase extends KernelTestBase {
 
-  use RNGTestTrait;
+  use RngTestTrait;
 
   /**
    * {@inheritdoc}

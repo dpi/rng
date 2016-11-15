@@ -15,7 +15,7 @@ use Drupal\rng\Entity\Registration;
  *
  * @group rng
  */
-class RegistrantRouteTest extends RNGTestBase {
+class RngRegistrantRouteTest extends RngWebTestBase {
 
   /**
    * @inheritdoc
@@ -57,7 +57,7 @@ class RegistrantRouteTest extends RNGTestBase {
     parent::setUp();
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalPlaceBlock('system_breadcrumb_block');
-    $this->eventType = $this->createEventTypeNG('entity_test', 'entity_test');
+    $this->eventType = $this->createEventType('entity_test', 'entity_test');
     $this->registrationType = $this->createRegistrationType();
 
     $event_name = $this->randomString();

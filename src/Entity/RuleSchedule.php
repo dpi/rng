@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\RuleSchedule.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;

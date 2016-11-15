@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\Registrant.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -20,9 +15,11 @@ use Drupal\rng\RegistrationInterface;
  * @ContentEntityType(
  *   id = "registrant",
  *   label = @Translation("Registrant"),
+ *   bundle_label = @Translation("Registrant type"),
+ *   bundle_entity_type = "registrant_type",
  *   handlers = {
+ *     "storage_schema" = "Drupal\rng\RegistrantStorageSchema",
  *     "views_data" = "Drupal\rng\Views\RegistrantViewsData",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "route_provider" = {
  *       "html" = "Drupal\rng\Routing\RegistrantRouteProvider",
@@ -37,9 +34,10 @@ use Drupal\rng\RegistrationInterface;
  *   base_table = "registrant",
  *   entity_keys = {
  *     "id" = "id",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "bundle" = "type"
  *   },
- *   field_ui_base_route = "rng.config.registrant",
+ *   field_ui_base_route = "entity.registrant_type.edit_form",
  *   links = {
  *     "canonical" = "/registrant/{registrant}",
  *     "edit-form" = "/registrant/{registrant}/edit",
@@ -126,16 +124,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Registrant ID'))
-      ->setDescription(t('The registrant ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The registrant UUID.'))
-      ->setReadOnly(TRUE);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['registration'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Registration'))

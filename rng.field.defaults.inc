@@ -63,6 +63,18 @@ function rng_add_event_field_storage($field_name, $entity_type) {
         'type' => 'boolean',
       );
       break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM:
+      $definition = [
+        'type' => 'integer',
+      ];
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM:
+      $definition = [
+        'type' => 'integer',
+      ];
+      break;
   }
 
   if (!empty($definition)) {
@@ -75,12 +87,9 @@ function rng_add_event_field_storage($field_name, $entity_type) {
   }
 }
 
-function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
-  if ($field = FieldConfig::loadByName($entity_type, $bundle, $field_name)) {
-    return NULL;
-  }
-
+function rng_event_field_config_definition($field_name) {
   $definition = array();
+
   switch ($field_name) {
     case EventManagerInterface::FIELD_REGISTRATION_TYPE:
       $definition = array(
@@ -102,8 +111,8 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
       $definition = array(
         'label' => 'Accept new registrations',
         'settings' => [
-        'on_label' => t('Accepting new registrations'),
-        'off_label' => t('Not accepting new registrations'),
+          'on_label' => t('Accepting new registrations'),
+          'off_label' => t('Not accepting new registrations'),
         ],
       );
       break;
@@ -135,7 +144,40 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
         ],
       );
       break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM:
+      $definition = array(
+        'label' => 'Minimum registrants',
+        'description' => t('Minimum number of registrants per registration.'),
+        'settings' => array(
+          'min' => 1,
+        ),
+      );
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM:
+      $definition = array(
+        'label' => 'Maximum registrants',
+        'description' => t('Maximum number of registrants per registration.'),
+        'settings' => array(
+          'min' => 1,
+        ),
+      );
+      break;
   }
+
+  return $definition;
+}
+
+/**
+ * @return \Drupal\Core\Field\FieldConfigInterface
+ */
+function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
+  if ($field = FieldConfig::loadByName($entity_type, $bundle, $field_name)) {
+    return NULL;
+  }
+
+  $definition = rng_event_field_config_definition($field_name);
 
   if (!empty($definition)) {
     $field = entity_create('field_config', array(
@@ -146,6 +188,8 @@ function rng_add_event_field_config($field_name, $entity_type, $bundle = NULL) {
     );
     $field->save();
   }
+
+  return $field;
 }
 
 /**
@@ -197,6 +241,18 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
     case EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS:
       $form_display->setComponent($field_name, array(
         'type' => 'boolean_checkbox',
+      ));
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM:
+      $form_display->setComponent($field_name, array(
+        'type' => 'unlimited_number',
+      ));
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM:
+      $form_display->setComponent($field_name, array(
+        'type' => 'unlimited_number',
       ));
       break;
   }

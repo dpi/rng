@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\GroupInterface.
- */
-
 namespace Drupal\rng;
 
 use Drupal\Core\Entity\ContentEntityInterface;

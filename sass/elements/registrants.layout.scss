@@ -1,0 +1,46 @@
+.registrants-element {
+  .for_arity {
+    legend {
+      float: left;
+    }
+
+    .form-item {
+      display: inline;
+    }
+
+    .fieldset-wrapper,
+    .form-radios {
+      display: inline-block;
+    }
+
+    div.form-type-radio {
+      display: inline-block;
+    }
+
+    .form-radios {
+      .ajax-progress {
+        float: right;
+      }
+    }
+  }
+
+  .entities {
+    &> .details-wrapper {
+      display: flex;
+    }
+  }
+
+  fieldset.person-type {
+    /* Need fieldset selector since you cannot define different attributes for
+       the container and each child radio */
+    div.form-type-radio {
+      position: relative;
+
+      .ajax-progress {
+        position: absolute;
+        right: 0;
+      }
+    }
+  }
+
+}

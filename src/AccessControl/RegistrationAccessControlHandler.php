@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\AccessControl\RegistrationAccessControlHandler.
- */
-
 namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;
@@ -49,7 +44,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     $account = $this->prepareUser($account);
 
-    if (!$account->isAnonymous() && in_array($operation, array('view', 'update', 'delete'))) {
+    if (in_array($operation, ['view', 'update', 'delete'])) {
       if ($account->hasPermission('administer rng')) {
         return AccessResult::allowed()->cachePerPermissions();
       }
@@ -77,11 +72,11 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
-   *
-   * @param string $entity_bundle
-   *   A registration type. Or NULL if it is a registration type listing.
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array(), $return_as_object = FALSE) {
+    // $entity_bundle: A registration type, or NULL if it is a registration type
+    // listing.
+
     if (!isset($context['event'])) {
       throw new AccessException('Requires event context.');
     }
@@ -92,10 +87,6 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
       ->addCacheContexts(['rng_event', 'user']) : FALSE;
 
     $account = $this->prepareUser($account);
-    if ($account->isAnonymous()) {
-      return AccessResult::neutral()
-        ->addCacheContexts(['user.roles:anonymous']);
-    }
 
     try {
       $event_meta = $this->eventManager->getMeta($event);
@@ -120,7 +111,7 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         return $fail;
       }
 
-      if (!$event_meta->countProxyIdentities()) {
+      if (!$event_meta->canRegisterProxyIdentities()) {
         return $fail;
       }
 

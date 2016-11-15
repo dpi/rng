@@ -9,10 +9,26 @@ entity.event_type.edit_form:
   title: 'Edit'
   weight: -100
 
+entity.event_type.edit_form_sub:
+  route_name: entity.event_type.edit_form
+  title: 'Edit'
+  parent_id: entity.event_type.edit_form
+
+entity.event_type.field_mapping:
+  route_name: entity.event_type.field_mapping
+  title: 'Field Mapping'
+  parent_id: entity.event_type.edit_form
+
 entity.event_type.access_defaults:
   route_name: entity.event_type.access_defaults
   base_route: entity.event_type.edit_form
   title: 'Access Defaults'
+
+# Registration type
+entity.registration_type.edit_form:
+  title: 'Edit'
+  route_name: entity.registration_type.edit_form
+  base_route: entity.registration_type.edit_form
 
 # Registrations
 entity.registration.canonical:
@@ -38,6 +54,12 @@ entity.registration.registrants:
   base_route: entity.registration.canonical
   title: 'Identities'
   weight: 15
+
+# Registrant type
+entity.registrant_type.edit_form:
+  title: 'Edit'
+  route_name: entity.registrant_type.edit_form
+  base_route: entity.registrant_type.edit_form
 
 # Registrant
 entity.registrant.canonical:
@@ -66,7 +88,7 @@ entity.rng_rule_component.edit:
   weight: 10
 
 # RNG Configuration
-rng.config.registrant:
-  route_name: rng.config.registrant
+rng.config.settings:
+  route_name: rng.config.settings
   title: 'Settings'
-  base_route: rng.config.registrant
+  base_route: rng.config.settings

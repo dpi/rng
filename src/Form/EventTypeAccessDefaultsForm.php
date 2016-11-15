@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\EventTypeAccessDefaultsForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\EntityForm;

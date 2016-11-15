@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Condition\IdentityIsRegistrant.
- */
-
 namespace Drupal\rng\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;

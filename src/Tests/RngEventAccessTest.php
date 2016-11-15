@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventAccessTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\Core\Url;
@@ -19,7 +14,7 @@ use Drupal\rng\Entity\EventTypeRule;
  *
  * @group rng
  */
-class EventAccessTest extends RNGTestBase {
+class RngEventAccessTest extends RngWebTestBase {
 
   public static $modules = ['block', 'entity_test'];
 
@@ -47,7 +42,7 @@ class EventAccessTest extends RNGTestBase {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $this->event_type = $this->createEventTypeNG('entity_test', 'entity_test');
+    $this->event_type = $this->createEventType('entity_test', 'entity_test');
     $this->registration_type = $this->createRegistrationType();
     $this->eventManager = \Drupal::service('rng.event_manager');
   }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Breadcrumb\RuleComponentBreadcrumbBuilder.
- */
-
 namespace Drupal\rng\Breadcrumb;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;

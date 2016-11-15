@@ -4,6 +4,7 @@ description: 'Provides ability to create and manage events and registrations.'
 package: RNG
 core: 8.x
 dependencies:
+  - system (>=8.1)
   - dynamic_entity_reference
   - courier
   - unlimited_number

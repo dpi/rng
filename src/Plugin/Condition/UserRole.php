@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Condition\UserRole.
- */
-
 namespace Drupal\rng\Plugin\Condition;
 
 use Drupal\user\Plugin\Condition\UserRole as CoreUserRole;

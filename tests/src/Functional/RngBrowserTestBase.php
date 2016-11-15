@@ -3,14 +3,14 @@
 namespace Drupal\Tests\rng\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\rng\Tests\RNGTestTrait;
+use Drupal\rng\Tests\RngTestTrait;
 
 /**
  * Base test class for functional browser tests.
  */
 abstract class RngBrowserTestBase extends BrowserTestBase {
 
-  use RNGTestTrait;
+  use RngTestTrait;
 
   /**
    * {@inheritdoc}

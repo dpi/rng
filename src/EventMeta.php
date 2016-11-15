@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\EventMeta.
- */
-
 namespace Drupal\rng;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -57,6 +52,20 @@ class EventMeta implements EventMetaInterface {
   protected $identityChannelManager;
 
   /**
+   * The RNG configuration service.
+   *
+   * @var \Drupal\rng\RngConfigurationInterface
+   */
+  protected $rngConfiguration;
+
+  /**
+   * The RNG event manager.
+   *
+   * @var \Drupal\rng\EventManagerInterface
+   */
+  protected $eventManager;
+
+  /**
    * Constructs a new EventMeta object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -67,14 +76,20 @@ class EventMeta implements EventMetaInterface {
    *   The selection plugin manager.
    * @param \Drupal\courier\Service\IdentityChannelManagerInterface $identity_channel_manager
    *   The identity channel manager.
+   * @param \Drupal\rng\RngConfigurationInterface $rng_configuration
+   *   The RNG configuration service.
+   * @param \Drupal\rng\EventManagerInterface $event_manager
+   *   The RNG event manager.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The event entity.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ConfigFactoryInterface $config_factory, SelectionPluginManagerInterface $selection_plugin_manager, IdentityChannelManagerInterface $identity_channel_manager, EntityInterface $entity) {
+  public function __construct(EntityManagerInterface $entity_manager, ConfigFactoryInterface $config_factory, SelectionPluginManagerInterface $selection_plugin_manager, IdentityChannelManagerInterface $identity_channel_manager, RngConfigurationInterface $rng_configuration, EventManagerInterface $event_manager, EntityInterface $entity) {
     $this->entityManager = $entity_manager;
     $this->configFactory = $config_factory;
     $this->selectionPluginManager = $selection_plugin_manager;
     $this->identityChannelManager = $identity_channel_manager;
+    $this->rngConfiguration = $rng_configuration;
+    $this->eventManager = $event_manager;
     $this->entity = $entity;
   }
 
@@ -87,6 +102,8 @@ class EventMeta implements EventMetaInterface {
       $container->get('config.factory'),
       $container->get('plugin.manager.entity_reference_selection'),
       $container->get('plugin.manager.identity_channel'),
+      $container->get('rng.configuration'),
+      $container->get('rng.event_manager'),
       $entity
     );
   }
@@ -96,6 +113,13 @@ class EventMeta implements EventMetaInterface {
    */
   public function getEvent() {
     return $this->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEventType() {
+    return $this->eventManager->eventType($this->entity->getEntityTypeId(), $this->entity->bundle());
   }
 
   /**
@@ -191,6 +215,34 @@ class EventMeta implements EventMetaInterface {
     }
     $remaining = $capacity - $this->countRegistrations();
     return $remaining > 0 ? $remaining : 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRegistrantsMinimum() {
+    if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM})) {
+      $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM};
+      $minimum = $field->value;
+      if ($minimum !== '' && is_numeric($minimum) && $minimum >= 0) {
+        return $minimum;
+      }
+    }
+    return 1;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRegistrantsMaximum() {
+    if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM})) {
+      $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM};
+      $maximum = $field->value;
+      if ($maximum !== '' && is_numeric($maximum) && $maximum >= 0) {
+        return $maximum;
+      }
+    }
+    return EventMetaInterface::CAPACITY_UNLIMITED;
   }
 
   /**
@@ -379,25 +431,50 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function canRegisterProxyIdentities() {
+    // Create is checked first since it is usually the cheapest.
+    $identity_types = $this->getCreatableIdentityTypes();
+    foreach ($identity_types as $entity_type_id => $bundles) {
+      $accessControl = $this->entityManager->getAccessControlHandler($entity_type_id);
+      if ($this->entityTypeHasBundles($entity_type_id)) {
+        foreach ($bundles as $bundle) {
+          if ($accessControl->createAccess($bundle)) {
+            return TRUE;
+          }
+        }
+      }
+      elseif (!empty($bundles)) {
+        if ($accessControl->createAccess()) {
+          return TRUE;
+        }
+      }
+    }
+
+    // Reference existing.
+    $identity_types = $this->getIdentityTypes();
+    foreach ($identity_types as $entity_type_id => $bundles) {
+      $referencable_bundles = $this->entityTypeHasBundles($entity_type_id) ? $bundles : [];
+      $count = $this->countRngReferenceableEntities($entity_type_id, $referencable_bundles);
+      if ($count > 0) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function countProxyIdentities() {
     $total = 0;
 
-    foreach ($this->getIdentityTypes() as $entity_type_id) {
-      $selection_groups = $this->selectionPluginManager->getSelectionGroups($entity_type_id);
-      if (!isset($selection_groups['rng_register'])) {
-        continue;
+    foreach ($this->getIdentityTypes() as $entity_type_id => $bundles) {
+      if ($this->entityTypeHasBundles($entity_type_id)) {
+        $total += $this->countRngReferenceableEntities($entity_type_id, $bundles);
       }
-
-      $count = $this
-        ->selectionPluginManager
-        ->getInstance([
-          'target_type' => $entity_type_id,
-          'handler' => 'rng_register',
-          'handler_settings' => ['event_entity_type' => $this->getEvent()->getEntityTypeId(), 'event_entity_id' => $this->getEvent()->id()],
-        ])
-        ->countReferenceableEntities();
-      if (is_numeric($count)) {
-        $total += $count;
+      elseif (!empty($bundles)) {
+        $total += $this->countRngReferenceableEntities($entity_type_id);
       }
     }
 
@@ -405,21 +482,88 @@ class EventMeta implements EventMetaInterface {
   }
 
   /**
+   * Count referencable entities using a rng_register entity selection plugin.
+   *
+   * @param string $entity_type_id
+   *   An identity entity type ID.
+   * @param array $bundles
+   *   (optional) An array of bundles.
+   *
+   * @return integer
+   *   The number of referencable entities.
+   */
+  protected function countRngReferenceableEntities($entity_type_id, $bundles = []) {
+    $selection_groups = $this->selectionPluginManager
+      ->getSelectionGroups($entity_type_id);
+
+    if (isset($selection_groups['rng_register'])) {
+      $options = [
+        'target_type' => $entity_type_id,
+        'handler' => 'rng_register',
+        'handler_settings' => [
+          'event_entity_type' => $this->getEvent()->getEntityTypeId(),
+          'event_entity_id' => $this->getEvent()->id(),
+        ],
+      ];
+
+      if (!empty($bundles)) {
+        $options['handler_settings']['target_bundles'] = $bundles;
+      }
+
+      return $this->selectionPluginManager
+        ->getInstance($options)
+        ->countReferenceableEntities();
+    }
+
+    return 0;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getIdentityTypes() {
-    $config = $this->configFactory->get('rng.settings');
-    $identity_types = $config->get('identity_types');
-    $allowed_identity_types = is_array($identity_types) ? $identity_types : [];
-    $available_identity_types = $this->identityChannelManager->getIdentityTypes();
-    return array_intersect($allowed_identity_types, $available_identity_types);
+    $event_type = $this->getEventType();
+
+    $result = [];
+    $identity_types_available = $this->rngConfiguration->getIdentityTypes();
+    foreach ($identity_types_available as $entity_type_id) {
+      $bundles = $this->entityManager->getBundleInfo($entity_type_id);
+      foreach ($bundles as $bundle => $info) {
+        if ($event_type->canIdentityTypeReference($entity_type_id, $bundle)) {
+          $result[$entity_type_id][] = $bundle;
+        }
+      }
+    }
+
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatableIdentityTypes() {
+    $event_type = $this->getEventType();
+
+    $result = [];
+    $identity_types_available = $this->rngConfiguration->getIdentityTypes();
+    foreach ($identity_types_available as $entity_type_id) {
+      $bundles = $this->entityManager->getBundleInfo($entity_type_id);
+      foreach ($bundles as $bundle => $info) {
+        if ($event_type->canIdentityTypeCreate($entity_type_id, $bundle)) {
+          $result[$entity_type_id][] = $bundle;
+        }
+      }
+    }
+
+    return $result;
   }
 
   /**
    * {@inheritdoc}
    */
   public function identitiesCanRegister($entity_type, array $entity_ids) {
-    if (in_array($entity_type, $this->getIdentityTypes())) {
+    $identity_types = $this->getIdentityTypes();
+    if (isset($identity_types[$entity_type])) {
       $options = [
         'target_type' => $entity_type,
         'handler' => 'rng_register',
@@ -428,6 +572,10 @@ class EventMeta implements EventMetaInterface {
           'event_entity_id' => $this->getEvent()->id(),
         ],
       ];
+
+      if ($this->entityTypeHasBundles($entity_type)) {
+        $options['handler_settings']['target_bundles'] = $identity_types[$entity_type];
+      }
 
       /* @var $selection \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
       $selection = $this->selectionPluginManager->getInstance($options);
@@ -444,6 +592,20 @@ class EventMeta implements EventMetaInterface {
     foreach ($rules as $rule) {
       $rule->save();
     }
+  }
+
+  /**
+   * Determine whether an entity type uses a separate bundle entity type.
+   *
+   * @param string $entity_type_id
+   *   An entity type Id.
+   *
+   * @return boolean
+   *   Whether an entity type uses a separate bundle entity type.
+   */
+  protected function entityTypeHasBundles($entity_type_id) {
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+    return ($entity_type->getBundleEntityType() !== NULL);
   }
 
 }

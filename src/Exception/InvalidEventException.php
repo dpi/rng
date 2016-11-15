@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Exception\InvalidEventException.
- */
-
 namespace Drupal\rng\Exception;
 
 /**

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Access\EntityIsEventCheck.
- */
-
 namespace Drupal\rng\Access;
 
 use Drupal\Core\Access\AccessResult;

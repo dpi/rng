@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\GroupForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\Condition\RuleScheduler.
- */
-
 namespace Drupal\rng\Plugin\Condition;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;

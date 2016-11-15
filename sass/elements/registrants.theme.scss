@@ -1,0 +1,35 @@
+.registrants-element {
+  .for_arity {
+    legend {
+      /* browsers cannot change legend from block to inline */
+      float: left;
+
+      &:after {
+        content: " ";
+      }
+    }
+
+    .form-item {
+      margin: 0 0 0 1em;
+    }
+  }
+
+  fieldset.person-type {
+    /* Need fieldset selector since you cannot define different attributes for
+       the container and each child radio */
+    white-space: nowrap;
+    width: 200px;
+  }
+
+  .person-container {
+    width: 100%;
+    padding-left: 2em;
+    border-left: 1px solid #ccc;
+  }
+
+  .existing-container {
+    input.form-autocomplete {
+      width: 100%;
+    }
+  }
+}

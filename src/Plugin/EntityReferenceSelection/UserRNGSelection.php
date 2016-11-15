@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\EntityReferenceSelection\UserRNGSelection.
- */
-
 namespace Drupal\rng\Plugin\EntityReferenceSelection;
 
 use Drupal\rng\RuleGrantsOperationTrait;
@@ -71,9 +66,11 @@ class UserRNGSelection extends RNGSelectionBase {
     $group = $query->orConditionGroup();
 
     // Self.
-    if ($this->currentUser->hasPermission('rng register self')) {
-      $proxy_count++;
-      $group->condition($this->entityType->getKey('id'), $this->currentUser->id(), '=');
+    if ($this->currentUser->isAuthenticated()) {
+      if ($this->currentUser->hasPermission('rng register self')) {
+        $proxy_count++;
+        $group->condition($this->entityType->getKey('id'), $this->currentUser->id(), '=');
+      }
     }
 
     foreach (user_roles(TRUE) as $role) {

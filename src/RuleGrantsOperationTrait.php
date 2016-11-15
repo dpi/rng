@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\RuleGrantsOperationTrait.
- */
-
 namespace Drupal\rng;
 
 /**

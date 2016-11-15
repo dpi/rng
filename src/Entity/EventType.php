@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Entity\EventType.
- */
-
 namespace Drupal\rng\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -14,6 +9,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\courier\Entity\CourierContext;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Entity\Entity\EntityFormMode;
+use Drupal\rng\RegistrantTypeInterface;
 
 /**
  * Defines the event type entity.
@@ -28,6 +24,7 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *       "edit" = "Drupal\rng\Form\EventTypeForm",
  *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm",
  *       "event_access_defaults" = "Drupal\rng\Form\EventTypeAccessDefaultsForm",
+ *       "field_mapping" = "Drupal\rng\Form\EventTypeFieldMappingForm",
  *     }
  *   },
  *   admin_permission = "administer event types",
@@ -40,6 +37,7 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
  *     "edit-form" = "/admin/structure/rng/event_types/manage/{event_type}/edit",
  *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete",
  *     "event-access-defaults" = "/admin/structure/rng/event_types/manage/{event_type}/access_defaults",
+ *     "field-mapping" = "/admin/structure/rng/event_types/manage/{event_type}/field_mapping",
  *   }
  * )
  */
@@ -95,6 +93,20 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public $custom_rules = TRUE;
 
   /**
+   * Registrant type for new registrants associated with this event type.
+   *
+   * @var string
+   */
+  protected $default_registrant;
+
+  /**
+   * Types of people types allowed to be associated with this event type.
+   *
+   * @var array
+   */
+  protected $people_types = [];
+
+  /**
    * Fields to add to event bundles.
    *
    * @var array
@@ -106,6 +118,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     EventManagerInterface::FIELD_CAPACITY,
     EventManagerInterface::FIELD_EMAIL_REPLY_TO,
     EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
+    EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM,
+    EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM,
   ];
 
   /**
@@ -165,6 +179,121 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   function setAllowCustomRules($allow) {
     $this->custom_rules = $allow;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getDefaultRegistrantType() {
+    return $this->default_registrant;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canIdentityTypeCreate($entity_type, $bundle) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    return !empty($this->people_types[$key]['create']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentityTypeCreate($entity_type, $bundle, $enabled) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    $this->people_types[$key]['create'] = $enabled;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIdentityTypeEntityFormMode($entity_type, $bundle) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    return !empty($this->people_types[$key]['entity_form_mode']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIdentityTypeEntityFormModes() {
+    $result = [];
+    foreach ($this->people_types as $people_type) {
+      $entity_type = $people_type['entity_type'];
+      $bundle = $people_type['bundle'];
+      $result[$entity_type][$bundle] = $people_type['entity_form_mode'];
+    }
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentityTypeEntityFormMode($entity_type, $bundle, $form_mode) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    $this->people_types[$key]['entity_form_mode'] = $form_mode;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canIdentityTypeReference($entity_type, $bundle) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    return !empty($this->people_types[$key]['existing']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdentityTypeReference($entity_type, $bundle, $enabled) {
+    $key = $this->getIdentityTypeKey($entity_type, $bundle);
+    $this->people_types[$key]['existing'] = $enabled;
+    return $this;
+  }
+
+  /**
+   * Get the array key of the people type.
+   *
+   * @param string $entity_type
+   *   The identity entity type ID.
+   * @param string $bundle
+   *   The identity bundle.
+   * @param boolean $create_key
+   *   Will initialise the array key.
+   *
+   * @return int|FALSE
+   *   The array key, or FALSE if it does not exist.
+   */
+  protected function getIdentityTypeKey($entity_type, $bundle, $create_key = TRUE) {
+    if (isset($this->people_types)) {
+      $pairs = $this->people_types;
+      foreach ($pairs as $k => $pair) {
+        if ($pair['entity_type'] == $entity_type && $pair['bundle'] == $bundle) {
+          return $k;
+        }
+      }
+    }
+
+    if ($create_key) {
+      // Create if it doesn't exist.
+      $next_key = count($this->people_types) + 1;
+      $this->people_types[$next_key] = [
+        'entity_type' => $entity_type,
+        'bundle' => $bundle,
+      ];
+      return $next_key;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setDefaultRegistrantType($registrant_type_id) {
+    $this->default_registrant = $registrant_type_id;
     return $this;
   }
 
@@ -256,6 +385,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         EventManagerInterface::FIELD_EMAIL_REPLY_TO,
         EventManagerInterface::FIELD_REGISTRATION_TYPE,
         EventManagerInterface::FIELD_REGISTRATION_GROUPS,
+        EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM,
+        EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM,
       ];
 
       module_load_include('inc', 'rng', 'rng.field.defaults');
@@ -316,6 +447,8 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
+
+    // Event entity type/bundle.
     $entity_type = \Drupal::entityTypeManager()
       ->getDefinition($this->getEventEntityTypeId());
     if ($entity_type) {
@@ -332,7 +465,36 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
         $this->addDependency('module', $entity_type->getProvider());
       }
     }
+
+    // Default registrant type.
+    $registrant_type_id = $this->getDefaultRegistrantType();
+    if ($registrant_type_id) {
+      $registrant_type = RegistrantType::load($registrant_type_id);
+      if ($registrant_type) {
+        $this->addDependency('config', $registrant_type->getConfigDependencyName());
+      }
+    }
+
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onDependencyRemoval(array $dependencies) {
+    $changed = parent::onDependencyRemoval($dependencies);
+
+    foreach ($dependencies['config'] as $entity) {
+      if ($entity instanceof RegistrantTypeInterface) {
+        // Registrant type is being deleted.
+        if ($entity->id() === $this->getDefaultRegistrantType()) {
+          $this->setDefaultRegistrantType(NULL);
+          $changed = TRUE;
+        }
+      }
+    }
+
+    return $changed;
   }
 
 }

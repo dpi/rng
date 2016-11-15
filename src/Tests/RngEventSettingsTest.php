@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventSettingsTest.
- */
-
 namespace Drupal\rng\Tests;
 
 /**
@@ -12,7 +7,7 @@ namespace Drupal\rng\Tests;
  *
  * @group rng
  */
-class EventSettingsTest extends RNGSiteTestBase {
+class RngEventSettingsTest extends RngSiteTestBase {
 
   public static $modules = ['block'];
 
@@ -30,12 +25,12 @@ class EventSettingsTest extends RNGSiteTestBase {
    *
    * Check if entities of each bundle are events.
    */
-  function testEvent() {
+  public function testEvent() {
     $bundle[0] = $this->event_bundle;
     $bundle[1] = $this->drupalCreateContentType();
     $bundle[2] = $this->drupalCreateContentType();
     $event_types[0] = $this->event_type;
-    $event_types[1] = $this->createEventType($bundle[2]);
+    $event_types[1] = $this->createEventType('node', $bundle[2]->id());
 
     \Drupal::service('router.builder')->rebuildIfNeeded();
 
@@ -82,7 +77,7 @@ class EventSettingsTest extends RNGSiteTestBase {
   /**
    * Tests canonical event page, and the Event default local task.
    */
-  function testEventSettings() {
+  public function testEventSettingsTabs() {
     $account = $this->drupalCreateUser([
       'edit own ' . $this->event_bundle->id() . ' content',
     ]);
@@ -101,6 +96,46 @@ class EventSettingsTest extends RNGSiteTestBase {
     $this->assertLinkByHref($base_url . '/event/access');
     $this->assertLinkByHref($base_url . '/event/messages');
     $this->assertLinkByHref($base_url . '/event/groups');
+  }
+
+  /**
+   * Tests changing event settings reveals the 'Register' tab.
+   */
+  public function testEventSettings() {
+    $bundle = $this->event_bundle->id();
+    $account = $this->drupalCreateUser([
+      'access content',
+      'edit own ' . $bundle . ' content',
+      'rng register self',
+    ]);
+    $this->drupalLogin($account);
+
+    $this->createEntity($this->event_bundle, [
+      'uid' => \Drupal::currentUser()->id()
+    ]);
+
+    // Event
+    $base_url = 'node/1';
+    $this->drupalGet($base_url . '');
+    $this->assertResponse(200);
+    $this->drupalGet($base_url . '/event');
+    $this->assertResponse(200);
+    $this->assertNoLinkByHref($base_url . '/register');
+    $this->drupalGet($base_url . '/register');
+    $this->assertResponse(403);
+
+    // Settings
+    $edit = [
+      'rng_status[value]' => TRUE,
+      'rng_registration_type[' . $this->registration_type->id() . ']' => TRUE,
+      'rng_capacity[0][unlimited_number][unlimited_number]' => 'limited',
+      'rng_capacity[0][unlimited_number][number]' => '1',
+    ];
+    $this->drupalPostForm($base_url . '/event', $edit, t('Save'));
+    $this->assertRaw(t('Event settings updated.'));
+
+    // Register tab appears.
+    $this->assertLinkByHref($base_url . '/register');
   }
 
 }

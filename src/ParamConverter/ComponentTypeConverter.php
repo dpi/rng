@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\ParamConverter\ComponentTypeConverter.
- */
-
 namespace Drupal\rng\ParamConverter;
 
 use Symfony\Component\Routing\Route;

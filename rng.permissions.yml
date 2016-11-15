@@ -9,8 +9,13 @@ administer event types:
   restrict access: TRUE
 
 administer registration types:
-  title: 'Admnister all registration types'
+  title: 'Administer all registration types'
   description: 'Create, and perform any action on registration types.'
+  restrict access: TRUE
+
+administer registrant types:
+  title: 'Administer all registrant types'
+  description: 'Create, and perform any action on registrant types.'
   restrict access: TRUE
 
 administer registration entity:

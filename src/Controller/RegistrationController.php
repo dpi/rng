@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Controller\RegistrationController.
- */
-
 namespace Drupal\rng\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

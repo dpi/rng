@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Lists\GroupListBuilder.
- */
-
 namespace Drupal\rng\Lists;
 
 use Drupal\Core\Entity\EntityListBuilder;

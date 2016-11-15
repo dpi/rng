@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\EventTypeDeleteForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;

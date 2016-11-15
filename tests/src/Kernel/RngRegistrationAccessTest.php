@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rng\Kernel\RegistrationAccessTest.
- */
-
 namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\simpletest\UserCreationTrait;
@@ -15,7 +10,7 @@ use Drupal\rng\EventManagerInterface;
  *
  * @group rng
  */
-class RegistrationAccessTest extends RNGKernelTestBase {
+class RngRegistrationAccessTest extends RngKernelTestBase {
 
   use UserCreationTrait {
     createUser as drupalCreateUser;

@@ -91,3 +91,92 @@ function rng_update_8001() {
     }
   }
 }
+
+/**
+ * Convert registrant entity to one with bundles
+ */
+function rng_update_8002() {
+  $entity_manager = \Drupal::entityTypeManager();
+  $config_factory = \Drupal::configFactory();
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  // Install 'registrant_type' config entity.
+  $entity_manager->clearCachedDefinitions();
+  $type = $entity_manager->getDefinition('registrant_type');
+  $update_manager->installEntityType($type);
+
+  // Clear config cache so new registrant type saves.
+  \Drupal::service('config.typed')->clearCachedDefinitions();
+
+  // Install 'type' field.
+  $field_definition = \Drupal\Core\Field\BaseFieldDefinition::create('entity_reference')
+    ->setLabel('Registrant type')
+    ->setSetting('target_type', 'registrant_type');
+  $update_manager->installFieldStorageDefinition('type', 'registrant', 'registrant', $field_definition);
+
+  // Create the first registrant_type entity which will re-capture any
+  // pre-existing fields from the formerly bundle-less entity.
+  $default_registrant_type_id = 'registrant';
+  $registrant_type = \Drupal\rng\Entity\RegistrantType::create([
+    'id' => $default_registrant_type_id,
+    'label' => 'Registrant',
+  ]);
+  $registrant_type->save();
+
+  // Re-calculate dependencies by re-saving fields.
+  $config_names = $config_factory->listAll('field.field.registrant.registrant.');
+  foreach ($config_names as $name) {
+    // Remove prefix
+    $id = str_replace('field.field.', '', $name);
+    $entity = \Drupal\field\Entity\FieldConfig::load($id);
+    $entity->save();
+  }
+}
+
+/**
+ * Update event types with new registrant and people type configuration.
+ */
+function rng_update_8003() {
+  /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info */
+  $bundle_info = \Drupal::service('entity_type.bundle.info');
+  $config_factory = \Drupal::configFactory();
+  $default_registrant_type_id = 'registrant';
+
+  // Generate default people types allowing all enabled identity types.
+  $people_types = [];
+  $identity_types = $config_factory->get('rng.settings')->get('identity_types') ?: [];
+  foreach ($identity_types as $entity_type) {
+    $bundles = $bundle_info->getBundleInfo($entity_type);
+    foreach (array_keys($bundles) as $bundle) {
+      $people_types[] = [
+        'entity_type' => $entity_type,
+        'bundle' => $bundle,
+        'existing' => 1,
+        'create' => 0,
+        'entity_form_mode' => 'default',
+      ];
+    }
+  }
+
+  $config_names = $config_factory->listAll('rng.event_type.');
+  foreach ($config_names as $name) {
+    $config = $config_factory->getEditable($name);
+
+    // Set default registrant for event types to the new bundle entity created
+    // in 8002. 8002 + 8003 happen simultaneously.
+    $config->set('default_registrant', $default_registrant_type_id);
+
+    // Permit referencing existing entities for all enabled identity types.
+    $config->set('people_types', $people_types);
+
+    // Add a dependency on the registrant type used for 'default_registrant'.
+    $id = 'rng.registrant_type.' . $default_registrant_type_id;
+    $config_dependencies = $config->get('dependencies.config') ?: [];
+    if (!in_array($id, $config_dependencies)) {
+      $config_dependencies[] = $id;
+      $config->set('dependencies.config', $config_dependencies);
+    }
+
+    $config->save();
+  }
+}

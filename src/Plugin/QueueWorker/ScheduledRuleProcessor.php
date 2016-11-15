@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Plugin\QueueWorker\ScheduledRuleProcessor.
- */
-
 namespace Drupal\rng\Plugin\QueueWorker;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;

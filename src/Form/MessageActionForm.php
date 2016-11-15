@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Form\MessageActionForm.
- */
-
 namespace Drupal\rng\Form;
 
 use Drupal\Core\Form\FormStateInterface;

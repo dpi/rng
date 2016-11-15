@@ -15,5 +15,17 @@
       "role": "Maintainer"
     }
   ],
-  "license": "GPL-2.0+"
+  "license": "GPL-2.0+",
+  "require": {
+    "drupal/core": "~8.1",
+    "drupal/dynamic_entity_reference": "~8.0",
+    "drupal/courier": "~8.0",
+    "drupal/unlimited_number": "~8.0"
+  },
+  "suggest": {
+    "drupal/rng_quick": "Provides blocks for event registration.",
+    "drupal/rng_conflict": "Prevent registrations when a registrant is registered for a similar event.",
+    "drupal/rng_contact": "Provides a simple contact entity type.",
+    "drupal/rng_date_scheduler": "Control whether a user can register based on current time in relation to date fields attached to an event entity."
+  }
 }

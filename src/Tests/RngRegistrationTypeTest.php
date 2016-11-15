@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\RegistrationTypeTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\Core\Url;
@@ -17,7 +12,7 @@ use Drupal\rng\EventManagerInterface;
  *
  * @group rng
  */
-class RegistrationTypeTest extends RNGSiteTestBase {
+class RngRegistrationTypeTest extends RngSiteTestBase {
 
   public static $modules = ['block'];
 

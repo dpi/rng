@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\ContextProvider\RngEventRouteContext.
- */
-
 namespace Drupal\rng\ContextProvider;
 
 use Drupal\Core\Cache\CacheableMetadata;

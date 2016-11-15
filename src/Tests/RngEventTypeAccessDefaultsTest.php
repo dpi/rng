@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rng\Tests\EventTypeAccessDefaultsTest.
- */
-
 namespace Drupal\rng\Tests;
 
 use Drupal\Core\Url;
@@ -19,7 +14,7 @@ use Drupal\rng\Entity\EventTypeRule;
  *
  * @group rng
  */
-class EventTypeAccessDefaultsTest extends RNGTestBase {
+class RngEventTypeAccessDefaultsTest extends RngWebTestBase {
 
   public static $modules = ['entity_test'];
 
@@ -38,7 +33,8 @@ class EventTypeAccessDefaultsTest extends RNGTestBase {
    */
   function testAccessDefaults() {
     $edit = [
-      'bundle' => 'entity_test.entity_test'
+      'bundle' => 'entity_test.entity_test',
+      'registrants[registrant_type]' => 'registrant',
     ];
     $this->drupalPostForm(Url::fromRoute('entity.event_type.add'), $edit, t('Save'));
 
