@@ -220,9 +220,13 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public function getIdentityTypeEntityFormModes() {
     $result = [];
     foreach ($this->people_types as $people_type) {
-      $entity_type = $people_type['entity_type'];
-      $bundle = $people_type['bundle'];
-      $result[$entity_type][$bundle] = $people_type['entity_form_mode'];
+      $required_keys = ['entity_type', 'bundle', 'entity_form_mode'];
+      // Ensure keys exist.
+      if (count($required_keys) === count(array_intersect_key(array_flip($required_keys), $people_type))) {
+        $entity_type = $people_type['entity_type'];
+        $bundle = $people_type['bundle'];
+        $result[$entity_type][$bundle] = $people_type['entity_form_mode'];
+      }
     }
     return $result;
   }

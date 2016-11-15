@@ -91,7 +91,7 @@ class RngEventMetaTest extends RngKernelTestBase {
   public function testRegistrantsMinimumNoDefaultValue() {
     $event = EntityTest::create();
     $event_meta = $this->eventManager->getMeta($event);
-    $this->assertSame($this->unlimited, $event_meta->getRegistrantsMinimum(), 'Minimum registrants matches empty bundle default.');
+    $this->assertSame(1, $event_meta->getRegistrantsMinimum(), 'Minimum registrants matches empty bundle default.');
   }
 
   /**
