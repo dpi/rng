@@ -115,7 +115,14 @@ class Registrants extends FormElement {
     $people = $element['#value'];
 
     $values = NestedArray::getValue($form_state->getUserInput(), $parents);
-    $for_bundle = isset($values['entities']['for_bundle']) ? $values['entities']['for_bundle'] : NULL;
+    $for_bundles = $utility->peopleTypeOptions();
+    if (isset($values['entities']['for_bundle'])) {
+      $for_bundle = $values['entities']['for_bundle'];
+    }
+    else {
+      // Set for bundle if there is only one person type.
+      $for_bundle = count($for_bundles) == 1 ? key($for_bundles) : NULL;
+    }
 
     $arity_is_multiple = $utility->getArity() === 'multiple';
     $arity_is_single = !$arity_is_multiple;
@@ -267,11 +274,11 @@ class Registrants extends FormElement {
       ],
     ];
 
-    $for_bundles = $utility->peopleTypeOptions();
     $element['entities']['for_bundle'] = [
       '#type' => 'radios',
       '#title' => t('Person type'),
       '#options' => $for_bundles,
+      '#default_value' => $for_bundle,
       '#access' => $change_it,
       '#ajax' => [
         'callback' => [static::class, 'ajaxElementRoot'],
