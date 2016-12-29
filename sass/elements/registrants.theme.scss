@@ -25,6 +25,21 @@
     width: 100%;
     padding-left: 2em;
     border-left: 1px solid #ccc;
+
+    &.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      > .message {
+        font-size: 1.4em;
+        text-align: center;
+
+        &:before {
+          content: " « ";
+        }
+      }
+    }
   }
 
   .existing-container {

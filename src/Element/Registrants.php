@@ -296,18 +296,17 @@ class Registrants extends FormElement {
       ],
     ];
 
+    $element['entities']['person'] = [
+      '#type' => 'container',
+      '#tree' => TRUE,
+      '#attributes' => [
+        'class' => ['person-container'],
+      ],
+    ];
+    $person_subform = &$element['entities']['person'];
+
     if ($change_it && isset($for_bundle)) {
       list($person_entity_type_id, $person_bundle) = explode(':', $for_bundle);
-
-      $element['entities']['person'] = [
-        '#type' => 'container',
-        '#tree' => TRUE,
-        '#attributes' => [
-          'class' => ['person-container'],
-        ],
-      ];
-
-      $person_subform = &$element['entities']['person'];
 
       // Registrant
       $person_subform['registrant'] = [
@@ -528,6 +527,16 @@ class Registrants extends FormElement {
           ];
         }
       }
+    }
+    else {
+      // There is no subform displayed to the side of "Person type" radios:
+      $person_subform['#attributes']['class'][] = 'empty';
+
+      $person_subform['select-person-type'] = [
+        '#plain_text' => t('Select person type'),
+        '#prefix' => '<div class="message">',
+        '#suffix' => '</div>',
+      ];
     }
 
     return $element;
