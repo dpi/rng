@@ -5,7 +5,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\rng\Entity\RuleSchedule;
 use Drupal\rng\EventTypeInterface;
 use Drupal\Core\Render\Element;
 
@@ -24,9 +23,9 @@ function rng_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_access().
  */
 function rng_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
-  /** @var \Drupal\rng\RngEntityAccess $rng_model */
-  $rng_model = \Drupal::service('rng.entity.access');
-  return $rng_model->hook_entity_access($entity, $operation, $account);
+  /** @var \Drupal\rng\RngEntityAccess $rng_access */
+  $rng_access = \Drupal::service('rng.entity.access');
+  return $rng_access->hook_entity_access($entity, $operation, $account);
 }
 
 /**
@@ -44,37 +43,9 @@ function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
  * Implements hook_cron().
  */
 function rng_cron() {
-  // Add scheduled rules to be executed.
-  $queue = \Drupal::queue('rng_rule_scheduler');
-  $rule_scheduler_storage = \Drupal::entityTypeManager()
-    ->getStorage('rng_rule_scheduler');
-
-  $ids = $rule_scheduler_storage->getQuery()
-    ->condition('trigger_date', time(), '<=')
-    ->condition('in_queue', 0, '=')
-    ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '<=')
-    ->execute();
-
-  foreach ($rule_scheduler_storage->loadMultiple($ids) as $rule_schedule) {
-    /** @var \Drupal\rng\RuleScheduleInterface $rule_schedule */
-    $data = ['rule_scheduler_id' => $rule_schedule->id()];
-    if ($queue->createItem($data)) {
-      $rule_schedule->setInQueue(TRUE)->save();
-
-      // De-activate the rule once it is queued.
-      if ($component = $rule_schedule->getComponent()) {
-        if ($rule = $component->getRule()) {
-          $rule->setIsActive(FALSE)->save();
-        }
-      }
-    }
-  }
-
-  // Delete scheduled rules which have had too many attempts.
-  $ids = $rule_scheduler_storage->getQuery()
-    ->condition('attempts', RuleSchedule::ATTEMPTS_MAX, '>')
-    ->execute();
-  $rule_scheduler_storage->delete($rule_scheduler_storage->loadMultiple($ids));
+  /** @var \Drupal\rng\RngCron $rng_cron */
+  $rng_cron = \Drupal::service('rng.cron');
+  $rng_cron->hook_cron();
 }
 
 /**

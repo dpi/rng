@@ -6,6 +6,9 @@ services:
     class: Drupal\rng\EventManager
     arguments: ['@entity.manager']
     parent: container.trait
+  rng.cron:
+    class: Drupal\rng\RngCron
+    arguments: ['@queue', '@entity_type.manager']
   rng.entity.access:
     class: Drupal\rng\RngEntityAccess
     arguments: ['@rng.event_manager']
