@@ -4,14 +4,14 @@ namespace Drupal\rng;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\courier\Service\IdentityChannelManagerInterface;
 use Drupal\rng\Entity\Registrant;
 use Drupal\rng\Plugin\Action\CourierTemplateCollection;
+use Drupal\courier\Service\IdentityChannelManagerInterface;
 
 /**
  * Enforces RNG model relationships.
  */
-class RngModel {
+class RngEntityModel {
 
   /**
    * Storage for registration entities.
@@ -56,7 +56,7 @@ class RngModel {
   protected $identityChannelManager;
 
   /**
-   * Constructs a new RegistrantFactory object.
+   * Constructs a new RngEntityModel object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.

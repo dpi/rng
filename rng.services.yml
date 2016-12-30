@@ -10,8 +10,8 @@ services:
     class: Drupal\rng\RngEntityAccess
     arguments: ['@rng.event_manager']
   rng.entity.model:
-    class: Drupal\rng\RngModel
-    arguments: ['@rng.event_manager', '@plugin.manager.identity_channel']
+    class: Drupal\rng\RngEntityModel
+    arguments: ['@entity_type.manager', '@rng.event_manager', '@plugin.manager.identity_channel']
   rng.registrant.factory:
     class: Drupal\rng\RegistrantFactory
     arguments: ['@entity_type.manager', '@rng.event_manager']

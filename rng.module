@@ -3,19 +3,10 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\courier\ChannelInterface;
-use Drupal\courier\TemplateCollectionInterface;
 use Drupal\rng\Entity\RuleSchedule;
-use Drupal\rng\Entity\Registrant;
 use Drupal\rng\EventTypeInterface;
-use Drupal\rng\Exception\InvalidEventException;
-use Drupal\courier\Entity\TemplateCollection;
-use Drupal\rng\RuleInterface;
-use Drupal\rng\RuleComponentInterface;
-use Drupal\rng\Plugin\Action\CourierTemplateCollection;
 use Drupal\Core\Render\Element;
 
 /**
@@ -109,7 +100,7 @@ function rng_entity_operation(EntityInterface $entity) {
  * Implements hook_entity_insert().
  */
 function rng_entity_insert(EntityInterface $entity) {
-  /** @var \Drupal\rng\RngModel $rng_model */
+  /** @var \Drupal\rng\RngEntityModel $rng_model */
   $rng_model = \Drupal::service('rng.entity.model');
   $rng_model->hook_entity_postsave($entity);
 }
@@ -118,7 +109,7 @@ function rng_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function rng_entity_update(EntityInterface $entity) {
-  /** @var \Drupal\rng\RngModel $rng_model */
+  /** @var \Drupal\rng\RngEntityModel $rng_model */
   $rng_model = \Drupal::service('rng.entity.model');
   $rng_model->hook_entity_postsave($entity);
 }
@@ -127,7 +118,7 @@ function rng_entity_update(EntityInterface $entity) {
  * Implements hook_entity_predelete().
  */
 function rng_entity_predelete(EntityInterface $entity) {
-  /** @var \Drupal\rng\RngModel $rng_model */
+  /** @var \Drupal\rng\RngEntityModel $rng_model */
   $rng_model = \Drupal::service('rng.entity.model');
   $rng_model->hook_entity_predelete($entity);
 }
