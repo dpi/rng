@@ -148,42 +148,18 @@ function rng_entity_operation(EntityInterface $entity) {
  * Implements hook_entity_insert().
  */
 function rng_entity_insert(EntityInterface $entity) {
-  _rng_entity_postsave($entity);
+  /** @var \Drupal\rng\RngModel $rng_model */
+  $rng_model = \Drupal::service('rng.entity.model');
+  $rng_model->hook_entity_postsave($entity);
 }
 
 /**
  * Implements hook_entity_update().
  */
 function rng_entity_update(EntityInterface $entity) {
-  _rng_entity_postsave($entity);
-}
-
-/**
- * Implements hook_entity_update().
- */
-function _rng_entity_postsave(EntityInterface $entity) {
-  if ($entity instanceof RuleInterface) {
-    if (isset($entity->original)) {
-      // Don't continue if rule status didn't change.
-      if ($entity->isActive() == $entity->original->isActive()) {
-        return;
-      }
-    }
-
-    foreach ($entity->getConditions() as $condition) {
-      if ($condition->getPluginId() == 'rng_rule_scheduler') {
-        // Create, update, or delete the associated rule scheduler entity if the
-        // rule status has changed.
-
-        /** @var \Drupal\rng\Plugin\Condition\RuleScheduler $plugin */
-        $plugin = $condition->createInstance();
-        $plugin->updateRuleSchedulerEntity();
-        $plugin_configuration = $plugin->getConfiguration();
-        $condition->setConfiguration($plugin_configuration);
-        $condition->save();
-      }
-    }
-  }
+  /** @var \Drupal\rng\RngModel $rng_model */
+  $rng_model = \Drupal::service('rng.entity.model');
+  $rng_model->hook_entity_postsave($entity);
 }
 
 /**

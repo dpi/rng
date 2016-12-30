@@ -75,6 +75,20 @@ class RngModel {
   }
 
   /**
+   * React to Drupal `hook_entity_insert` or `hook_entity_update` hooks.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object for the entity that is already saved.
+   *
+   * @see _rng_entity_postsave();
+   */
+  public function hook_entity_postsave(EntityInterface $entity) {
+    if ($entity instanceof RuleInterface) {
+      $this->postSaveRngRule($entity);
+    }
+  }
+
+  /**
    * React to Drupal `hook_entity_predelete` hook.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -137,6 +151,35 @@ class RngModel {
     $rules = $event_meta->getRules(NULL, FALSE, NULL);
     $this->ruleStorage
       ->delete($rules);
+  }
+
+  /**
+   * Update rule scheduler after a rule entity is saved.
+   *
+   * @param \Drupal\rng\RuleInterface $entity
+   *   An RNG rule entity.
+   */
+  protected function postSaveRngRule(RuleInterface $entity) {
+    if (isset($entity->original)) {
+      // Don't continue if rule status didn't change.
+      if ($entity->isActive() == $entity->original->isActive()) {
+        return;
+      }
+    }
+
+    foreach ($entity->getConditions() as $condition) {
+      if ('rng_rule_scheduler' == $condition->getPluginId()) {
+        // Create, update, or delete the associated rule scheduler entity if the
+        // rule status has changed.
+
+        /** @var \Drupal\rng\Plugin\Condition\RuleScheduler $plugin */
+        $plugin = $condition->createInstance();
+        $plugin->updateRuleSchedulerEntity();
+        $plugin_configuration = $plugin->getConfiguration();
+        $condition->setConfiguration($plugin_configuration);
+        $condition->save();
+      }
+    }
   }
 
   /**
