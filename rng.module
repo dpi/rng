@@ -190,51 +190,9 @@ function _rng_entity_postsave(EntityInterface $entity) {
  * Implements hook_entity_predelete().
  */
 function rng_entity_predelete(EntityInterface $entity) {
-  /** @var \Drupal\courier\Service\IdentityChannelManagerInterface $icm */
-  $icm = \Drupal::service('plugin.manager.identity_channel');
-  if (in_array($entity->getEntityType(), $icm->getIdentityTypes())) {
-    // Remove registrant references to this identity.
-    $registrant_ids = Registrant::getRegistrantsIdsForIdentity($entity);
-    foreach (Registrant::loadMultiple($registrant_ids) as $registrant) {
-      $registrant->clearIdentity();
-      $registrant->save();
-    }
-  }
-
-  // Delete related entities when an event is deleted.
-  /** @var \Drupal\rng\EventManagerInterface $event_manager */
-  $event_manager = \Drupal::service('rng.event_manager');
-  try{
-    $event_meta = $event_manager->getMeta($entity);
-
-    // Delete registrations.
-    \Drupal::entityTypeManager()
-      ->getStorage('registration')
-      ->delete($event_meta->getRegistrations());
-
-    // Delete groups.
-    \Drupal::entityTypeManager()
-      ->getStorage('registration_group')
-      ->delete($event_meta->getGroups());
-
-    // Delete rules.
-    \Drupal::entityTypeManager()
-      ->getStorage('rng_rule')
-      ->delete($event_meta->getRules(NULL, FALSE, NULL));
-  }
-  // Not an event, thrown by getMeta().
-  catch (InvalidEventException $e) { }
-
-  if ($entity instanceof RuleComponentInterface) {
-    // Delete a TemplateCollection if the entity is a component with
-    // configuration for 'rng_courier_message'.
-    if ($entity->getPluginId() == 'rng_courier_message') {
-      $action = $entity->createInstance();
-      if (($action instanceof CourierTemplateCollection) && ($template_collection = $action->getTemplateCollection())) {
-        $template_collection->delete();
-      }
-    }
-  }
+  /** @var \Drupal\rng\RngModel $rng_model */
+  $rng_model = \Drupal::service('rng.entity.model');
+  $rng_model->hook_entity_predelete($entity);
 }
 
 /**
