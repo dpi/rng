@@ -27,12 +27,19 @@
   .entities {
     &> .details-wrapper {
       display: flex;
+
+      > .person-controls {
+        display: flex;
+        flex-direction: column;
+      }
     }
   }
 
   fieldset.person-type {
     /* Need fieldset selector since you cannot define different attributes for
        the container and each child radio */
+    flex: 1;
+
     div.form-type-radio {
       position: relative;
 

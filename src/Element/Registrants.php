@@ -274,7 +274,15 @@ class Registrants extends FormElement {
       ],
     ];
 
-    $element['entities']['for_bundle'] = [
+    $element['entities']['controls'] = [
+      '#type' => 'container',
+      '#tree' => TRUE,
+      '#attributes' => [
+        'class' => ['person-controls'],
+      ],
+    ];
+
+    $element['entities']['controls']['for_bundle'] = [
       '#type' => 'radios',
       '#title' => t('Person type'),
       '#options' => $for_bundles,
@@ -294,7 +302,32 @@ class Registrants extends FormElement {
       '#attributes' => [
         'class' => ['person-type'],
       ],
+      '#parents' => array_merge($parents, ['entities', 'for_bundle']),
     ];
+
+    $element['entities']['controls']['actions'] = [
+      '#type' => 'actions',
+      '#tree' => TRUE,
+    ];
+
+    // Display a close button if there are people and arity is multiple.
+    if ($arity_is_multiple && count($people) > 0) {
+      $element['entities']['controls']['actions']['done'] = [
+        '#type' => 'submit',
+        '#value' => t('Done'),
+        '#ajax' => [
+          'callback' => [static::class, 'ajaxElementRoot'],
+          'wrapper' => $ajax_wrapper_id_root,
+        ],
+        '#limit_validation_errors' => [],
+        '#validate' => [
+          [static::class, 'decoyValidator'],
+        ],
+        '#submit' => [
+          [static::class, 'submitClose'],
+        ],
+      ];
+    }
 
     $element['entities']['person'] = [
       '#type' => 'container',
@@ -799,6 +832,24 @@ class Registrants extends FormElement {
       $utility->clearPeopleFormInput();
       $utility->setForBundleAsFirstRegistrant();
     }
+  }
+
+  /**
+   * Submission callback to close the selection interface.
+   *
+   * @param array $form
+   *   The complete form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function submitClose(array $form, FormStateInterface $form_state) {
+    $form_state->setRebuild();
+
+    $element = RegistrantsElement::findElement($form, $form_state);
+    $utility = new RegistrantsElement($element, $form_state);
+
+    $utility->setChangeIt(FALSE);
+    $utility->clearPeopleFormInput();
   }
 
   /**

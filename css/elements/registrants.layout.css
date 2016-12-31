@@ -17,9 +17,14 @@
 .registrants-element .entities > .details-wrapper {
   display: flex;
 }
+.registrants-element .entities > .details-wrapper > .person-controls {
+  display: flex;
+  flex-direction: column;
+}
 .registrants-element fieldset.person-type {
   /* Need fieldset selector since you cannot define different attributes for
      the container and each child radio */
+  flex: 1;
 }
 .registrants-element fieldset.person-type div.form-type-radio {
   position: relative;
