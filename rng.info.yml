@@ -7,4 +7,4 @@ dependencies:
   - system (>=8.1)
   - dynamic_entity_reference
   - courier
-  - unlimited_number
+  - unlimited_number (>=8.x-1.0-beta2)

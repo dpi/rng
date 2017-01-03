@@ -149,9 +149,12 @@ function rng_event_field_config_definition($field_name) {
       $definition = array(
         'label' => 'Minimum registrants',
         'description' => t('Minimum number of registrants per registration.'),
-        'settings' => array(
-          'min' => 1,
-        ),
+        'settings' => [
+          'min' => 0,
+        ],
+        'default_value' => [
+          ['value' => 1]
+        ],
       );
       break;
 
@@ -159,9 +162,12 @@ function rng_event_field_config_definition($field_name) {
       $definition = array(
         'label' => 'Maximum registrants',
         'description' => t('Maximum number of registrants per registration.'),
-        'settings' => array(
-          'min' => 1,
-        ),
+        'settings' => [
+          'min' => -1,
+        ],
+        'default_value' => [
+          ['value' => -1]
+        ],
       );
       break;
   }
@@ -247,12 +253,22 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
     case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM:
       $form_display->setComponent($field_name, array(
         'type' => 'unlimited_number',
+        'settings' => [
+          'value_unlimited' => 0,
+          'label_unlimited' => t('No registrants required'),
+          'label_number' => t('Minimum'),
+        ],
       ));
       break;
 
     case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM:
       $form_display->setComponent($field_name, array(
         'type' => 'unlimited_number',
+        'settings' => [
+          'value_unlimited' => -1,
+          'label_unlimited' => t('No maximum'),
+          'label_number' => t('Maximum'),
+        ],
       ));
       break;
   }
