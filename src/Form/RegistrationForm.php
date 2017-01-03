@@ -170,10 +170,6 @@ class RegistrationForm extends ContentEntityForm {
       }
     }
 
-    if (count($registrants_after) == 0) {
-      $form_state->setError($form['people']['registrants'], $this->t('There must be at least one registrant.'));
-    }
-
     $form_state->set('registrants_after', $registrants_after);
     $form_state->set('registrants_delete', $registrants_delete);
 
