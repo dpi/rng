@@ -39,10 +39,15 @@ class RngEventTypeTest extends RngWebTestBase {
     $event_type->delete();
     $event_bundle->delete();
 
-    // Event types button on admin.
+    // Admin structure overview
     $this->drupalGet('admin/structure');
+    $this->assertLinkByHref(Url::fromRoute('rng.structure')->toString());
+    $this->assertRaw('Manage registration entity types.', 'RNG shows in administration structure.');
+
+    // Event types button on admin.
+    $this->drupalGet('admin/structure/rng');
     $this->assertLinkByHref(Url::fromRoute('rng.event_type.overview')->toString());
-    $this->assertRaw('Manage which entity bundles are designated as events.', 'Button shows in administration.');
+    $this->assertRaw('Manage which entity bundles are designated as events.', 'Event type overview link shows in RNG administration.');
 
     // No events.
     $this->assertEqual(0, count(EventType::loadMultiple()), 'There are no event type entities.');
