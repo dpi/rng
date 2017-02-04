@@ -197,6 +197,15 @@ rng.rng_event_type_rule.component.edit:
       component_id:
         type: 'rng_component_id'
 
+# RNG Structure overview
+rng.structure:
+  path: '/admin/structure/rng'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'RNG'
+  requirements:
+    _permission: 'access administration pages'
+
 # RNG Configuration
 rng.config:
   path: '/admin/config/rng'
