@@ -262,8 +262,16 @@ class EventTypeForm extends EntityForm {
       }
     }
 
-    // Blacklist user creation. It does not work because it is special.
-    $form['registrants']['registrants']['user:user']['create']['#access'] = FALSE;
+    // Check if user people type is enabled, then apply some special handling.
+    if (isset($form['registrants']['registrants']['user:user'])) {
+      // Blacklist user creation. It does not work because it is special.
+      $form['registrants']['registrants']['user:user']['create']['#access'] = FALSE;
+
+      // Auto check existing references for users.
+      if ($event_type->isNew()) {
+        $form['registrants']['registrants']['user:user']['existing']['#default_value'] = TRUE;
+      }
+    }
 
     return $form;
   }
