@@ -11,7 +11,7 @@ use Drupal\courier\Service\IdentityChannelManagerInterface;
 /**
  * Enforces RNG model relationships.
  */
-class RngEntityModel {
+class RngEntityModel implements RngEntityModelInterface {
 
   /**
    * Storage for registration entities.
@@ -56,6 +56,15 @@ class RngEntityModel {
   protected $identityChannelManager;
 
   /**
+   * Record operations for relevant RNG entities.
+   *
+   * These operations are acted on during request termination.
+   *
+   * @var \Drupal\rng\RngOperationRecord[]
+   */
+  protected $operationRecords = [];
+
+  /**
    * Constructs a new RngEntityModel object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -79,12 +88,23 @@ class RngEntityModel {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object for the entity that is already saved.
+   * @param boolean $update
+   *   Whether this entity is new.
    *
    * @see _rng_entity_postsave();
    */
-  public function hook_entity_postsave(EntityInterface $entity) {
+  public function hook_entity_postsave(EntityInterface $entity, $update = TRUE) {
     if ($entity instanceof RuleInterface) {
       $this->postSaveRngRule($entity);
+    }
+    if ($entity instanceof RegistrationInterface) {
+      $operation_record = new RngOperationRecord();
+      $operation = $update ? 'update' : 'insert';
+      $operation_record
+        ->setOperation($operation)
+        ->setEntityTypeId($entity->getEntityTypeId())
+        ->setEntityId($entity->id());
+      $this->operationRecords[] = $operation_record;
     }
   }
 
@@ -108,6 +128,13 @@ class RngEntityModel {
     if ($entity instanceof RuleComponentInterface) {
       $this->deleteRngRuleComponent($entity);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperationRecords() {
+    return $this->operationRecords;
   }
 
   /**

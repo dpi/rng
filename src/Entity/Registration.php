@@ -292,10 +292,6 @@ class Registration extends ContentEntityBase implements RegistrationInterface {
         ->save();
       unset($this->identities_unsaved[$k]);
     }
-
-    $trigger_id = $update ? 'entity:registration:update' : 'entity:registration:new';
-    \Drupal::service('rng.event_manager')->getMeta($this->getEvent())
-      ->trigger($trigger_id, ['registrations' => [$this]]);
   }
 
   /**

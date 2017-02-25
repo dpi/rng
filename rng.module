@@ -73,7 +73,7 @@ function rng_entity_operation(EntityInterface $entity) {
 function rng_entity_insert(EntityInterface $entity) {
   /** @var \Drupal\rng\RngEntityModel $rng_model */
   $rng_model = \Drupal::service('rng.entity.model');
-  $rng_model->hook_entity_postsave($entity);
+  $rng_model->hook_entity_postsave($entity, FALSE);
 }
 
 /**
@@ -82,7 +82,7 @@ function rng_entity_insert(EntityInterface $entity) {
 function rng_entity_update(EntityInterface $entity) {
   /** @var \Drupal\rng\RngEntityModel $rng_model */
   $rng_model = \Drupal::service('rng.entity.model');
-  $rng_model->hook_entity_postsave($entity);
+  $rng_model->hook_entity_postsave($entity, TRUE);
 }
 
 /**

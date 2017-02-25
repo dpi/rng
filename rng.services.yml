@@ -39,6 +39,11 @@ services:
     arguments: ['@entity.manager', '@rng.event_manager']
     tags:
       - { name: event_subscriber }
+  rng.request_subscriber:
+    class: Drupal\rng\EventSubscriber\RngRequestSubscriber
+    arguments: ['@entity_type.manager', '@rng.entity.model', '@rng.event_manager']
+    tags:
+      - { name: event_subscriber }
   rng.route_enhancer:
     class: Drupal\rng\Routing\Enhancer\RngRouteEnhancer
     tags:
