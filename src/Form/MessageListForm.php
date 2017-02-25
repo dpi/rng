@@ -107,6 +107,7 @@ class MessageListForm extends FormBase {
     // Actions.
     $form['actions'] = [
       '#type' => 'details',
+      '#title' => $this->t('Operations'),
       '#attributes' => [
         'class' => ['container-inline'],
       ],
