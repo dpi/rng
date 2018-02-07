@@ -353,6 +353,11 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
+    // Do not change config when config sync is running.
+    if (\Drupal::isConfigSyncing()) {
+      return;
+    }
+
     // Create mode for the entity type.
     $mode_id = $this->entity_type . '.rng_event';
     if (!EntityFormMode::load($mode_id)) {
