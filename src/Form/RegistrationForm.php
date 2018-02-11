@@ -218,7 +218,7 @@ class RegistrationForm extends ContentEntityForm {
       $form_state->setRedirectUrl($registration->toUrl());
     }
     else {
-      $form_state->setRedirect($event->toUrl);
+      $form_state->setRedirectUrl($event->toUrl);
     }
   }
 
