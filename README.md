@@ -1,6 +1,6 @@
 RNG is a Drupal module enabling people to register for events.
 
-Copyright (C) 2016 Daniel Phin (@dpi)
+Copyright (C) 2018 Daniel Phin (@dpi)
 
 [![Build Status](https://travis-ci.org/dpi/rng.svg?branch=8.x-1.x)](https://travis-ci.org/dpi/rng)
 
