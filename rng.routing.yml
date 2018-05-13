@@ -42,6 +42,14 @@ entity.registration_type.add:
   requirements:
     _permission: 'administer registration types'
 
+entity.registration_type.canonical:
+  path: '/admin/structure/rng/registration_types/manage/{registration_type}'
+  defaults:
+    _entity_form: 'registration_type.edit'
+    _title: 'Edit registration type'
+  requirements:
+    _permission: 'administer registration types'
+
 entity.registration_type.edit_form:
   path: '/admin/structure/rng/registration_types/manage/{registration_type}'
   defaults:
