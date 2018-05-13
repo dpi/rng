@@ -2,6 +2,7 @@
 
 namespace Drupal\rng\Form;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -293,7 +294,7 @@ class EventTypeForm extends EntityForm {
 
     if ($event_type->isNew()) {
       if ($this->moduleHandler->moduleExists('node') && ($form_state->getValue('entity_type') == 'node')) {
-        $node_type = $this->createContentType('event');
+        $node_type = $this->createContentType('Event');
         $t_args = [
           '%label' => $node_type->label(),
           ':url' => $node_type->toUrl()->toString(),
@@ -347,7 +348,7 @@ class EventTypeForm extends EntityForm {
    * @return \Drupal\node\NodeTypeInterface
    *   A node type entity.
    */
-  private function createContentType($prefix) {
+  protected function createContentType($prefix) {
     // Generate a unique ID.
     $i = 0;
     $separator = '_';
@@ -358,7 +359,7 @@ class EventTypeForm extends EntityForm {
     }
 
     $node_type = NodeType::create([
-      'type' => $id,
+      'type' => Unicode::strtolower($id),
       'name' => $id,
     ]);
     $node_type->save();
