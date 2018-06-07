@@ -69,7 +69,7 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_form' => '\Drupal\rng\Form\EventSettingsForm',
             '_title' => 'Manage event',
             // Tell controller which parameter the event entity is stored.
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements,
           $options
@@ -82,7 +82,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           [
             '_form' => '\Drupal\rng\Form\EventAccessForm',
             '_title' => 'Access',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ],
           $manage_requirements,
           $options
@@ -95,7 +95,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_form' => '\Drupal\rng\Form\EventAccessResetForm',
             '_title' => 'Reset access to default',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements + [
             '_event_rule_reset' => 'TRUE',
@@ -110,7 +110,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_form' => '\Drupal\rng\Form\MessageListForm',
             '_title' => 'Messages',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements,
           $options
@@ -123,7 +123,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_form' => '\Drupal\rng\Form\MessageActionForm',
             '_title' => 'Add message',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements,
           $options
@@ -136,7 +136,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_controller' => '\Drupal\rng\Controller\GroupController::listing',
             '_title' => 'Groups',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements,
           $options
@@ -149,7 +149,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_controller' => '\Drupal\rng\Controller\GroupController::GroupAdd',
             '_title' => 'Add group',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           $manage_requirements,
           $options
@@ -162,7 +162,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_controller' => '\Drupal\rng\Controller\RegistrationController::RegistrationAddPage',
             '_title' => 'Register',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           array(
             '_registration_add_access' => 'TRUE',
@@ -178,7 +178,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           array(
             '_controller' => '\Drupal\rng\Controller\RegistrationController::RegistrationAdd',
             '_title_callback' => '\Drupal\rng\Controller\RegistrationController::addPageTitle',
-            'event' => $entity_type,
+            'rng_event_type' => $entity_type,
           ),
           array(
             '_registration_add_access' => 'TRUE',

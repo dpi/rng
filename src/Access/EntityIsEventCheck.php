@@ -36,7 +36,7 @@ class EntityIsEventCheck implements AccessInterface {
    * Checks that an entity is an event type.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
-    if ($event = $route->getDefault('event')) {
+    if ($event = $route->getDefault('rng_event_type')) {
       $event = $route_match->getParameter($event);
       if ($event instanceof EntityInterface) {
         $event_type = $this->eventManager->eventType($event->getEntityTypeId(), $event->bundle());

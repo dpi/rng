@@ -48,19 +48,19 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The matched route.
    *
-   * @param string $event
+   * @param string $rng_event_type
    *   The parameter to find the event entity.
    *
    * @return array A registration form.
    */
-  public function RegistrationAddPage(RouteMatchInterface $route_match, $event) {
-    $event_entity = $route_match->getParameter($event);
+  public function RegistrationAddPage(RouteMatchInterface $route_match, $rng_event_type) {
+    $event_entity = $route_match->getParameter($rng_event_type);
     $render = [];
     $registration_types = $this->eventManager->getMeta($event_entity)->getRegistrationTypes();
     if (count($registration_types) == 1) {
       $registration_type = array_shift($registration_types);
-      return $this->redirect('rng.event.' . $event . '.register', [
-        $event => $event_entity->id(),
+      return $this->redirect('rng.event.' . $rng_event_type . '.register', [
+        $rng_event_type => $event_entity->id(),
         'registration_type' => $registration_type->id(),
       ]);
     }
@@ -104,7 +104,7 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The matched route.
    *
-   * @param string $event
+   * @param string $rng_event_type
    *   The parameter to find the event entity.
    *
    * @param \Drupal\rng\RegistrationTypeInterface $registration_type
@@ -112,8 +112,8 @@ class RegistrationController extends ControllerBase implements ContainerInjectio
    *
    * @return array A registration form.
    */
-  public function RegistrationAdd(RouteMatchInterface $route_match, $event, RegistrationTypeInterface $registration_type) {
-    $event_entity = $route_match->getParameter($event);
+  public function RegistrationAdd(RouteMatchInterface $route_match, $rng_event_type, RegistrationTypeInterface $registration_type) {
+    $event_entity = $route_match->getParameter($rng_event_type);
     $registration = Registration::create([
       'type' => $registration_type->id(),
     ]);
