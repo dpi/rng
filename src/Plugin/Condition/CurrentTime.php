@@ -81,17 +81,15 @@ class CurrentTime extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // Disable saving this plugin if it is not enabled.
-    if (!$form_state->getValue('enable')) {
+    // Disable saving this plugin if it is not actively enabled.
+    $enabled = $form_state->getValue('enable');
+    if (!$enabled) {
       return;
     }
+    $this->setConfig('enable', $enabled);
+    $this->setConfig('date', $form_state->getValue('date')->format('U'));
     parent::submitConfigurationForm($form, $form_state);
-    if ($date = $form_state->getValue('date')) {
-      $this->configuration['date'] = $date->format('U');
-    }
-    else {
-      $this->configuration['date'] = NULL;
-    }
+
   }
 
   /**
