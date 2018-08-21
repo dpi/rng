@@ -78,3 +78,15 @@ services:
     arguments: ['@rng.event_route_context']
     tags:
       - { name: cache.context }
+  rng.registration_creation_subscriber:
+    class: Drupal\rng\EventSubscriber\RngRegistrationCreationSubscriber
+    arguments: ['@rng.event_manager']
+    tags:
+      - { name: event_subscriber }
+  rng.registration_waitlist_subscriber:
+    class: Drupal\rng\EventSubscriber\RegistrationWaitlistSubscriber
+    arguments:
+      - '@rng.event_manager'
+      - '@messenger'
+    tags:
+      - { name: event_subscriber }

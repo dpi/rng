@@ -41,6 +41,13 @@ interface EventManagerInterface {
   const FIELD_CAPACITY = 'rng_capacity';
 
   /**
+   * ID of an `boolean` field attached to an event bundle.
+   *
+   * Whether an event allows a wait list.
+   */
+  const FIELD_WAIT_LIST = 'rng_wait_list';
+
+  /**
    * ID of an `email` field attached to an event bundle.
    *
    * Reply-to address for e-mails sent from an event.

@@ -22,6 +22,7 @@ class EventTypeFieldMappingForm extends EntityForm {
     EventManagerInterface::FIELD_REGISTRATION_GROUPS,
     EventManagerInterface::FIELD_STATUS,
     EventManagerInterface::FIELD_CAPACITY,
+    EventManagerInterface::FIELD_WAIT_LIST,
     EventManagerInterface::FIELD_EMAIL_REPLY_TO,
     EventManagerInterface::FIELD_ALLOW_DUPLICATE_REGISTRANTS,
     EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM,

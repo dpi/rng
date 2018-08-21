@@ -42,7 +42,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "edit" = "Drupal\rng\Form\RegistrationForm",
  *       "delete" = "Drupal\rng\Form\RegistrationDeleteForm",
  *       "registrants" = "Drupal\rng\Form\RegistrationRegistrantEditForm"
- *     }
+ *     },
+ *     "storage" = "Drupal\rng\RegistrationStorage",
  *   },
  *   bundle_entity_type = "registration_type",
  *   admin_permission = "administer registration entity",
