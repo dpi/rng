@@ -61,7 +61,7 @@ class RegistrationWaitListSubscriber implements EventSubscriberInterface {
    */
   public function onRegistrationInsert(RegistrationEvent $event) {
     $meta = $this->rngEventManager->getMeta($event->getRegistration()->getEvent());
-    if ($meta->allowWaitList() && $meta->remainingCapacity() < 1) {
+    if ($meta->allowWaitList() && $meta->remainingCapacity() === 0) {
       $this->messenger->addStatus($this->t('Registration is at its capacity. You have been added to a waiting list.'));
     }
   }
