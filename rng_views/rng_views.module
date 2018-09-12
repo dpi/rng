@@ -178,3 +178,33 @@ function rng_views_event_registrations(EntityTypeInterface $entity_type) {
 
   return $view;
 }
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function rng_views_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  /** @var \Drupal\rng\EventManager $event_manager */
+  $event_manager = \Drupal::service('rng.event_manager');
+  $event_types = $event_manager->getEventTypes();
+  foreach (array_keys($event_types) as $entity_type) {
+    if ($view->id() == "rng_registrations_$entity_type") {
+      /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match */
+      $route_match = \Drupal::service('current_route_match');
+      /** @var \Drupal\Core\Entity\EntityInterface $event */
+      if ($event = $route_match->getParameter($entity_type)) {
+        if ($meta = $event_manager->getMeta($event)) {
+          // If we waitlist and have a registration limit, set some defaults.
+          if ($meta->allowWaitList() && $meta->getRegistrantsMaximum() > 0) {
+            if ($view->getDisplay()->display['id'] == 'page_1') {
+              $query->setLimit($meta->getRegistrantsMaximum());
+            }
+            if ($view->getDisplay()->display['id'] == 'attachment_1') {
+              $view->setOffset($meta->getRegistrantsMaximum());
+            }
+          }
+        }
+      }
+
+    }
+  }
+}
