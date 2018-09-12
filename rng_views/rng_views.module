@@ -3,7 +3,8 @@
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\views\Entity\View;
-use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
