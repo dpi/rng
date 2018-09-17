@@ -160,7 +160,7 @@ class EventTypeRule extends ConfigEntityBase implements EventTypeRuleInterface {
   public function calculateDependencies() {
     parent::calculateDependencies();
 
-    if ($event_type = EventType::load($this->getEventEntityTypeId() . '.' . $this->getEventBundle())) {
+    if ($event_type = RngEventType::load($this->getEventEntityTypeId() . '.' . $this->getEventBundle())) {
       $this->addDependency('config', $event_type->getConfigDependencyName());
     }
 

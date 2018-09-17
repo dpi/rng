@@ -8,9 +8,9 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  *
- * event_type_edit_form
+ * rng_event_type_edit_form
  */
-function rng_views_form_event_type_form_alter(&$form, FormStateInterface &$form_state) {
+function rng_views_form_rng_event_type_form_alter(&$form, FormStateInterface &$form_state) {
   /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
   $form_object = $form_state->getFormObject();
   // This hook users BASE_ID, so this hook will be called for

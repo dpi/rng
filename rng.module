@@ -57,8 +57,8 @@ function rng_entity_operation(EntityInterface $entity) {
   if ($entity instanceof EventTypeInterface) {
     $operations['access_defaults'] = array(
       'title' => t('Event access defaults'),
-      'url' => Url::fromRoute('entity.event_type.access_defaults', [
-        'event_type' => $entity->id(),
+      'url' => Url::fromRoute('entity.rng_event_type.access_defaults', [
+        'rng_event_type' => $entity->id(),
       ]),
       'weight' => 20,
     );

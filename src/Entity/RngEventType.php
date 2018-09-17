@@ -15,7 +15,7 @@ use Drupal\rng\RegistrantTypeInterface;
  * Defines the event type entity.
  *
  * @ConfigEntityType(
- *   id = "event_type",
+ *   id = "rng_event_type",
  *   label = @Translation("Event type"),
  *   handlers = {
  *     "list_builder" = "\Drupal\rng\Lists\EventTypeListBuilder",
@@ -28,20 +28,20 @@ use Drupal\rng\RegistrantTypeInterface;
  *     }
  *   },
  *   admin_permission = "administer event types",
- *   config_prefix = "event_type",
+ *   config_prefix = "rng_event_type",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "id"
  *   },
  *   links = {
- *     "edit-form" = "/admin/structure/rng/event_types/manage/{event_type}/edit",
- *     "delete-form" = "/admin/structure/rng/event_types/manage/{event_type}/delete",
- *     "event-access-defaults" = "/admin/structure/rng/event_types/manage/{event_type}/access_defaults",
- *     "field-mapping" = "/admin/structure/rng/event_types/manage/{event_type}/field_mapping",
+ *     "edit-form" = "/admin/structure/rng/event_types/manage/{rng_event_type}/edit",
+ *     "delete-form" = "/admin/structure/rng/event_types/manage/{rng_event_type}/delete",
+ *     "event-access-defaults" = "/admin/structure/rng/event_types/manage/{rng_event_type}/access_defaults",
+ *     "field-mapping" = "/admin/structure/rng/event_types/manage/{rng_event_type}/field_mapping",
  *   }
  * )
  */
-class EventType extends ConfigEntityBase implements EventTypeInterface {
+class RngEventType extends ConfigEntityBase implements EventTypeInterface {
 
   /**
    * The machine name of this event config.
@@ -437,7 +437,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
     parent::postDelete($storage, $entities);
 
     if ($event_type = reset($entities)) {
-      EventType::courierContextCC($event_type->entity_type, 'delete');
+      RngEventType::courierContextCC($event_type->entity_type, 'delete');
     }
 
     // Rebuild routes and local tasks.

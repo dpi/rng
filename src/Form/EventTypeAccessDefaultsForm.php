@@ -331,8 +331,8 @@ class EventTypeAccessDefaultsForm extends EntityForm {
       ),
     );
 
-    $actions['delete-custom-rules']['#url'] = Url::fromRoute('entity.event_type.access_defaults.delete_all', [
-      'event_type' => $event_type->id(),
+    $actions['delete-custom-rules']['#url'] = Url::fromRoute('entity.rng_event_type.access_defaults.delete_all', [
+      'rng_event_type' => $event_type->id(),
     ]);
 
     return $actions;
