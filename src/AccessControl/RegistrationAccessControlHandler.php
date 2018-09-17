@@ -107,7 +107,11 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
         return $fail;
       }
 
-      if ($event_meta->remainingCapacity() == 0) {
+      if ($event_meta->remainingRegistrantCapacity() == 0) {
+        return $fail;
+      }
+
+      if ($event_meta->remainingRegistrationCapacity() == 0) {
         return $fail;
       }
 
