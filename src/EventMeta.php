@@ -198,7 +198,7 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   public function getCapacity() {
-    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
+    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATIONS_CAPACITY}->value;
     if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {
       return $capacity;
     }

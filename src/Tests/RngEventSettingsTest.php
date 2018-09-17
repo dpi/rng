@@ -128,8 +128,8 @@ class RngEventSettingsTest extends RngSiteTestBase {
     $edit = [
       'rng_status[value]' => TRUE,
       'rng_registration_type[' . $this->registration_type->id() . ']' => TRUE,
-      'rng_capacity[0][unlimited_number][unlimited_number]' => 'limited',
-      'rng_capacity[0][unlimited_number][number]' => '1',
+      'rng_registrations_capacity[0][unlimited_number][unlimited_number]' => 'limited',
+      'rng_registrations_capacity[0][unlimited_number][number]' => '1',
     ];
     $this->drupalPostForm($base_url . '/event', $edit, t('Save'));
     $this->assertRaw(t('Event settings updated.'));
