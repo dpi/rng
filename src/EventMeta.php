@@ -292,9 +292,15 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   function buildEventRegistrantQuery() {
-    $registrations = $this->buildRegistrationQuery()->execute();
-    return $this->entityManager->getStorage('registrant')->getQuery('AND')
-      ->condition('registration', $registrations, 'IN');
+    // TODO: Rebuild using non-deprecated solution.
+    $query = db_select('registrant', 'ant');
+    $query->join('registration', 'ion', 'ion.id = ant.registration');
+    $query->join('registration_field_data', 'rfd', 'ion.id = rfd.id');
+    $query->fields('ant', ['id']);
+    $query->condition('rfd.event__target_type', $this->getEvent()->getEntityTypeId(), '=');
+    $query->condition('rfd.event__target_id', $this->getEvent()->id(), '=');
+
+    return $query;
   }
 
   /**
@@ -316,7 +322,7 @@ class EventMeta implements EventMetaInterface {
    * {@inheritdoc}
    */
   function countRegistrants() {
-    return $this->buildEventRegistrantQuery()->count()->execute();
+    return $this->buildEventRegistrantQuery()->countQuery()->execute()->fetchField();
   }
 
   /**
