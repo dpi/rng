@@ -4,7 +4,7 @@ description: 'Improved Views integration for RNG.'
 package: RNG
 core: 8.x
 dependencies:
-  - rng
-  - views
-  - veoa
-  - views_advanced_routing
+  - rng:rng
+  - drupal:views
+  - veoa:veoa
+  - views_advanced_routing:views_advanced_routing
