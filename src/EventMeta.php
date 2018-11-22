@@ -148,7 +148,7 @@ class EventMeta implements EventMetaInterface {
    */
   public function getRegistrationTypeIds() {
     return array_map(function ($element) {
-      return $element['target_id'];
+      return isset($element['target_id']) ? $element['target_id'] : [];
     }, $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_TYPE}->getValue());
   }
 
