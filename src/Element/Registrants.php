@@ -287,7 +287,7 @@ class Registrants extends FormElement {
       '#title' => t('Person type'),
       '#options' => $for_bundles,
       '#default_value' => $for_bundle,
-      '#access' => $change_it,
+      '#access' => $change_it && count($for_bundles) > 1,
       '#ajax' => [
         'callback' => [static::class, 'ajaxElementRoot'],
         'wrapper' => $ajax_wrapper_id_root,
