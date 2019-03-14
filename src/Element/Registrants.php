@@ -643,6 +643,12 @@ class Registrants extends FormElement {
   public static function validateRegisterable(&$element, FormStateInterface $form_state, &$complete_form) {
     $utility = new RegistrantsElement($element, $form_state);
 
+    // Add existing registrants to whitelist.
+    foreach ($complete_form['registrants_before']['#value'] as $existing_registrant) {
+      $identity = $existing_registrant->getIdentity();
+      $utility->addWhitelistExisting($identity);
+    }
+
     /** @var \Drupal\rng\RegistrantInterface[] $registrants */
     $registrants = $element['#value'];
     $whitelisted = $utility->getWhitelistExisting();
