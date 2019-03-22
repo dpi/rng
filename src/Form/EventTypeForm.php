@@ -121,7 +121,7 @@ class EventTypeForm extends EntityForm {
         $form['#attached']['library'][] = 'rng/rng.admin';
         $form['entity_type'] = [
           '#type' => 'radios',
-          '#options' => NULL,
+          '#options' => [],
           '#title' => $this->t('Event entity type'),
           '#required' => TRUE,
         ];
