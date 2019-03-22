@@ -78,7 +78,7 @@ class RngEventTypeTest extends RngWebTestBase {
 
     // Event type list.
     $this->drupalGet('admin/structure/rng/event_types');
-    $this->assertRaw('<td>Content: event</td>', 'Event Type shows in list');
+    $this->assertRaw('<td>Content: Event</td>', 'Event Type shows in list');
     $options = ['node_type' => 'event'];
     $this->assertLinkByHref(Url::fromRoute("entity.node.field_ui_fields", $options)->toString());
 
