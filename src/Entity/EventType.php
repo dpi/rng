@@ -211,7 +211,7 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   public function getIdentityTypeEntityFormMode($entity_type, $bundle) {
     $key = $this->getIdentityTypeKey($entity_type, $bundle);
-    return !empty($this->people_types[$key]['entity_form_mode']);
+    return !empty($this->people_types[$key]['entity_form_mode']) ? $this->people_types[$key]['entity_form_mode'] : 'default';
   }
 
   /**
