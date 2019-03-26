@@ -51,7 +51,7 @@ class RngRegistrationTypeTest extends RngSiteTestBase {
     $this->registration_type->delete();
 
     // Administration.
-    $this->drupalGet('admin/structure');
+    $this->drupalGet('admin/structure/rng');
     $this->assertLinkByHref(Url::fromRoute('rng.registration_type.overview')->toString());
 
     $this->drupalGet('admin/structure/rng/registration_types');
