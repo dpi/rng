@@ -186,7 +186,7 @@ class Registrants extends FormElement {
     $element['for_arity'] = [
       '#type' => 'radios',
       '#title' => t('This registration is for'),
-      '#options' => NULL,
+      '#options' => [],
       '#access' => $for_arity_any_arity && $change_it,
       '#attributes' => [
         'class' => ['for_arity'],
