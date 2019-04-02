@@ -213,11 +213,12 @@ class RegistrationForm extends ContentEntityForm {
       $registrant->delete();
     }
 
+    $event = $registration->getEvent();
     if ($registration->access('view')) {
       $form_state->setRedirectUrl($registration->toUrl());
     }
     else {
-      $form_state->setRedirect('<front>');
+      $form_state->setRedirectUrl($event->toUrl());
     }
   }
 
