@@ -127,6 +127,10 @@ class Registrants extends FormElement {
     $arity_is_multiple = $utility->getArity() === 'multiple';
     $arity_is_single = !$arity_is_multiple;
     $change_it = $utility->getChangeIt();
+    if(count($for_bundles) == 1){
+      // Show the form directly if it's single persond and only one bundle:
+      $utility->setShowCreateEntitySubform(TRUE);
+    }
     $entity_create_form = $utility->getShowCreateEntitySubform();
 
     if (!$change_it) {
