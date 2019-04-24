@@ -40,6 +40,18 @@ function rng_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 }
 
 /**
+ * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
+ */
+function rng_plugin_filter_condition__block_ui_alter(array &$definitions, array $extra) {
+  // Remove rng conditions from the block UI.
+  foreach ($definitions as $key => $definition) {
+    if (strpos($key, 'rng_') === 0) {
+      unset($definitions[$key]);
+    }
+  }
+}
+
+/**
  * Implements hook_cron().
  */
 function rng_cron() {
