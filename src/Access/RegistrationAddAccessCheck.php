@@ -36,7 +36,7 @@ class RegistrationAddAccessCheck implements AccessInterface {
    * Checks new registrations are permitted on an event.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account, RegistrationTypeInterface $registration_type = NULL) {
-    if ($event = $route->getDefault('event')) {
+    if ($event = $route->getDefault('rng_event_type')) {
       $context = ['event' => $route_match->getParameter($event)];
       $access_control_handler = $this->entityManager->getAccessControlHandler('registration');
       if ($registration_type) {

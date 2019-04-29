@@ -72,7 +72,7 @@ class ResetAccessRules extends LocalActionDefault {
    */
   public function getTitle() {
     $route = $this->routeProvider->getRouteByName($this->getRouteName());
-    $param = $route->getDefault('event');
+    $param = $route->getDefault('rng_event_type');
 
     if ($event = $this->currentRoute->getParameter($param)) {
       if ($this->eventManager->getMeta($event)->isDefaultRules('rng_event.register')) {

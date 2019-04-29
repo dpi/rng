@@ -80,7 +80,7 @@ class RngEventRouteContext implements ContextProviderInterface {
       return NULL;
     }
 
-    if ($event_param = $route->getDefault('event')) {
+    if ($event_param = $route->getDefault('rng_event_type')) {
       $event = $this->routeMatch->getParameter($event_param);
       return $event instanceof EntityInterface ? $event : NULL;
     }
