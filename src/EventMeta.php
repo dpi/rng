@@ -197,8 +197,8 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCapacity() {
-    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_CAPACITY}->value;
+  public function getRegistrantCapacity() {
+    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_REGISTRANTS_CAPACITY}->value;
     if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {
       return $capacity;
     }
@@ -208,8 +208,31 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
-  public function remainingCapacity() {
-    $capacity = $this->getCapacity();
+  public function remainingRegistrantCapacity() {
+    $capacity = $this->getRegistrantCapacity();
+    if ($capacity == EventMetaInterface::CAPACITY_UNLIMITED) {
+      return $capacity;
+    }
+    $remaining = $capacity - $this->countRegistrants();
+    return $remaining > 0 ? $remaining : 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRegistrationCapacity() {
+    $capacity = (int) $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATIONS_CAPACITY}->value;
+    if ($capacity != '' && is_numeric($capacity) && $capacity >= 0) {
+      return $capacity;
+    }
+    return EventMetaInterface::CAPACITY_UNLIMITED;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function remainingRegistrationCapacity() {
+    $capacity = $this->getRegistrationCapacity();
     if ($capacity == EventMetaInterface::CAPACITY_UNLIMITED) {
       return $capacity;
     }
@@ -268,6 +291,21 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  function buildEventRegistrantQuery() {
+    // TODO: Rebuild using non-deprecated solution.
+    $query = db_select('registrant', 'ant');
+    $query->join('registration', 'ion', 'ion.id = ant.registration');
+    $query->join('registration_field_data', 'rfd', 'ion.id = rfd.id');
+    $query->fields('ant', ['id']);
+    $query->condition('rfd.event__target_type', $this->getEvent()->getEntityTypeId(), '=');
+    $query->condition('rfd.event__target_id', $this->getEvent()->id(), '=');
+
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   function buildRegistrationQuery() {
     return $this->buildQuery('registration');
   }
@@ -278,6 +316,13 @@ class EventMeta implements EventMetaInterface {
   function getRegistrations() {
     $query = $this->buildRegistrationQuery();
     return $this->entityManager->getStorage('registration')->loadMultiple($query->execute());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function countRegistrants() {
+    return $this->buildEventRegistrantQuery()->countQuery()->execute()->fetchField();
   }
 
   /**

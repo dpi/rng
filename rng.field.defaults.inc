@@ -46,7 +46,13 @@ function rng_add_event_field_storage($field_name, $entity_type) {
       );
       break;
 
-    case EventManagerInterface::FIELD_CAPACITY:
+    case EventManagerInterface::FIELD_REGISTRANTS_CAPACITY:
+      $definition = array(
+        'type' => 'integer',
+      );
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATIONS_CAPACITY:
       $definition = array(
         'type' => 'integer',
       );
@@ -117,7 +123,17 @@ function rng_event_field_config_definition($field_name) {
       );
       break;
 
-    case EventManagerInterface::FIELD_CAPACITY:
+    case EventManagerInterface::FIELD_REGISTRANTS_CAPACITY:
+      $definition = array(
+        'label' => 'Maximum registrants',
+        'description' => t('Maximum amount of registrants for this event.'),
+        'settings' => array(
+          'min' => 1,
+        ),
+      );
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATIONS_CAPACITY:
       $definition = array(
         'label' => 'Maximum registrations',
         'description' => t('Maximum amount of registrations for this event.'),
@@ -147,7 +163,7 @@ function rng_event_field_config_definition($field_name) {
 
     case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM:
       $definition = array(
-        'label' => 'Minimum registrants',
+        'label' => 'Minimum registrants per registration',
         'description' => t('Minimum number of registrants per registration.'),
         'settings' => [
           'min' => 0,
@@ -160,7 +176,7 @@ function rng_event_field_config_definition($field_name) {
 
     case EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MAXIMUM:
       $definition = array(
-        'label' => 'Maximum registrants',
+        'label' => 'Maximum registrants per registration',
         'description' => t('Maximum number of registrants per registration.'),
         'settings' => [
           'min' => -1,
@@ -229,7 +245,13 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
       ));
       break;
 
-    case EventManagerInterface::FIELD_CAPACITY:
+    case EventManagerInterface::FIELD_REGISTRANTS_CAPACITY:
+      $form_display->setComponent($field_name, array(
+        'type' => 'unlimited_number',
+      ));
+      break;
+
+    case EventManagerInterface::FIELD_REGISTRATIONS_CAPACITY:
       $form_display->setComponent($field_name, array(
         'type' => 'unlimited_number',
       ));
