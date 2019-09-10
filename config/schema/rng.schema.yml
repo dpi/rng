@@ -63,6 +63,11 @@ rng.event_type.*.*:
       label: 'Types of people types allowed to be associated with this event type.'
       sequence:
         type: rng_event_type_people_type
+    default_messages:
+      type: sequence
+      label: 'Default messages for this event type.'
+      sequence:
+        type: rng_event_type_default_message
 
 condition.plugin.rng_user_role:
   type: condition.plugin.user_role

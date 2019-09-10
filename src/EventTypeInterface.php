@@ -85,6 +85,21 @@ interface EventTypeInterface extends ConfigEntityInterface {
   function getDefaultRegistrantType();
 
   /**
+   * Default messages configured for this event type.
+   *
+   * @return array
+   */
+  function getDefaultMessages();
+
+  /**
+   * Set default messages for this event type.
+   *
+   * @param array $messages
+   *   Default messages array.
+   */
+  function setDefaultMessages($messages);
+
+  /**
    * Whether a identity type can be created.
    *
    * @param string $entity_type
