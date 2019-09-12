@@ -10,6 +10,8 @@ use Drupal\courier\Service\IdentityChannelManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\rng\Entity\Rule;
 use Drupal\rng\Entity\RuleComponent;
+use Drupal\rng\Entity\RuleSchedule;
+use Drupal\courier\Entity\TemplateCollection;
 
 /**
  * Meta event wrapper for RNG.
@@ -606,6 +608,88 @@ class EventMeta implements EventMetaInterface {
   protected function entityTypeHasBundles($entity_type_id) {
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
     return ($entity_type->getBundleEntityType() !== NULL);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function createDefaultEventMessages() {
+    // Get Default messages for this Event type.
+    $default_messages = $this->getEventType()->getDefaultMessages();
+    // TODO: remove these test values.
+    $default_messages = array(
+      array(
+        'trigger' => 'entity:registration:new',
+        'status' => 1,
+        'subject' => 'Test subj',
+        'body' => 'Test text',
+      ),
+      array(
+        'trigger' => 'entity:registration:new',
+        'status' => 0,
+        'subject' => 'Test subj DIS',
+        'body' => 'Test text DIS',
+      ),
+      array(
+        'trigger' => 'rng:custom:date',
+        'status' => 1,
+        'subject' => 'Test subj Date',
+        'body' => 'Test text Date',
+      ),
+    );
+
+    if ($default_messages) {
+      foreach ($default_messages as $default_message) {
+        // Create Event Messages from Default Messages.
+        /** @var \Drupal\courier\Service\CourierManagerInterface $courier_manager */
+        $courier_manager = \Drupal::service('courier.manager');
+        /** @var \Drupal\Core\Action\ActionManager $action_manager */
+        $action_manager = \Drupal::service('plugin.manager.action');
+
+        $template_collection = TemplateCollection::create();
+        $template_collection->save();
+        $courier_manager->addTemplates($template_collection);
+        $template_collection->setOwner($this->getEvent());
+        $template_collection->save();
+
+        $templates = $template_collection->getTemplates();
+        /** @var \Drupal\courier\EmailInterface $courier_email */
+        $courier_email = $templates[0];
+        $courier_email->setSubject($default_message['subject']);
+        $courier_email->setBody($default_message['body']);
+        $courier_email->save();
+
+        $rule = Rule::create([
+          'event' => ['entity' => $this->getEvent()],
+          'trigger_id' => $default_message['trigger'],
+        ]);
+        $rule->setIsActive($default_message['status']);
+
+        $actionPlugin = $action_manager->createInstance('rng_courier_message');
+        $configuration = $actionPlugin->getConfiguration();
+        $configuration['template_collection'] = $template_collection->id();
+        $action = RuleComponent::create([])
+          ->setPluginId($actionPlugin->getPluginId())
+          ->setConfiguration($configuration)
+          ->setType('action');
+        $rule->addComponent($action);
+        $rule->save();
+
+        // Handle custom date trigger.
+        if ($default_message['trigger'] == 'rng:custom:date') {
+          $rule_component = RuleComponent::create()
+            ->setRule($rule)
+            ->setType('condition')
+            ->setPluginId('rng_rule_scheduler');
+          $rule_component->save();
+           // Save the ID into config.
+          $rule_component->setConfiguration([
+            'rng_rule_component' => $rule_component->id(),
+          ]);
+          $rule_component->save();
+        }
+      }
+    }
   }
 
 }
