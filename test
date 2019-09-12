@@ -1,0 +1,199 @@
+diff --git a/rng.links.action.yml b/rng.links.action.yml
+index b91c82f..2eca628 100644
+--- a/rng.links.action.yml
++++ b/rng.links.action.yml
+@@ -2,6 +2,12 @@ rng.local_actions:
+   class: \Drupal\Core\Menu\LocalActionDefault
+   deriver: \Drupal\rng\Plugin\Derivative\LocalActions
+ 
++rng.default_messages.add_form:
++  route_name: entity.event_type.default_messages.add
++  title: 'Add message'
++  appears_on:
++    - entity.event_type.default_messages
++
+ rng.registration_type.add:
+   route_name: entity.registration_type.add
+   title: 'Add registration type'
+@@ -18,4 +24,4 @@ rng.event_type.add:
+   route_name: entity.event_type.add
+   title: 'Add event type'
+   appears_on:
+-    - rng.event_type.overview
+\ No newline at end of file
++    - rng.event_type.overview
+diff --git a/rng.routing.yml b/rng.routing.yml
+index 68a2622..4e74d39 100644
+--- a/rng.routing.yml
++++ b/rng.routing.yml
+@@ -167,6 +167,18 @@ entity.event_type.default_messages:
+   requirements:
+     _permission: 'administer event types'
+ 
++entity.event_type.default_messages.add:
++  path: '/admin/structure/rng/event_types/manage/{event_type}/messages/add'
++  defaults:
++    _form: '\Drupal\rng\Form\EventTypeDefaultMessagesAddForm'
++    _title: 'Add message'
++  options:
++    parameters:
++      event_type:
++        type: entity:event_type
++  requirements:
++    _permission: 'administer event types'
++
+ entity.event_type.field_mapping:
+   path: '/admin/structure/rng/event_types/manage/{event_type}/field_mapping'
+   defaults:
+diff --git a/src/EventMeta.php b/src/EventMeta.php
+index 21b70b4..bca03b2 100644
+--- a/src/EventMeta.php
++++ b/src/EventMeta.php
+@@ -617,6 +617,7 @@ class EventMeta implements EventMetaInterface {
+     // Get Default messages for this Event type.
+     $default_messages = $this->getEventType()->getDefaultMessages();
+     // TODO: remove these test values.
++    /*
+     $default_messages = array(
+       array(
+         'trigger' => 'entity:registration:new',
+@@ -637,7 +638,7 @@ class EventMeta implements EventMetaInterface {
+         'body' => 'Test text Date',
+       ),
+     );
+-
++    */
+     if ($default_messages) {
+       foreach ($default_messages as $default_message) {
+         // Create Event Messages from Default Messages.
+diff --git a/src/Form/EventTypeDefaultMessagesForm.php b/src/Form/EventTypeDefaultMessagesForm.php
+index c90aa61..319d43a 100644
+--- a/src/Form/EventTypeDefaultMessagesForm.php
++++ b/src/Form/EventTypeDefaultMessagesForm.php
+@@ -101,27 +101,118 @@ class EventTypeDefaultMessagesForm extends EntityForm {
+    */
+   public function buildForm(array $form, FormStateInterface $form_state) {
+     $form = parent::buildForm($form, $form_state);
+-
+     /** @var \Drupal\rng\EventTypeInterface $event_type */
+     $event_type = $this->entity;
+-
+-    $default_massages = $event_type->getDefaultMessages();
+-    // TODO: create form to configure Default messages.
++    /** @var array $default_messages */
++    $default_messages = $form_state->get('default_messages');
++    if (empty($default_messages)) {
++      $default_messages = $event_type->getDefaultMessages();
++      $form_state->set('default_messages', $default_messages);
++    }
++
++    // @TODO : Move this and other occurences into a common place?.
++    // @see EventTypeDefaultMessagesAddForm::buildForm.
++    $triggers = [
++      'rng:custom:date' => $this->t('To all registrations, on a date.'),
++      (string) $this->t('Registrations') => [
++        'entity:registration:new' => $this->t('To a single registration, when it is created.'),
++        'entity:registration:update' => $this->t('To a single registration, when it is updated.'),
++      ],
++    ];
++
++    $form['messages'] = [
++      '#type' => 'container',
++      '#attributes' => [
++        'id' => 'rng-default-messages-wrapper',
++      ],
++      '#tree' => TRUE,
++    ];
++    foreach ($default_messages as $key => $message) {
++      $form['messages'][$key] = [
++        '#type' => 'details',
++        '#tree' => TRUE,
++        '#title' => $message['label'],
++      ];
++       $form['messages'][$key]['label'] = [
++        '#type' => 'textfield',
++        '#title' => $this->t('Label'),
++        '#default_value' => $message['label'],
++        '#required' => TRUE,
++      ];
++      $form['messages'][$key]['trigger'] = [
++        '#type' => 'select',
++        '#options' => $triggers,
++        '#title' => $this->t('Trigger'),
++        '#default_value' => $message['trigger'],
++      ];
++      $form['messages'][$key]['status'] = [
++        '#type' => 'checkbox',
++        '#title' => $this->t('Enabled'),
++        '#default_value' => $message['status'],
++      ];
++      $form['messages'][$key]['subject'] = [
++        '#type' => 'textfield',
++        '#title' => $this->t('Subject'),
++        '#default_value' => $message['subject'],
++        '#required' => TRUE,
++      ];
++      $form['messages'][$key]['body'] = [
++        '#type' => 'textarea',
++        '#title' => $this->t('Body'),
++        '#default_value' => $message['body'],
++        '#required' => TRUE,
++      ];
++      $form['messages'][$key]['remove'] = [
++        '#type' => 'submit',
++        '#value' => $this->t('Remove this message'),
++        '#message_key' => $key,
++        '#name' => 'button-message-remove-' . $key,
++        '#submit' => ['::removeMessageCallback'],
++        '#ajax' => [
++          'callback' => '::processMessageCallback',
++          'wrapper' => 'rng-default-messages-wrapper',
++        ]
++      ];
++    }
+ 
+     return $form;
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function processMessageCallback(array &$form, FormStateInterface $form_state) {
++    // This function may be used for other ajax callbacks, too.
++    $triggering_element = $form_state->getTriggeringElement();
++    if (strpos($triggering_element['#name'], 'button-message-remove') !== FALSE) {
++      unset($form['messages'][$triggering_element['#message_key']]);
++
++      return $form['messages'];
++    }
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function removeMessageCallback(array &$form, FormStateInterface $form_state) {
++    $key = $form_state->getTriggeringElement()['#message_key'];
++    $default_messages = $form_state->get('default_messages');
++    unset($default_messages[$key]);
++
++    $form_state->set('default_messages', $default_messages);
++    $form_state->setRebuild();
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+   public function save(array $form, FormStateInterface $form_state) {
+     /** @var \Drupal\rng\EventTypeInterface $event_type */
+     $event_type = $this->entity;
++    /** @var array $default_messages */
++    $default_messages = $form_state->getValue('messages');
+ 
+-    // TODO: save default messages.
+-    $messages = array();
+-
+-    $event_type->setDefaultMessages($messages)->save();
++    $event_type->setDefaultMessages($default_messages)->save();
+ 
+     // Site cache needs to be cleared after enabling this setting as there are
+     // issue regarding caching.

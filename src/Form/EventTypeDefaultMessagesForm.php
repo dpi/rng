@@ -101,14 +101,106 @@ class EventTypeDefaultMessagesForm extends EntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-
     /** @var \Drupal\rng\EventTypeInterface $event_type */
     $event_type = $this->entity;
+    /** @var array $default_messages */
+    $default_messages = $form_state->get('default_messages');
+    if (empty($default_messages)) {
+      $default_messages = $event_type->getDefaultMessages();
+      $form_state->set('default_messages', $default_messages);
+    }
 
-    $default_massages = $event_type->getDefaultMessages();
-    // TODO: create form to configure Default messages.
+    // @TODO : Move this and other occurences into a common place?.
+    // @see EventTypeDefaultMessagesAddForm::buildForm.
+    $triggers = [
+      'rng:custom:date' => $this->t('To all registrations, on a date.'),
+      (string) $this->t('Registrations') => [
+        'entity:registration:new' => $this->t('To a single registration, when it is created.'),
+        'entity:registration:update' => $this->t('To a single registration, when it is updated.'),
+      ],
+    ];
+
+    $form['messages'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'id' => 'rng-default-messages-wrapper',
+      ],
+      '#tree' => TRUE,
+    ];
+    foreach ($default_messages as $key => $message) {
+      $form['messages'][$key] = [
+        '#type' => 'details',
+        '#tree' => TRUE,
+        '#title' => $message['label'],
+      ];
+       $form['messages'][$key]['label'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Label'),
+        '#default_value' => $message['label'],
+        '#required' => TRUE,
+      ];
+      $form['messages'][$key]['trigger'] = [
+        '#type' => 'select',
+        '#options' => $triggers,
+        '#title' => $this->t('Trigger'),
+        '#default_value' => $message['trigger'],
+      ];
+      $form['messages'][$key]['status'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enabled'),
+        '#default_value' => $message['status'],
+      ];
+      $form['messages'][$key]['subject'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Subject'),
+        '#default_value' => $message['subject'],
+        '#required' => TRUE,
+      ];
+      $form['messages'][$key]['body'] = [
+        '#type' => 'textarea',
+        '#title' => $this->t('Body'),
+        '#default_value' => $message['body'],
+        '#required' => TRUE,
+      ];
+      $form['messages'][$key]['remove'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Remove this message'),
+        '#message_key' => $key,
+        '#name' => 'button-message-remove-' . $key,
+        '#submit' => ['::removeMessageCallback'],
+        '#ajax' => [
+          'callback' => '::processMessageCallback',
+          'wrapper' => 'rng-default-messages-wrapper',
+        ]
+      ];
+    }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processMessageCallback(array &$form, FormStateInterface $form_state) {
+    // This function may be used for other ajax callbacks, too.
+    $triggering_element = $form_state->getTriggeringElement();
+    if (strpos($triggering_element['#name'], 'button-message-remove') !== FALSE) {
+      unset($form['messages'][$triggering_element['#message_key']]);
+
+      return $form['messages'];
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeMessageCallback(array &$form, FormStateInterface $form_state) {
+    $key = $form_state->getTriggeringElement()['#message_key'];
+    $default_messages = $form_state->get('default_messages');
+    unset($default_messages[$key]);
+
+    $form_state->set('default_messages', $default_messages);
+    $form_state->setRebuild();
   }
 
   /**
@@ -117,11 +209,10 @@ class EventTypeDefaultMessagesForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\rng\EventTypeInterface $event_type */
     $event_type = $this->entity;
+    /** @var array $default_messages */
+    $default_messages = $form_state->getValue('messages');
 
-    // TODO: save default messages.
-    $messages = array();
-
-    $event_type->setDefaultMessages($messages)->save();
+    $event_type->setDefaultMessages($default_messages)->save();
 
     // Site cache needs to be cleared after enabling this setting as there are
     // issue regarding caching.
