@@ -366,4 +366,9 @@ interface EventMetaInterface {
    */
   function addDefaultAccess();
 
+  /**
+   * Create messages for Event from Default messages for this Event Type.
+   */
+  function createDefaultEventMessages();
+
 }
