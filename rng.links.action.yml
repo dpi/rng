@@ -2,6 +2,12 @@ rng.local_actions:
   class: \Drupal\Core\Menu\LocalActionDefault
   deriver: \Drupal\rng\Plugin\Derivative\LocalActions
 
+rng.default_messages.add_form:
+  route_name: entity.event_type.default_messages.add
+  title: 'Add message'
+  appears_on:
+    - entity.event_type.default_messages
+
 rng.registration_type.add:
   route_name: entity.registration_type.add
   title: 'Add registration type'

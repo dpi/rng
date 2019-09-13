@@ -617,6 +617,7 @@ class EventMeta implements EventMetaInterface {
     // Get Default messages for this Event type.
     $default_messages = $this->getEventType()->getDefaultMessages();
     // TODO: remove these test values.
+    /*
     $default_messages = array(
       array(
         'trigger' => 'entity:registration:new',
@@ -637,7 +638,7 @@ class EventMeta implements EventMetaInterface {
         'body' => 'Test text Date',
       ),
     );
-
+    */
     if ($default_messages) {
       foreach ($default_messages as $default_message) {
         // Create Event Messages from Default Messages.
