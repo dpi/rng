@@ -62,6 +62,13 @@ function rng_entity_operation(EntityInterface $entity) {
       ]),
       'weight' => 20,
     );
+    $operations['default_messages'] = array(
+      'title' => t('Default messages'),
+      'url' => Url::fromRoute('entity.event_type.default_messages', [
+        'event_type' => $entity->id(),
+      ]),
+      'weight' => 25,
+    );
   }
 
   return $operations;

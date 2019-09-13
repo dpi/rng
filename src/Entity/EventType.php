@@ -24,6 +24,7 @@ use Drupal\rng\RegistrantTypeInterface;
  *       "edit" = "Drupal\rng\Form\EventTypeForm",
  *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm",
  *       "event_access_defaults" = "Drupal\rng\Form\EventTypeAccessDefaultsForm",
+ *       "event_default_messages" = "Drupal\rng\Form\EventTypeDefaultMessagesListForm",
  *       "field_mapping" = "Drupal\rng\Form\EventTypeFieldMappingForm",
  *     }
  *   },
@@ -107,6 +108,13 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
   protected $people_types = [];
 
   /**
+   * Default messages configured for this event type.
+   *
+   * @var array
+   */
+  protected $default_messages = [];
+
+  /**
    * Fields to add to event bundles.
    *
    * @var array
@@ -187,6 +195,21 @@ class EventType extends ConfigEntityBase implements EventTypeInterface {
    */
   function getDefaultRegistrantType() {
     return $this->default_registrant;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getDefaultMessages() {
+    return $this->default_messages;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setDefaultMessages($messages) {
+    $this->default_messages = $messages;
+    return $this;
   }
 
   /**

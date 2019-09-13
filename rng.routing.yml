@@ -159,6 +159,26 @@ entity.event_type.access_defaults:
   requirements:
     _permission: 'administer event types'
 
+entity.event_type.default_messages:
+  path: '/admin/structure/rng/event_types/manage/{event_type}/messages'
+  defaults:
+    _entity_form: 'event_type.event_default_messages'
+    _title: 'Event type Default messages'
+  requirements:
+    _permission: 'administer event types'
+
+entity.event_type.default_messages.add:
+  path: '/admin/structure/rng/event_types/manage/{event_type}/messages/add'
+  defaults:
+    _form: '\Drupal\rng\Form\EventTypeDefaultMessagesAddForm'
+    _title: 'Add message'
+  options:
+    parameters:
+      event_type:
+        type: entity:event_type
+  requirements:
+    _permission: 'administer event types'
+
 entity.event_type.field_mapping:
   path: '/admin/structure/rng/event_types/manage/{event_type}/field_mapping'
   defaults:

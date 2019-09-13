@@ -24,6 +24,11 @@ entity.event_type.access_defaults:
   base_route: entity.event_type.edit_form
   title: 'Access Defaults'
 
+entity.event_type.default_messages:
+  route_name: entity.event_type.default_messages
+  base_route: entity.event_type.edit_form
+  title: 'Default messages'
+
 # Registration type
 entity.registration_type.edit_form:
   title: 'Edit'

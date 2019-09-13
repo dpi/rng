@@ -106,6 +106,10 @@ class RngEntityModel implements RngEntityModelInterface {
         ->setEntityId($entity->id());
       $this->operationRecords[] = $operation_record;
     }
+    if ($this->eventManager->isEvent($entity) && $update == FALSE) {
+      $event = $this->eventManager->getMeta($entity);
+      $event->createDefaultEventMessages();
+    }
   }
 
   /**

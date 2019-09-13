@@ -26,3 +26,19 @@ rng_event_type_people_type:
     entity_form_mode:
       type: string
       label: 'Form display mode used when the entity is created inline.'
+
+rng_event_type_default_message:
+  type: mapping
+  mapping:
+    trigger:
+      type: string
+      label: 'Trigger'
+    status:
+      type: boolean
+      label: 'Whether this entity bundle can be created inline.'
+    subject:
+      type: string
+      label: 'Subject of the message.'
+    body:
+      type: string
+      label: 'Message body.'
