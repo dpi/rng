@@ -24,7 +24,7 @@ use Drupal\rng\RegistrantTypeInterface;
  *       "edit" = "Drupal\rng\Form\EventTypeForm",
  *       "delete" = "Drupal\rng\Form\EventTypeDeleteForm",
  *       "event_access_defaults" = "Drupal\rng\Form\EventTypeAccessDefaultsForm",
- *       "event_default_messages" = "Drupal\rng\Form\EventTypeDefaultMessagesForm",
+ *       "event_default_messages" = "Drupal\rng\Form\EventTypeDefaultMessagesListForm",
  *       "field_mapping" = "Drupal\rng\Form\EventTypeFieldMappingForm",
  *     }
  *   },

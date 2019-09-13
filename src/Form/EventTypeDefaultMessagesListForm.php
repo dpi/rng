@@ -17,7 +17,7 @@ use Drupal\Core\Url;
 /**
  * Form for event type default message.
  */
-class EventTypeDefaultMessagesForm extends EntityForm {
+class EventTypeDefaultMessagesListForm extends EntityForm {
 
   /**
    * The redirect destination service.
@@ -112,12 +112,17 @@ class EventTypeDefaultMessagesForm extends EntityForm {
 
     // @TODO : Move this and other occurences into a common place?.
     // @see EventTypeDefaultMessagesAddForm::buildForm.
-    $triggers = [
+    $trigger_options = [
       'rng:custom:date' => $this->t('To all registrations, on a date.'),
       (string) $this->t('Registrations') => [
         'entity:registration:new' => $this->t('To a single registration, when it is created.'),
         'entity:registration:update' => $this->t('To a single registration, when it is updated.'),
       ],
+    ];
+    $trigger_labels = [
+      'entity:registration:new' => $this->t('Registration creation'),
+      'entity:registration:update' => $this->t('Registration updated'),
+      'rng:custom:date' => $this->t('Send on a date'),
     ];
 
     $form['messages'] = [
@@ -131,17 +136,14 @@ class EventTypeDefaultMessagesForm extends EntityForm {
       $form['messages'][$key] = [
         '#type' => 'details',
         '#tree' => TRUE,
-        '#title' => $message['label'],
-      ];
-       $form['messages'][$key]['label'] = [
-        '#type' => 'textfield',
-        '#title' => $this->t('Label'),
-        '#default_value' => $message['label'],
-        '#required' => TRUE,
+        '#title' => $this->t('@label (@status)', [
+          '@label' => isset($trigger_labels[$message['trigger']]) ? $trigger_labels[$message['trigger']] : $message['trigger'],
+          '@status' => $message['status'] ? $this->t('active') : $this->t('disabled'),
+        ]),
       ];
       $form['messages'][$key]['trigger'] = [
         '#type' => 'select',
-        '#options' => $triggers,
+        '#options' => $trigger_options,
         '#title' => $this->t('Trigger'),
         '#default_value' => $message['trigger'],
       ];
@@ -216,11 +218,9 @@ class EventTypeDefaultMessagesForm extends EntityForm {
 
     // Site cache needs to be cleared after enabling this setting as there are
     // issue regarding caching.
-    // For some reason actions access is not reset if pages are rendered with no
-    // access/viability.
     Cache::invalidateTags(['rendered']);
 
-    drupal_set_message($this->t('Event type access defaults saved.'));
+    $this->messenger()->addMessage($this->t('Event type default messages saved.'));
     $this->eventManager->invalidateEventType($event_type);
   }
 }

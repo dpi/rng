@@ -55,11 +55,6 @@ class EventTypeDefaultMessagesAddForm extends FormBase {
       ],
     ];
 
-    $form['label'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Label'),
-      '#required' => TRUE,
-    ];
     $form['trigger'] = [
       '#type' => 'select',
       '#options' => $triggers,
@@ -96,7 +91,6 @@ class EventTypeDefaultMessagesAddForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $messages = $this->eventType->getDefaultMessages();
     array_push($messages, [
-      'label' => $form_state->getValue('label'),
       'trigger' => $form_state->getValue('trigger'),
       'status' => $form_state->getValue('status'),
       'subject' => $form_state->getValue('subject'),
