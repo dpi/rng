@@ -36,7 +36,7 @@ rng.registrant_type.*:
       type: text
       label: 'Description'
 
-rng.event_type.*.*:
+rng.rng_event_type.*.*:
   type: config_entity
   label: 'Event bundle settings'
   mapping:

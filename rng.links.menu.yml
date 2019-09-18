@@ -20,7 +20,7 @@ rng.event.overview:
   title: 'Event types'
   parent: system.admin_structure
   description: 'Manage which entity bundles are designated as events.'
-  route_name: rng.event_type.overview
+  route_name: rng.rng_event_type.overview
 
 rng.config.settings:
   title: 'Registrant settings'

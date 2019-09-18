@@ -127,48 +127,48 @@ entity.rng_rule_component.edit_form:
     _entity_access: 'rng_rule_component.update'
 
 # event_type entities
-entity.event_type.add:
+entity.rng_event_type.add:
   path: '/admin/structure/rng/event_types/add'
   defaults:
-    _entity_form: 'event_type.add'
-    _title: 'Add event type'
+    _entity_form: 'rng_event_type.add'
+    _title: 'Add RNG event type'
   requirements:
     _permission: 'administer event types'
 
-entity.event_type.edit_form:
-  path: '/admin/structure/rng/event_types/manage/{event_type}/edit'
+entity.rng_event_type.edit_form:
+  path: '/admin/structure/rng/event_types/manage/{rng_event_type}/edit'
   defaults:
-    _entity_form: 'event_type.edit'
+    _entity_form: 'rng_event_type.edit'
     _title: 'Edit event type'
   requirements:
     _permission: 'administer event types'
 
-entity.event_type.delete_form:
-  path: '/admin/structure/rng/event_types/manage/{event_type}/delete'
+entity.rng_event_type.delete_form:
+  path: '/admin/structure/rng/event_types/manage/{rng_event_type}/delete'
   defaults:
-    _entity_form: 'event_type.delete'
+    _entity_form: 'rng_event_type.delete'
     _title: 'Delete event type'
   requirements:
     _permission: 'administer event types'
 
-entity.event_type.access_defaults:
-  path: '/admin/structure/rng/event_types/manage/{event_type}/access_defaults'
+entity.rng_event_type.access_defaults:
+  path: '/admin/structure/rng/event_types/manage/{rng_event_type}/access_defaults'
   defaults:
-    _entity_form: 'event_type.event_access_defaults'
+    _entity_form: 'rng_event_type.event_access_defaults'
     _title: 'Event type access defaults'
   requirements:
     _permission: 'administer event types'
 
-entity.event_type.field_mapping:
-  path: '/admin/structure/rng/event_types/manage/{event_type}/field_mapping'
+entity.rng_event_type.field_mapping:
+  path: '/admin/structure/rng/event_types/manage/{rng_event_type}/field_mapping'
   defaults:
-    _entity_form: 'event_type.field_mapping'
+    _entity_form: 'rng_event_type.field_mapping'
     _title: 'Field mapping'
   requirements:
     _permission: 'administer event types'
 
-entity.event_type.access_defaults.delete_all:
-  path: '/admin/structure/rng/event_types/manage/{event_type}/access_defaults/delete'
+entity.rng_event_type.access_defaults.delete_all:
+  path: '/admin/structure/rng/event_types/manage/{rng_event_type}/access_defaults/delete'
   defaults:
     _form: '\Drupal\rng\Form\EventTypeRuleDeleteAll'
     _title: 'Delete all event custom rules'
@@ -179,11 +179,11 @@ entity.event_type.access_defaults.delete_all:
       rng_event_type_rule:
         type: 'entity:rng_event_type_rule'
 
-rng.event_type.overview:
+rng.rng_event_type.overview:
   path: '/admin/structure/rng/event_types'
   defaults:
     _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
-    entity_type: 'event_type'
+    entity_type: 'rng_event_type'
     _title: 'Event types'
   requirements:
     _permission: 'administer event types'

@@ -36,7 +36,7 @@ class EventManager implements EventManagerInterface {
    *   The entity manager.
    */
   function __construct(EntityManagerInterface $entity_manager) {
-    $this->eventTypeStorage = $entity_manager->getStorage('event_type');
+    $this->eventTypeStorage = $entity_manager->getStorage('rng_event_type');
   }
 
   /**
