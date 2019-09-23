@@ -4,7 +4,8 @@ namespace Drupal\rng\AccessControl;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
-use Drupal\rng\Entity\RegistrationType;
+use Drupal\rng\Event\RegistrationAccessEvent;
+use Drupal\rng\Event\RegistrationEvents;
 use Drupal\rng\RuleGrantsOperationTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -28,11 +29,19 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
   protected $eventManager;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(EntityTypeInterface $entity_type) {
     parent::__construct($entity_type);
     $this->eventManager = \Drupal::service('rng.event_manager');
+    $this->eventDispatcher = \Drupal::service('event_dispatcher');
   }
 
   /**
@@ -89,29 +98,9 @@ class RegistrationAccessControlHandler extends EntityAccessControlHandler {
     $account = $this->prepareUser($account);
 
     try {
-      $event_meta = $this->eventManager->getMeta($event);
-
-      // $entity_bundle is omitted for registration type list at
-      // $event_path/register
-      if ($entity_bundle && ($registration_type = RegistrationType::load($entity_bundle))) {
-        if (!$event_meta->registrationTypeIsValid($registration_type)) {
-          return $fail;
-        }
-      }
-      // There are no registration types configured.
-      elseif (!$event_meta->getRegistrationTypeIds()) {
-        return $fail;
-      }
-
-      if (!$event_meta->isAcceptingRegistrations()) {
-        return $fail;
-      }
-
-      if ($event_meta->remainingCapacity() == 0) {
-        return $fail;
-      }
-
-      if (!$event_meta->canRegisterProxyIdentities()) {
+      $event = new RegistrationAccessEvent($entity_bundle, $account, $context);
+      $this->eventDispatcher->dispatch(RegistrationEvents::REGISTRATION_CREATE_ACCESS, $event);
+      if (!$event->isAccessAllowed()) {
         return $fail;
       }
 

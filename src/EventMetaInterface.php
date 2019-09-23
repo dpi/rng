@@ -138,6 +138,14 @@ interface EventMetaInterface {
   public function remainingCapacity();
 
   /**
+   * Checks if a registrant is allowed to register on a wait list on this event.
+   *
+   * @return bool
+   *   Whether wait list registrations are allowed.
+   */
+  public function allowWaitList();
+
+  /**
    * Get minimum number of registrants allowed per registration.
    *
    * @return integer

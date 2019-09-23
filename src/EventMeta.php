@@ -220,6 +220,13 @@ class EventMeta implements EventMetaInterface {
   /**
    * {@inheritdoc}
    */
+  public function allowWaitList() {
+    return (bool) $this->getEvent()->{EventManagerInterface::FIELD_WAIT_LIST}->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRegistrantsMinimum() {
     if (isset($this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM})) {
       $field = $this->getEvent()->{EventManagerInterface::FIELD_REGISTRATION_REGISTRANTS_MINIMUM};

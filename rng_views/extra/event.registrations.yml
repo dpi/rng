@@ -241,7 +241,21 @@ display:
           entity_type: registration
           plugin_id: entity_operations
       filters: {  }
-      sorts: {  }
+      sorts:
+        id:
+          id: id
+          table: registration_field_data
+          field: id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: false
+          expose:
+            label: ''
+          entity_type: registration
+          entity_field: id
+          plugin_id: standard
       title: Registrations
       header: {  }
       footer: {  }
@@ -309,15 +323,56 @@ display:
       display_extenders: {  }
     cache_metadata:
       contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url
-        - user
+      - 'languages:language_content'
+      - 'languages:language_interface'
+      - url
       cacheable: false
+      max-age: -1
+      tags: {  }
+  attachment_1:
+    display_plugin: attachment
+    id: attachment_1
+    display_title: 'Waitlisted Registrations'
+    position: 2
+    display_options:
+      display_extenders:
+        views_advanced_routing_route:
+          route: ''
+      display_description: ''
+      title: 'Waitlisted Registrations'
+      defaults:
+        title: false
+        empty: false
+      pager:
+        type: none
+        options:
+          offset: 0
+      attachment_position: after
+      displays:
+        page_1: page_1
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content: 'No waitlisted registrations.'
+          plugin_id: text_custom
+    cache_metadata:
+      max-age: -1
+      contexts:
+      - 'languages:language_content'
+      - 'languages:language_interface'
+      - url
+      tags: {  }
   page_1:
     display_plugin: page
     id: page_1
-    display_title: 'My Page'
+    display_title: Registrations
     position: 1
     display_options:
       display_extenders:
@@ -344,8 +399,9 @@ display:
       display_description: ''
     cache_metadata:
       contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url
-        - user
+      - 'languages:language_content'
+      - 'languages:language_interface'
+      - url
       cacheable: false
+      max-age: -1
+      tags: {  }

@@ -52,6 +52,12 @@ function rng_add_event_field_storage($field_name, $entity_type) {
       );
       break;
 
+    case EventManagerInterface::FIELD_WAIT_LIST:
+      $definition = [
+        'type' => 'boolean',
+      ];
+      break;
+
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
       $definition = array(
         'type' => 'email',
@@ -125,6 +131,17 @@ function rng_event_field_config_definition($field_name) {
           'min' => 1,
         ),
       );
+      break;
+
+    case EventManagerInterface::FIELD_WAIT_LIST:
+      $definition = [
+        'label' => 'Allow a wait list',
+        'description' => t('Allow a waiting list for the event.'),
+        'settings' => [
+          'on_label' => t('Allow a waiting list for this event'),
+          'off_label' => t('Do not allow a waiting list for this event'),
+        ],
+      ];
       break;
 
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
@@ -233,6 +250,12 @@ function rng_add_event_form_display_defaults(EntityFormDisplayInterface $form_di
       $form_display->setComponent($field_name, array(
         'type' => 'unlimited_number',
       ));
+      break;
+
+    case EventManagerInterface::FIELD_WAIT_LIST:
+      $form_display->setComponent($field_name, [
+        'type' => 'boolean_checkbox',
+      ]);
       break;
 
     case EventManagerInterface::FIELD_EMAIL_REPLY_TO:
