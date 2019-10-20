@@ -3,6 +3,7 @@
 namespace Drupal\Tests\rng\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\rng\Entity\EventType;
 use Drupal\rng\Entity\Registrant;
 use Drupal\simpletest\UserCreationTrait;
 use Drupal\rng\Entity\Registration;
@@ -96,6 +97,43 @@ class RngRegistrationEntityTest extends RngKernelTestBase {
     $this->assertEquals(get_class($user1), get_class($registrant->getIdentity()), 'Identity class is same');
     $this->assertEquals($user1->getEntityTypeId(), $registrant->getIdentity()->getEntityTypeId(), 'Identity entity type is same');
     $this->assertEquals($user1->id(), $registrant->getIdentity()->id(), 'Identity ID is same');
+  }
+
+  /**
+   * Test creating a registration for an event type that exceeds 32 characters.
+   */
+  public function testLongEventTypeRegistration() {
+    $event_type = $this->createEventTypeBase([
+      'bundle' => 'event_type_over_32_characters',
+    ]);
+    $event = $this->createEvent();
+    $registration = Registration::create([
+      'type' => $event_type->id(),
+    ]);
+    $registration->setEvent($event->getEvent());
+    $user1 = $this->drupalCreateUser();
+    $registration
+      ->addIdentity($user1)
+      ->save();
+  }
+
+  /**
+   * Create a event type with only required info.
+   *
+   * @param array $values
+   *   Default values to use when creating the event type.
+   *
+   * @return \Drupal\rng\EventTypeInterface
+   *   An new event type entity.
+   */
+  protected function createEventTypeBase($values = []) {
+    $event_type = EventType::create($values + [
+        'id' => $this->randomMachineName(33),
+        'label' => $this->randomMachineName(),
+        'entity_type' => 'entity_test',
+        'bundle' => 'entity_test',
+      ]);
+    return $event_type;
   }
 
 }
