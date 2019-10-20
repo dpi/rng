@@ -29,6 +29,7 @@ class CurrentTime extends ConditionPluginBase {
   public function defaultConfiguration() {
     return [
       'date' => NULL,
+      'enable' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -55,6 +56,12 @@ class CurrentTime extends ConditionPluginBase {
       '#weight' => 50,
     );
 
+    $form['enable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable this condition?'),
+      '#default_value' => $this->getConfiguration()['enable'],
+    ];
+
     $form['negate'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Timing'),
@@ -74,13 +81,15 @@ class CurrentTime extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Disable saving this plugin if it is not actively enabled.
+    $enabled = $form_state->getValue('enable');
+    if (!$enabled) {
+      return;
+    }
+    $this->setConfig('enable', $enabled);
+    $this->setConfig('date', $form_state->getValue('date')->format('U'));
     parent::submitConfigurationForm($form, $form_state);
-    if ($date = $form_state->getValue('date')) {
-      $this->configuration['date'] = $date->format('U');
-    }
-    else {
-      $this->configuration['date'] = NULL;
-    }
+
   }
 
   /**
